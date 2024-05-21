@@ -1,0 +1,134 @@
+---
+title: "TICQ"
+subtitle: "Total Ion Current Quality Assessment for Mass Spectrometry Spectral Data"
+author: "Vimalnath Nambiar and Shabarinath Nambiar"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output: 
+  html_notebook:
+    toc: true
+    toc_float: true
+    toc_depth: 6
+    theme: paper
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 6
+    theme: paper
+params:
+    input: NULL
+    metadata: NULL
+    chromatogramRegion: NULL
+    targetFile: NULL
+    anpcMethodLibrary: NULL
+    roundDecimal: NULL
+    anonymiserStatus: FALSE
+---
+
+# Configuration Parameters {.tabset}
+Parameters configured for TICQ assessment.
+```{r, echo = FALSE, warning = FALSE, include = FALSE}
+# Load (and install missing) packages
+library(roxygen2)
+library(devtools)
+
+roxygen2::roxygenise("../.")
+devtools::load_all("../.")
+ticq::loadPackage(packageList = c("DT", "dplyr"))
+
+# Input data
+input <- params$input
+metadata <- params$metadata
+
+# Chromatogram region to splice
+chromatogramRegion <- params$chromatogramRegion
+
+# Method / Target Data
+targetFile <- params$targetFile
+anpcMethodLibrary <- params$anpcMethodLibrary
+roundDecimal <- params$roundDecimal
+
+# Anonymise data?
+anonymiserStatus <- params$anonymiserStatus
+```
+
+```{r, echo = FALSE, warning = FALSE, include = FALSE}
+# Identify path to historical data (Method-specific)
+historicalDataPath <- paste0(getwd(), "/hist/")
+if (anpcMethodLibrary == "MS-AA-POS") {
+  historicalDataPath <- paste0(historicalDataPath, "MS-AA-POS.rds")
+} else if (anpcMethodLibrary == "MS-HIL-POS") {
+  historicalDataPath <- paste0(historicalDataPath, "MS-HIL-POS.rds")
+} else if (anpcMethodLibrary == "MS-HIL-NEG") {
+  historicalDataPath <- paste0(historicalDataPath, "MS-HIL-NEG.rds")
+} else if (anpcMethodLibrary == "MS-RP-POS") {
+  historicalDataPath <- paste0(historicalDataPath, "MS-RP-POS.rds")
+} else if (anpcMethodLibrary == "MS-RP-NEG") {
+  historicalDataPath <- paste0(historicalDataPath, "MS-RP-NEG.rds")
+} else {
+  historicalDataPath <- NULL
+}
+
+# Extract target m/z from target file or in-house ANPC method library
+targetMZ <- ticq::extractTargetMZ(targetFile = targetFile,
+                                  anpcMethodLibrary = anpcMethodLibrary,
+                                  roundDecimal = roundDecimal)
+
+# Clean environment
+rm(targetFile, anpcMethodLibrary)
+```
+
+## Input
+```{r, echo = FALSE, warning = FALSE}
+# Display input path
+print(input)
+```
+
+## Chromatogram Region
+```{r, echo = FALSE, warning = FALSE}
+# Display chromatogram regions
+print(chromatogramRegion)
+```
+
+## Target m/z
+```{r, echo = FALSE, warning = FALSE}
+if (!is.null(targetMZ)) {
+  # Display number of decimal used for precision value rounding
+  if (!is.null(roundDecimal)) {
+    print(paste("NOTE: Target m/z values rounded to", roundDecimal, "decimal place(s)"))
+  } else {
+    print("NOTE: Using DEFAULT precision length for target m/z values")
+  }
+
+  # Display target m/z data
+  DT::datatable(data = targetMZ,
+                filter = "top",
+                options = list(scrollX = TRUE))
+} else {
+  print("No available target m/z data")
+}
+```
+
+# Input Check
+Input specified is validated for the presence of JSON file(s) to be extracted and assessed.
+```{r, echo = FALSE, warning = FALSE}
+# Retrieve file list
+inputFiles <- ticq::retrieveFileList(input = input, fileExtension = "JSON")
+
+# Display number of JSON files to process
+print(paste("Number of JSON files to process:", length(inputFiles)))
+if (length(inputFiles) > 0) {
+  newStatus <- TRUE
+} else {
+  newStatus <- FALSE
+  
+  # Clean environment
+  rm(input, inputFiles)
+}
+```
+
+# Spectral Data Extraction
+Spectral data is extracted from JSON file(s) retrieved from input. 
+```{r, echo = FALSE, warning = FALSE}
+
+```
+
