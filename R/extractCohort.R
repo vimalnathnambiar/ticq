@@ -53,8 +53,6 @@ extractCohort <- function(input) {
     grepl("preserve", input) ~ "Preserve",
     grepl("ipf", input) ~ "IPF",
     grepl("colchicin", input) ~ "Colchicin Chile",
-    grepl("neg", input) ~ "Negative",
-    grepl("pos", input) ~ "Positive",
     grepl("C1", input) ~ "C1",
     grepl("C2", input) ~ "C2",
     grepl("C3", input) ~ "C3",

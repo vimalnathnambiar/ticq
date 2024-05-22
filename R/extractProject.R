@@ -44,8 +44,6 @@ extractProject <- function(input) {
     grepl("comet|COM", input) ~ "Comet Toxicology Project",
     grepl("performance|HPP", input) ~ "Human Performance Project",
     grepl("bioreactor|BRX", input) ~ "Bioreactor",
-    # grepl("HIL", input) ~ "HILIC",
-    # grepl("RP", input) ~ "Reversed Phase",
     grepl("intersalt|IST", input) ~ "Intersalt",
     grepl("studentProjects|STD", input) ~ "Student Projects",
     TRUE ~ NA_character_

@@ -31,6 +31,7 @@ extractTargetMZ <- function(targetFile = NULL,
   if (!is.null(targetFile)) {
     # Check for published to web URL or local file path (TSV document)
     if (grepl("^(?:http|https)://[^ \"]+&output=tsv$", targetFile, ignore.case = TRUE)) {
+      # Perform HTTP request
       response <- tryCatch(httr::GET(targetFile),
                            warning = function(w) NULL,
                            error = function(e) NULL)
@@ -51,38 +52,19 @@ extractTargetMZ <- function(targetFile = NULL,
                            error = function(e) NULL)
     }
   } else if (!is.null(anpcMethodLibrary)) {
+    urlList <- list("MS-AA-POS" = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSeo31hlruA3QuwoESz5IDJ9Nu6ndSAgLTRn3uc45rOPO4BlksfHzh9xtNB22Oes9JOxhEbI4NK-zxl/pub?gid=0&single=true&output=tsv",
+                    "MS-HIL-POS" = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSeo31hlruA3QuwoESz5IDJ9Nu6ndSAgLTRn3uc45rOPO4BlksfHzh9xtNB22Oes9JOxhEbI4NK-zxl/pub?gid=1628071829&single=true&output=tsv",
+                    "MS-HIL-NEG" = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSeo31hlruA3QuwoESz5IDJ9Nu6ndSAgLTRn3uc45rOPO4BlksfHzh9xtNB22Oes9JOxhEbI4NK-zxl/pub?gid=1082422270&single=true&output=tsv",
+                    "MS-RP-POS" = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSeo31hlruA3QuwoESz5IDJ9Nu6ndSAgLTRn3uc45rOPO4BlksfHzh9xtNB22Oes9JOxhEbI4NK-zxl/pub?gid=1641228752&single=true&output=tsv",
+                    "MS-RP-NEG" = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSeo31hlruA3QuwoESz5IDJ9Nu6ndSAgLTRn3uc45rOPO4BlksfHzh9xtNB22Oes9JOxhEbI4NK-zxl/pub?gid=311622861&single=true&output=tsv")
+      
     # Check if one of the ANPC method libraries is specified
-    if (anpcMethodLibrary == "MS-AA-POS") {
-      response <- tryCatch(httr::GET("https://docs.google.com/spreadsheets/d/e/2PACX-1vSeo31hlruA3QuwoESz5IDJ9Nu6ndSAgLTRn3uc45rOPO4BlksfHzh9xtNB22Oes9JOxhEbI4NK-zxl/pub?gid=0&single=true&output=tsv"),
+    if (anpcMethodLibrary %in% names(urlList)) {
+      # Perform HTTP request
+      response <- tryCatch(httr::GET(urlList[[anpcMethodLibrary]]),
                            warning = function(w) NULL,
                            error = function(e) NULL)
-    } else if (anpcMethodLibrary == "MS-HIL-POS") {
-      response <- tryCatch(httr::GET("https://docs.google.com/spreadsheets/d/e/2PACX-1vSeo31hlruA3QuwoESz5IDJ9Nu6ndSAgLTRn3uc45rOPO4BlksfHzh9xtNB22Oes9JOxhEbI4NK-zxl/pub?gid=1628071829&single=true&output=tsv"),
-                           warning = function(w) NULL,
-                           error = function(e) NULL)
-    } else if (anpcMethodLibrary == "MS-HIL-NEG") {
-      response <- tryCatch(httr::GET("https://docs.google.com/spreadsheets/d/e/2PACX-1vSeo31hlruA3QuwoESz5IDJ9Nu6ndSAgLTRn3uc45rOPO4BlksfHzh9xtNB22Oes9JOxhEbI4NK-zxl/pub?gid=1082422270&single=true&output=tsv"),
-                           warning = function(w) NULL,
-                           error = function(e) NULL)
-    } else if (anpcMethodLibrary == "MS-RP-POS") {
-      response <- tryCatch(httr::GET("https://docs.google.com/spreadsheets/d/e/2PACX-1vSeo31hlruA3QuwoESz5IDJ9Nu6ndSAgLTRn3uc45rOPO4BlksfHzh9xtNB22Oes9JOxhEbI4NK-zxl/pub?gid=1641228752&single=true&output=tsv"),
-                           warning = function(w) NULL,
-                           error = function(e) NULL)
-    } else if (anpcMethodLibrary == "MS-RP-NEG") {
-      response <- tryCatch(httr::GET("https://docs.google.com/spreadsheets/d/e/2PACX-1vSeo31hlruA3QuwoESz5IDJ9Nu6ndSAgLTRn3uc45rOPO4BlksfHzh9xtNB22Oes9JOxhEbI4NK-zxl/pub?gid=311622861&single=true&output=tsv"),
-                           warning = function(w) NULL,
-                           error = function(e) NULL)
-    } 
-    # else if (anpcMethodLibrary == "MS-UT-POS") {
-    #   response <- tryCatch(httr::GET("https://docs.google.com/spreadsheets/d/e/2PACX-1vSeo31hlruA3QuwoESz5IDJ9Nu6ndSAgLTRn3uc45rOPO4BlksfHzh9xtNB22Oes9JOxhEbI4NK-zxl/pub?gid=662696694&single=true&output=tsv"),
-    #                        warning = function(w) NULL,
-    #                        error = function(e) NULL)
-    # } else if (anpcMethodLibrary == "MS-UT-NEG") {
-    #   response <- tryCatch(httr::GET("https://docs.google.com/spreadsheets/d/e/2PACX-1vSeo31hlruA3QuwoESz5IDJ9Nu6ndSAgLTRn3uc45rOPO4BlksfHzh9xtNB22Oes9JOxhEbI4NK-zxl/pub?gid=1106522204&single=true&output=tsv"),
-    #                        warning = function(w) NULL,
-    #                        error = function(e) NULL)
-    # } 
-    else {
+    } else {
       response <- NULL
     }
     

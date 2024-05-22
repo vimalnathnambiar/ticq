@@ -1,5 +1,5 @@
 Package: ticq
-Title: Total Ion Current Quality Assessment for Mass Spectrometry Spectral Data
+Title: Total Ion Current Quality Assessment of Mass Spectrometry Spectral Data
 Version: 0.0.0.0
 Description: Quckly assess sample quality and instrument performance using total ion current (TIC) as the measurable unit to evaluate mass spectrometry (MS) spectral data.
 License: MIT + file LICENSE
@@ -17,4 +17,8 @@ Imports: rmarkdown,
   stringr,
   httr,
   readr,
-  DT
+  DT,
+  jsonlite,
+  ggplot2,
+  HotellingEllipse,
+  ggforce

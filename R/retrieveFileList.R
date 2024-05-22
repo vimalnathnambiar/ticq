@@ -28,12 +28,12 @@ retrieveFileList <- function(input, fileExtension = NULL) {
     } else {
       if (!is.null(fileExtension)) {
         if (grepl(paste0("\\.", fileExtension, "$"), input, ignore.case = TRUE)) {
-          inputFiles <- input
+          inputFiles <- basename(input)
         } else {
           inputFiles <- character(0)
         }
       } else {
-        inputFiles <- input
+        inputFiles <- basename(input)
       }
     }
   } else {

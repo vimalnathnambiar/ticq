@@ -52,5 +52,8 @@ rsconnect/
 *.nb.html
 *.html
 
+# Output files
+out/*
+
 # macOS DS Store
 .DS_Store
