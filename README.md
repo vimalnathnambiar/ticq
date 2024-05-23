@@ -1,1 +1,1 @@
-# ticq
+# TICQ

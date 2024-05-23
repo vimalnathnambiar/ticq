@@ -1,6 +1,6 @@
 #' plotPCA
 #' 
-#' Plot data generated from Principle Component Analysis (PCA): Scree plot, scores plot, loadings plot and biplot..
+#' Plot data generated from Principle Component Analysis (PCA): Scree plot, scores plot, loadings plot and biplot.
 #' 
 #' @import ggplot2
 #' @import HotellingEllipse
@@ -14,8 +14,14 @@
 #' @param confidence Confidence value of the data (Default: 95): double
 #' @param distribution Add distribution boundaries to the PCA scores plot (Default: NULL, Options: "normal" or "t"): NULL or character
 #' @param colour The name of the column that will be used to colour categorise the data (Default: NULL): NULL or character
+#' @param shape The name of the column that will be used to shape categorise the data (Default: NULL): NULL or character
 #' @param subtitle The subtitle for the plot (Default: NULL): NULL or character
-#' @param legend Legend label that represents the different colour categories (Default: the name of the column used to colour categorise the data): NULL or character
+#' @param colourLegend Legend label that represents the different colour categories (Default: the name of the column used to colour categorise the data): NULL or character
+#' @param shapeLegend Legend label that represents the different shape categories (Default: the name of the column used to shape categorise the data): NULL or character
+#' @param screePlt Toggle to display scree plot (Default: FALSE, Options: TRUE or FALSE): boolean 
+#' @param scoresPlt Toggle to display scpres plot (Default: FALSE, Options: TRUE or FALSE): boolean 
+#' @param loadingsPlt Toggle to display laodings plot (Default: FALSE, Options: TRUE or FALSE): boolean 
+#' @param biPlt Toggle to display biplot (Default: FALSE, Options: TRUE or FALSE): boolean 
 plotPCA <- function(data,
                     startIDX,
                     endIDX = NULL,
@@ -23,8 +29,10 @@ plotPCA <- function(data,
                     confidence = 95,
                     distribution = NULL,
                     colour = NULL,
+                    shape = NULL,
                     subtitle = NULL,
-                    legend = NULL,
+                    colourLegend = colour,
+                    shapeLegend = shape,
                     screePlt = FALSE,
                     scoresPlt = FALSE,
                     loadingsPlt = FALSE,
@@ -108,15 +116,30 @@ plotPCA <- function(data,
                                           aes(x = .data[[paste0("PC", i)]],
                                               y = .data[[paste0("PC", j)]]))
             
-              # If colour is NULL
+            
+              # Set colour and shapes
               if (is.null(colour)) {
-                scoresPlot <- scoresPlot + 
-                  ggplot2::geom_point(alpha = 0.25)
+                if (is.null(shape)) {
+                  scoresPlot <- scoresPlot +
+                    ggplot2::geom_point(alpha = 0.25)
+                } else {
+                  scoresPlot <- scoresPlot +
+                    ggplot2::geom_point(aes(shape = data[[shape]]),
+                                        alpha = 0.25)
+                }
               } else {
-                scoresPlot <- scoresPlot +
-                  ggplot2::geom_point(aes(colour = data[[colour]],
-                                          group = ifelse(data[[colour]] == "Historical", 1, 2)),
-                                      alpha = 0.25)
+                if (is.null(shape)) {
+                  scoresPlot <- scoresPlot +
+                    ggplot2::geom_point(aes(colour = data[[colour]],
+                                            group = ifelse(data[[colour]] == "Historical", 1, 2)),
+                                        alpha = 0.25)
+                } else {
+                  scoresPlot <- scoresPlot +
+                    ggplot2::geom_point(aes(colour = data[[colour]],
+                                            shape = data[[shape]],
+                                            group = ifelse(data[[colour]] == "Historical", 1, 2)),
+                                        alpha = 0.25)
+                }
               }
               
               # Add lines
@@ -151,7 +174,8 @@ plotPCA <- function(data,
                               subtitle = subtitle,
                               x = paste0("PC", i, " [", round(pca$importance[2, i] * 100, 2), "%]"),
                               y = paste0("PC", j, " [", round(pca$importance[2, j] * 100, 2), "%]"),
-                              colour = legend,
+                              colour = colourLegend,
+                              shape = shapeLegend,
                               caption = paste0("Hotelling T² Ellipse (Blue: 95% Confidence; Red: 99% Confidence)"))
               
               # Add distribution at a specific confidence
@@ -205,12 +229,7 @@ plotPCA <- function(data,
                                  aes(x = .data[[paste0("PC", i)]], 
                                      y = .data[[paste0("PC", j)]], 
                                      label = row.names(loading))) + 
-              ggplot2::labs(title = "PCA Biplot",
-                            subtitle = subtitle,
-                            x = paste0("PC", i, " [", round(pca$importance[2, i] * 100, 2), "%]"),
-                            y = paste0("PC", j, " [", round(pca$importance[2, j] * 100, 2), "%]"),
-                            colour = legend,
-                            caption = paste0("Hotelling T² Ellipse (Blue: 95% Confidence; Red: 99% Confidence)"))
+              ggplot2::labs(title = "PCA Biplot")
             
               if (biPlt == TRUE) {
                 print(biplot)

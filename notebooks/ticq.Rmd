@@ -1,5 +1,5 @@
 ---
-title: "TICQ"
+title: "TICQ Report"
 subtitle: "Total Ion Current Quality Assessment of Mass Spectrometry Spectral Data"
 author: "Vimalnath Nambiar and Shabarinath Nambiar"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
@@ -47,11 +47,14 @@ roundDecimal <- 4
 
 # Anonymise data?
 anonymiserStatus <- params$anonymiserStatus
+
+# Clean environment
+rm(params)
 ```
 
 ```{r, echo = FALSE, warning = FALSE, include = FALSE}
 # Identify path to historical data (Method-specific)
-historicalDataPath <- paste0(getwd(), "/../hist/")
+historicalDataPath <- paste0(getwd(), "/../data/historical/")
 if (!is.null(anpcMethodLibrary)) {
   switch(anpcMethodLibrary,
          "MS-AA-POS" = historicalDataPath <- paste0(historicalDataPath, "MS-AA-POS.rds"),
@@ -134,7 +137,7 @@ if (newStatus) {
   # Check new sample status (and save data if TRUE)
   if (nrow(passedData) != 0) {
     newStatus <- TRUE
-    saveRDS(passedData, file = paste0(getwd(), "/../out/raw.rds"))
+    saveRDS(passedData, file = paste0(getwd(), "/../data/raw.rds"))
   } else {
     newStatus <- FALSE
   }
@@ -154,7 +157,6 @@ if (newStatus) {
   print("Spectral data extraction not performed: No data files available for extraction")
 }
 ```
-
 
 ```{r, echo = FALSE, warning = FALSE, include = FALSE}
 # If there is new samples to process
@@ -358,14 +360,16 @@ if (newStatus) {
     # Dynamically select column to be used for colour grouping of plots
     if (length(unique(plotData[[projectCohort]])) > 1) {
       colour <- projectCohort
-      legend <- "Project"
-    } else if (length(unique(plotData[[plate]])) > 1) {
-      colour <- plate
-      legend <- "Plate"
+      colourLegend <- "Project"
     } else {
-      colour <- sampleType
-      legend <- "Sample Type"
+      colour <- plate
+      colourLegend <- "Plate"
     }
+    
+    # Column to be used for shape grouping of plots
+    shape <- sampleType
+    shapeLegend <- "Sample Type"
+
   } else {
     msStatus <- FALSE
     print("Unable to generate Total Ion Chromatogram: No available MS level 1 spectral data")
@@ -401,7 +405,7 @@ if (newStatus && msStatus) {
                                subtitle = paste("LTR", i),
                                labelX = labelX,
                                labelY = labelY,
-                               legend = legend,
+                               legend = colourLegend,
                                chromatogramRegion = chromatogramRegion)
       }
       
@@ -437,7 +441,7 @@ if (newStatus && msStatus) {
                                subtitle = i,
                                labelX = labelX,
                                labelY = labelY,
-                               legend = legend,
+                               legend = colourLegend,
                                chromatogramRegion = chromatogramRegion)
       }
     }
@@ -470,7 +474,7 @@ if (newStatus && msStatus) {
                                subtitle = i,
                                labelX = labelX,
                                labelY = labelY,
-                               legend = legend,
+                               legend = colourLegend,
                                chromatogramRegion = chromatogramRegion)
       }
     }
@@ -503,7 +507,7 @@ if (newStatus && msStatus) {
                                subtitle = i,
                                labelX = labelX,
                                labelY = labelY,
-                               legend = legend,
+                               legend = colourLegend,
                                chromatogramRegion = chromatogramRegion)
       }
     }
@@ -536,7 +540,7 @@ if (newStatus && msStatus) {
                                subtitle = i,
                                labelX = labelX,
                                labelY = labelY,
-                               legend = legend,
+                               legend = colourLegend,
                                chromatogramRegion = chromatogramRegion)
       }
     }
@@ -569,7 +573,7 @@ if (newStatus && msStatus) {
                                subtitle = i,
                                labelX = labelX,
                                labelY = labelY,
-                               legend = legend,
+                               legend = colourLegend,
                                chromatogramRegion = chromatogramRegion)
       }
     }
@@ -602,16 +606,13 @@ if (newStatus && msStatus) {
                                subtitle = i,
                                labelX = labelX,
                                labelY = labelY,
-                               legend = legend,
+                               legend = colourLegend,
                                chromatogramRegion = chromatogramRegion)
       }
     }
   } else {
     print("No available data")
   }
-  
-  # # Clean environment
-  # rm(title, labelX, labelY, pattern, i)
 }
 ```
 
@@ -638,7 +639,7 @@ if (newStatus && msStatus) {
                                subtitle = i,
                                labelX = labelX,
                                labelY = labelY,
-                               legend = legend,
+                               legend = colourLegend,
                                chromatogramRegion = chromatogramRegion)
       }
     }
@@ -671,7 +672,7 @@ if (newStatus && msStatus) {
                                subtitle = i,
                                labelX = labelX,
                                labelY = labelY,
-                               legend = legend,
+                               legend = colourLegend,
                                chromatogramRegion = chromatogramRegion)
       }
     }
@@ -737,8 +738,10 @@ if (newStatus && msStatus) {
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
                   colour = colour,
+                  shape = shape,
                   subtitle = "LTR Plasma",
-                  legend = legend,
+                  colourLegend = colourLegend,
+                  shapeLegend = shapeLegend,
                   screePlt = screePlt,
                   scoresPlt = scoresPlt,
                   loadingsPlt = loadingsPlt,
@@ -763,8 +766,10 @@ if (newStatus && msStatus) {
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
                   colour = colour,
+                  shape = shape,
                   subtitle = "LTR Serum",
-                  legend = legend,
+                  colourLegend = colourLegend,
+                  shapeLegend = shapeLegend,
                   screePlt = screePlt,
                   scoresPlt = scoresPlt,
                   loadingsPlt = loadingsPlt,
@@ -789,8 +794,10 @@ if (newStatus && msStatus) {
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
                   colour = colour,
+                  shape = shape,
                   subtitle = "LTR Urine",
-                  legend = legend,
+                  colourLegend = colourLegend,
+                  shapeLegend = shapeLegend,
                   screePlt = screePlt,
                   scoresPlt = scoresPlt,
                   loadingsPlt = loadingsPlt,
@@ -816,8 +823,10 @@ if (newStatus && msStatus) {
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
                   colour = colour,
+                  shape = shape,
                   subtitle = pattern,
-                  legend = legend,
+                  colourLegend = colourLegend,
+                  shapeLegend = shapeLegend,
                   screePlt = screePlt,
                   scoresPlt = scoresPlt,
                   loadingsPlt = loadingsPlt,
@@ -842,8 +851,10 @@ if (newStatus && msStatus) {
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
                   colour = colour,
+                  shape = shape,
                   subtitle = pattern,
-                  legend = legend,
+                  colourLegend = colourLegend,
+                  shapeLegend = shapeLegend,
                   screePlt = screePlt,
                   scoresPlt = scoresPlt,
                   loadingsPlt = loadingsPlt,
@@ -868,8 +879,10 @@ if (newStatus && msStatus) {
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
                   colour = colour,
+                  shape = shape,
                   subtitle = pattern,
-                  legend = legend,
+                  colourLegend = colourLegend,
+                  shapeLegend = shapeLegend,
                   screePlt = screePlt,
                   scoresPlt = scoresPlt,
                   loadingsPlt = loadingsPlt,
@@ -895,8 +908,10 @@ if (newStatus && msStatus) {
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
                   colour = colour,
+                  shape = shape,
                   subtitle = pattern,
-                  legend = legend,
+                  colourLegend = colourLegend,
+                  shapeLegend = shapeLegend,
                   screePlt = screePlt,
                   scoresPlt = scoresPlt,
                   loadingsPlt = loadingsPlt,
@@ -921,8 +936,10 @@ if (newStatus && msStatus) {
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
                   colour = colour,
+                  shape = shape,
                   subtitle = pattern,
-                  legend = legend,
+                  colourLegend = colourLegend,
+                  shapeLegend = shapeLegend,
                   screePlt = screePlt,
                   scoresPlt = scoresPlt,
                   loadingsPlt = loadingsPlt,
@@ -947,8 +964,10 @@ if (newStatus && msStatus) {
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
                   colour = colour,
+                  shape = shape,
                   subtitle = pattern,
-                  legend = legend,
+                  colourLegend = colourLegend,
+                  shapeLegend = shapeLegend,
                   screePlt = screePlt,
                   scoresPlt = scoresPlt,
                   loadingsPlt = loadingsPlt,
@@ -974,8 +993,10 @@ if (newStatus && msStatus) {
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
                   colour = colour,
+                  shape = shape,
                   subtitle = pattern,
-                  legend = legend,
+                  colourLegend = colourLegend,
+                  shapeLegend = shapeLegend,
                   screePlt = screePlt,
                   scoresPlt = scoresPlt,
                   loadingsPlt = loadingsPlt,
@@ -1000,8 +1021,10 @@ if (newStatus && msStatus) {
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
                   colour = colour,
+                  shape = shape,
                   subtitle = pattern,
-                  legend = legend,
+                  colourLegend = colourLegend,
+                  shapeLegend = shapeLegend,
                   screePlt = screePlt,
                   scoresPlt = scoresPlt,
                   loadingsPlt = loadingsPlt,
@@ -1026,8 +1049,10 @@ if (newStatus && msStatus) {
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
                   colour = colour,
+                  shape = shape,
                   subtitle = pattern,
-                  legend = legend,
+                  colourLegend = colourLegend,
+                  shapeLegend = shapeLegend,
                   screePlt = screePlt,
                   scoresPlt = scoresPlt,
                   loadingsPlt = loadingsPlt,
@@ -1053,8 +1078,10 @@ if (newStatus && msStatus) {
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
                   colour = colour,
+                  shape = shape,
                   subtitle = pattern,
-                  legend = legend,
+                  colourLegend = colourLegend,
+                  shapeLegend = shapeLegend,
                   screePlt = screePlt,
                   scoresPlt = scoresPlt,
                   loadingsPlt = loadingsPlt,
@@ -1079,8 +1106,10 @@ if (newStatus && msStatus) {
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
                   colour = colour,
+                  shape = shape,
                   subtitle = pattern,
-                  legend = legend,
+                  colourLegend = colourLegend,
+                  shapeLegend = shapeLegend,
                   screePlt = screePlt,
                   scoresPlt = scoresPlt,
                   loadingsPlt = loadingsPlt,
@@ -1105,8 +1134,10 @@ if (newStatus && msStatus) {
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
                   colour = colour,
+                  shape = shape,
                   subtitle = pattern,
-                  legend = legend,
+                  colourLegend = colourLegend,
+                  shapeLegend = shapeLegend,
                   screePlt = screePlt,
                   scoresPlt = scoresPlt,
                   loadingsPlt = loadingsPlt,
@@ -1131,8 +1162,10 @@ if (newStatus && msStatus) {
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
                   colour = colour,
+                  shape = shape,
                   subtitle = pattern,
-                  legend = legend,
+                  colourLegend = colourLegend,
+                  shapeLegend = shapeLegend,
                   screePlt = screePlt,
                   scoresPlt = scoresPlt,
                   loadingsPlt = loadingsPlt,
@@ -1158,8 +1191,10 @@ if (newStatus && msStatus) {
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
                   colour = colour,
+                  shape = shape,
                   subtitle = pattern,
-                  legend = legend,
+                  colourLegend = colourLegend,
+                  shapeLegend = shapeLegend,
                   screePlt = screePlt,
                   scoresPlt = scoresPlt,
                   loadingsPlt = loadingsPlt,
@@ -1184,8 +1219,10 @@ if (newStatus && msStatus) {
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
                   colour = colour,
+                  shape = shape,
                   subtitle = pattern,
-                  legend = legend,
+                  colourLegend = colourLegend,
+                  shapeLegend = shapeLegend,
                   screePlt = screePlt,
                   scoresPlt = scoresPlt,
                   loadingsPlt = loadingsPlt,
@@ -1210,8 +1247,10 @@ if (newStatus && msStatus) {
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
                   colour = colour,
+                  shape = shape,
                   subtitle = pattern,
-                  legend = legend,
+                  colourLegend = colourLegend,
+                  shapeLegend = shapeLegend,
                   screePlt = screePlt,
                   scoresPlt = scoresPlt,
                   loadingsPlt = loadingsPlt,
@@ -1236,8 +1275,10 @@ if (newStatus && msStatus) {
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
                   colour = colour,
+                  shape = shape,
                   subtitle = pattern,
-                  legend = legend,
+                  colourLegend = colourLegend,
+                  shapeLegend = shapeLegend,
                   screePlt = screePlt,
                   scoresPlt = scoresPlt,
                   loadingsPlt = loadingsPlt,
@@ -1262,8 +1303,10 @@ if (newStatus && msStatus) {
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
                   colour = colour,
+                  shape = shape,
                   subtitle = pattern,
-                  legend = legend,
+                  colourLegend = colourLegend,
+                  shapeLegend = shapeLegend,
                   screePlt = screePlt,
                   scoresPlt = scoresPlt,
                   loadingsPlt = loadingsPlt,
@@ -1288,8 +1331,10 @@ if (newStatus && msStatus) {
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
                   colour = colour,
+                  shape = shape,
                   subtitle = pattern,
-                  legend = legend,
+                  colourLegend = colourLegend,
+                  shapeLegend = shapeLegend,
                   screePlt = screePlt,
                   scoresPlt = scoresPlt,
                   loadingsPlt = loadingsPlt,
@@ -1314,8 +1359,10 @@ if (newStatus && msStatus) {
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
                   colour = colour,
+                  shape = shape,
                   subtitle = pattern,
-                  legend = legend,
+                  colourLegend = colourLegend,
+                  shapeLegend = shapeLegend,
                   screePlt = screePlt,
                   scoresPlt = scoresPlt,
                   loadingsPlt = loadingsPlt,
@@ -1340,8 +1387,10 @@ if (newStatus && msStatus) {
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
                   colour = colour,
+                  shape = shape,
                   subtitle = pattern,
-                  legend = legend,
+                  colourLegend = colourLegend,
+                  shapeLegend = shapeLegend,
                   screePlt = screePlt,
                   scoresPlt = scoresPlt,
                   loadingsPlt = loadingsPlt,
@@ -1367,8 +1416,10 @@ if (newStatus && msStatus) {
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
                   colour = colour,
+                  shape = shape,
                   subtitle = pattern,
-                  legend = legend,
+                  colourLegend = colourLegend,
+                  shapeLegend = shapeLegend,
                   screePlt = screePlt,
                   scoresPlt = scoresPlt,
                   loadingsPlt = loadingsPlt,
@@ -1393,8 +1444,10 @@ if (newStatus && msStatus) {
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
                   colour = colour,
+                  shape = shape,
                   subtitle = pattern,
-                  legend = legend,
+                  colourLegend = colourLegend,
+                  shapeLegend = shapeLegend,
                   screePlt = screePlt,
                   scoresPlt = scoresPlt,
                   loadingsPlt = loadingsPlt,
@@ -1420,8 +1473,10 @@ if (newStatus && msStatus) {
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
                   colour = colour,
+                  shape = shape,
                   subtitle = "Sample Plasma",
-                  legend = legend,
+                  colourLegend = colourLegend,
+                  shapeLegend = shapeLegend,
                   screePlt = screePlt,
                   scoresPlt = scoresPlt,
                   loadingsPlt = loadingsPlt,
@@ -1446,8 +1501,10 @@ if (newStatus && msStatus) {
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
                   colour = colour,
+                  shape = shape,
                   subtitle = "Sample Serum",
-                  legend = legend,
+                  colourLegend = colourLegend,
+                  shapeLegend = shapeLegend,
                   screePlt = screePlt,
                   scoresPlt = scoresPlt,
                   loadingsPlt = loadingsPlt,
@@ -1472,8 +1529,10 @@ if (newStatus && msStatus) {
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
                   colour = colour,
+                  shape = shape,
                   subtitle = "Sample Urine",
-                  legend = legend,
+                  colourLegend = colourLegend,
+                  shapeLegend = shapeLegend,
                   screePlt = screePlt,
                   scoresPlt = scoresPlt,
                   loadingsPlt = loadingsPlt,
@@ -1499,8 +1558,10 @@ if (newStatus && msStatus) {
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
                   colour = colour,
+                  shape = shape,
                   subtitle = "dSample Plasma",
-                  legend = legend,
+                  colourLegend = colourLegend,
+                  shapeLegend = shapeLegend,
                   screePlt = screePlt,
                   scoresPlt = scoresPlt,
                   loadingsPlt = loadingsPlt,
@@ -1525,8 +1586,10 @@ if (newStatus && msStatus) {
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
                   colour = colour,
+                  shape = shape,
                   subtitle = "dSample Serum",
-                  legend = legend,
+                  colourLegend = colourLegend,
+                  shapeLegend = shapeLegend,
                   screePlt = screePlt,
                   scoresPlt = scoresPlt,
                   loadingsPlt = loadingsPlt,
@@ -1551,8 +1614,10 @@ if (newStatus && msStatus) {
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
                   colour = colour,
-                  subtitle = "dSample Urine",
-                  legend = legend,
+                  shape = shape,
+                  subtitle = "dSample Plasma",
+                  colourLegend = colourLegend,
+                  shapeLegend = shapeLegend,
                   screePlt = screePlt,
                   scoresPlt = scoresPlt,
                   loadingsPlt = loadingsPlt,

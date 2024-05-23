@@ -12,8 +12,10 @@ plotPCA(
   confidence = 95,
   distribution = NULL,
   colour = NULL,
+  shape = NULL,
   subtitle = NULL,
-  legend = NULL,
+  colourLegend = colour,
+  shapeLegend = shape,
   screePlt = FALSE,
   scoresPlt = FALSE,
   loadingsPlt = FALSE,
@@ -35,10 +37,22 @@ plotPCA(
 
 \item{colour}{The name of the column that will be used to colour categorise the data (Default: NULL): NULL or character}
 
+\item{shape}{The name of the column that will be used to shape categorise the data (Default: NULL): NULL or character}
+
 \item{subtitle}{The subtitle for the plot (Default: NULL): NULL or character}
 
-\item{legend}{Legend label that represents the different colour categories (Default: the name of the column used to colour categorise the data): NULL or character}
+\item{colourLegend}{Legend label that represents the different colour categories (Default: the name of the column used to colour categorise the data): NULL or character}
+
+\item{shapeLegend}{Legend label that represents the different shape categories (Default: the name of the column used to shape categorise the data): NULL or character}
+
+\item{screePlt}{Toggle to display scree plot (Default: FALSE, Options: TRUE or FALSE): boolean}
+
+\item{scoresPlt}{Toggle to display scpres plot (Default: FALSE, Options: TRUE or FALSE): boolean}
+
+\item{loadingsPlt}{Toggle to display laodings plot (Default: FALSE, Options: TRUE or FALSE): boolean}
+
+\item{biPlt}{Toggle to display biplot (Default: FALSE, Options: TRUE or FALSE): boolean}
 }
 \description{
-Plot data generated from Principle Component Analysis (PCA): Scree plot, scores plot, loadings plot and biplot..
+Plot data generated from Principle Component Analysis (PCA): Scree plot, scores plot, loadings plot and biplot.
 }

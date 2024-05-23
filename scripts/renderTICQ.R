@@ -10,7 +10,7 @@ metadata <- ticq::extractMetadata(input = input)
 
 # Configure parameters (Dynamically based on input metadata - ANPC specific)
   # Define output path
-  outputDir <- paste0(getwd(), "/out/")
+  outputDir <- paste0(getwd(), "/report/")
   
   # Chromatogram region
   timepoint <- list("MS-AA-POS" = list(massCalStart = 0, massCalEnd = 0.3, washStart = 5),
@@ -30,7 +30,7 @@ metadata <- ticq::extractMetadata(input = input)
 
 
 # Render TICQ R Markdown script
-rmarkdown::render(input = paste0(getwd(), "/nb/ticq.Rmd"),
+rmarkdown::render(input = paste0(getwd(), "/notebook/ticq.Rmd"),
                   output_format = "html_document",
                   output_dir = outputDir,
                   output_file = paste0(outputDir, 
