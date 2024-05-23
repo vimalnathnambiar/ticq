@@ -53,7 +53,7 @@ rm(params)
 ```
 
 ```{r, echo = FALSE, warning = FALSE, include = FALSE}
-# Identify path to historical data (Method-specific)
+# Identify path to historical data (In-house ANPC method library-specific)
 historicalDataPath <- paste0(getwd(), "/../data/historical/")
 if (!is.null(anpcMethodLibrary)) {
   switch(anpcMethodLibrary,
@@ -90,6 +90,7 @@ print(chromatogramRegion)
 
 ## Target m/z
 ```{r, echo = FALSE, warning = FALSE}
+# Check if target m/z data is available
 if (!is.null(targetMZ)) {
   # Display number of decimal used for precision value rounding
   if (!is.null(roundDecimal)) {
@@ -128,7 +129,7 @@ if (length(inputFiles) > 0) {
 # Spectral Data Extraction
 Spectral data is extracted from JSON file(s) retrieved from input. 
 ```{r, echo = FALSE, warning = FALSE}
-# If there are new samples to process
+# Check if there are new samples to process
 if (newStatus) {
   # Extract spectral data and metadata
   result <- ticq::extractSpectrum(input = input, inputFiles = inputFiles)
@@ -151,7 +152,7 @@ if (newStatus) {
   }
   
   # Clean environment
-  rm(input, inputFiles)
+  rm(input, inputFiles, result)
   invisible(gc())
 } else {
   print("Spectral data extraction not performed: No data files available for extraction")
@@ -159,10 +160,9 @@ if (newStatus) {
 ```
 
 ```{r, echo = FALSE, warning = FALSE, include = FALSE}
-# If there is new samples to process
+# If there are new samples to process
 if (newStatus) {
-  # Set column names of the extracted data as it can change in the future
-  # The following are common variables used throughout the script
+  # Set column names of the extracted data
   sampleID <- "sampleID"
   project <- "project"
   cohort <- "cohort"
@@ -187,7 +187,7 @@ if (newStatus) {
 ```
 
 ```{r, echo = FALSE, warning = FALSE, include = FALSE}
-# If there is new samples to process
+# If there are new samples to process and anonymiser status is TRUE
 if (newStatus && anonymiserStatus) {
   # Anonymise sample information
   passedData <- ticq::anonymiseMetadata(data = passedData,
@@ -208,7 +208,7 @@ rm(anonymiserStatus)
 ## Undefined Sample Type Check
 Extracted samples are checked for the presence of undefined sample type (based on metadata).
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process
+# Check if there are new samples to process
 if (newStatus) {
   # Check for undefined sample type
   result <- ticq::checkUndefinedSampleType(data = passedData,
@@ -220,7 +220,7 @@ if (newStatus) {
   # Check new sample status
   passedData <- result$passedData
   if (nrow(passedData) == 0) {
-    newStatus <- TRUE
+    newStatus <- FALSE
   }
   
   # Display undefined sample type check result
@@ -242,7 +242,7 @@ if (newStatus) {
 ## Spectrum Count Check
 Spectrum count of samples are checked against a threshold limit of 20% below average spectrum count of all samples (mean).
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process
+# Check if there are new samples to process
 if (newStatus) {
   # If historical data exists
   if (file.exists(historicalDataPath)) {
@@ -256,7 +256,7 @@ if (newStatus) {
     invisible(gc())
   }
   
-  # Check spectrum count if comparison with historical data or more than 1 new sample is being processed
+  # Check spectrum count if comparison with historical data or more than 1 new sample is performed
   if (length(unique(passedData[[sampleID]])) > 1) {
     result <- ticq::checkSpectrumCount(data = passedData, 
                                        commonColumn = colnames(passedData)[which(colnames(passedData) == sampleID):
@@ -307,7 +307,7 @@ if (newStatus) {
 
 # Sample Types To Be Analysed
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process
+# Check if there are new samples to process
 if (newStatus) {
   # Extract sample types of new samples
   sampleTypeList <- unique(passedData[[sampleType]])
@@ -320,13 +320,13 @@ if (newStatus) {
 # Total Ion Chromatogram {.tabset}
 Chromatogram overview (Total ion current, TIC vs Retention Time, RT) of each sample type along with 3 chromatographic regions of interest outlined: mass calibration, analyte, and wash region. Chromatogram is plotted using full scan MS level 1 spectral data. 
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process
+# Check if there are new samples to process
 if (newStatus) {
-  # If MS level 1 spectral data available
+  # Check if MS level 1 spectral data is available
   if (any(passedData[[msLevel]] == 1)) {
     msStatus <- TRUE
     
-    # MS level 1 spectral data for plotting
+    # Filter MS level 1 spectral data for plotting
     plotData <- passedData %>% 
       dplyr::filter(.data[[msLevel]] == 1) %>%
       dplyr::select(all_of(c(colnames(passedData)[which(colnames(passedData) == sampleID):
@@ -344,7 +344,7 @@ if (newStatus) {
                                                         which(colnames(historicalData) == spectrumCount)],
                                retentionTime, totalIonCurrent)))
       
-      # Merge historical data and new data
+      # Merge historical data into plot data
       plotData <- rbind(historicalData, plotData)
       
       # Clean environment
@@ -352,24 +352,21 @@ if (newStatus) {
       invisible(gc())
     }
     
-    # Set common variables for plotting
+    # Set plot variables and labels
     title <- "Total Ion Chromatogram"
     labelX <- "RT"
     labelY <- "TIC"
-    
-    # Dynamically select column to be used for colour grouping of plots
-    if (length(unique(plotData[[projectCohort]])) > 1) {
-      colour <- projectCohort
-      colourLegend <- "Project"
-    } else {
-      colour <- plate
-      colourLegend <- "Plate"
-    }
-    
-    # Column to be used for shape grouping of plots
     shape <- sampleType
     shapeLegend <- "Sample Type"
-
+    
+      # Dynamically set colour grouping variable and label
+      if (length(unique(plotData[[projectCohort]])) > 1) {s
+        colour <- projectCohort
+        colourLegend <- "Project"
+      } else {
+        colour <- plate
+        colourLegend <- "Plate"
+      }
   } else {
     msStatus <- FALSE
     print("Unable to generate Total Ion Chromatogram: No available MS level 1 spectral data")
@@ -381,18 +378,18 @@ if (newStatus) {
 
 ## LTR
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
   # Set patterns to check
   pattern <- c("sLTR Plasma", "LTR Plasma",
                "sLTR Serum", "LTR Serum",
                "sLTR Urine", "LTR Urine")
   
-  # If pattern exist in sample type list
+  # Check if any of the patterns exists in sample type list
   if (any(pattern %in% sampleTypeList)) {
     # Generate chromatogram plot for each pattern combination that exists
     for (i in unique(sub("sLTR |LTR ", "", pattern))) {
-      # Check if combined pattern exists in sample type list
+      # If combined pattern exists in sample type list
       tmpPattern <- c(paste("sLTR", i), paste("LTR", i))
       if (any(tmpPattern %in% sampleTypeList)) {
         # Plot chromatogram
@@ -420,16 +417,16 @@ if (newStatus && msStatus) {
 
 ## dLTR
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
   # Set patterns to check
   pattern <- c("dLTR Plasma", "dLTR Serum", "dLTR Urine")
   
-  # If pattern exist in sample type list
+  # Check if any of the patterns exists in sample type list
   if (any(pattern %in% sampleTypeList)) {
     # Generate chromatogram plot for each pattern that exists
     for (i in pattern) {
-      # Check if pattern exists in sample type list
+      # If pattern exists in sample type list
       if (i %in% sampleTypeList) {
         # Plot chromatogram
         ticq::plotChromatogram(data = plotData %>% 
@@ -453,16 +450,16 @@ if (newStatus && msStatus) {
 
 ## PQC
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
   # Set patterns to check
   pattern <- c("PQC Plasma", "PQC Serum", "PQC Urine")
   
-  # If pattern exist in sample type list
+  # Check if any of the patterns exists in sample type list
   if (any(pattern %in% sampleTypeList)) {
     # Generate chromatogram plot for each pattern that exists
     for (i in pattern) {
-      # Check if pattern exists in sample type list
+      # If pattern exists in sample type list
       if (i %in% sampleTypeList) {
         # Plot chromatogram
         ticq::plotChromatogram(data = plotData %>% 
@@ -486,16 +483,16 @@ if (newStatus && msStatus) {
 
 ## dPQC
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
   # Set patterns to check
   pattern <- c("dPQC Plasma", "dPQC Serum", "dPQC Urine")
   
-  # If pattern exist in sample type list
+  # Check if any of the patterns exists in sample type list
   if (any(pattern %in% sampleTypeList)) {
     # Generate chromatogram plot for each pattern that exists
     for (i in pattern) {
-      # Check if pattern exists in sample type list
+      # If pattern exists in sample type list
       if (i %in% sampleTypeList) {
         # Plot chromatogram
         ticq::plotChromatogram(data = plotData %>% 
@@ -519,16 +516,16 @@ if (newStatus && msStatus) {
 
 ## QC
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
   # Set patterns to check
   pattern <- c("QC01", "QC02", "QC03", "QC04")
   
-  # If pattern exist in sample type list
+  # Check if any of the patterns exists in sample type list
   if (any(pattern %in% sampleTypeList)) {
     # Generate chromatogram plot for each pattern that exists
     for (i in pattern) {
-      # Check if pattern exists in sample type list
+      # If pattern exists in sample type list
       if (i %in% sampleTypeList) {
         # Plot chromatogram
         ticq::plotChromatogram(data = plotData %>% 
@@ -552,16 +549,16 @@ if (newStatus && msStatus) {
 
 ## CAL
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
   # Set patterns to check
   pattern <- c("CAL01", "CAL02", "CAL03", "CAL04", "CAL05", "CAL06", "CAL07", "CAL08")
   
-  # If pattern exist in sample type list
+  # Check if any of the patterns exists in sample type list
   if (any(pattern %in% sampleTypeList)) {
     # Generate chromatogram plot for each pattern that exists
     for (i in pattern) {
-      # Check if pattern exists in sample type list
+      # If pattern exists in sample type list
       if (i %in% sampleTypeList) {
         # Plot chromatogram
         ticq::plotChromatogram(data = plotData %>% 
@@ -585,16 +582,16 @@ if (newStatus && msStatus) {
 
 ## Blank
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
   # Set patterns to check
   pattern <- c("Single Blank", "Double Blank")
   
-  # If pattern exist in sample type list
+  # Check if any of the patterns exists in sample type list
   if (any(pattern %in% sampleTypeList)) {
     # Generate chromatogram plot for each pattern that exists
     for (i in pattern) {
-      # Check if pattern exists in sample type list
+      # If pattern exists in sample type list
       if (i %in% sampleTypeList) {
         # Plot chromatogram
         ticq::plotChromatogram(data = plotData %>% 
@@ -618,16 +615,16 @@ if (newStatus && msStatus) {
 
 ## Sample
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
   # Set patterns to check
   pattern <- c("Sample Plasma", "Sample Serum", "Sample Urine")
   
-  # If pattern exist in sample type list
+  # Check if any of the patterns exists in sample type list
   if (any(pattern %in% sampleTypeList)) {
     # Generate chromatogram plot for each pattern that exists
     for (i in pattern) {
-      # Check if pattern exists in sample type list
+      # If pattern exists in sample type list
       if (i %in% sampleTypeList) {
         # Plot chromatogram
         ticq::plotChromatogram(data = plotData %>% 
@@ -651,16 +648,16 @@ if (newStatus && msStatus) {
 
 ## dSample
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
   # Set patterns to check
   pattern <- c("dSample Plasma", "dSample Serum", "dSample Urine")
   
-  # If pattern exist in sample type list
+  # Check if any of the patterns exists in sample type list
   if (any(pattern %in% sampleTypeList)) {
     # Generate chromatogram plot for each pattern that exists
     for (i in pattern) {
-      # Check if pattern exists in sample type list
+      # If pattern exists in sample type list
       if (i %in% sampleTypeList) {
         # Plot chromatogram
         ticq::plotChromatogram(data = plotData %>% 
@@ -688,7 +685,7 @@ if (newStatus && msStatus) {
 # Total Ion Current (TIC) Analysis
 Samples are analysed using the TIC values across 3 different chromatogram regions of interest: mass calibration, analyte and wash region.
 ```{r, echo = FALSE, warning = FALSE, include = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
   # Splice and sum TIC of chromatogram regions specified
   plotData <- ticq::spliceChromatogramRegion(data = plotData,
@@ -699,6 +696,7 @@ if (newStatus && msStatus) {
                                              filterBy = retentionTime,
                                              sumBy = totalIonCurrent)
   
+  # Set column names of the spliced chromatogram regions
   overallRegion <- "overallRegion"
   prewashRegion <- "prewashRegion"
   massCalRegion <- "massCalRegion"
@@ -710,12 +708,13 @@ if (newStatus && msStatus) {
 ## Principal Component Analysis (PCA) {.tabset}
 PCA provides an overview of the overall sample variance influenced by the 3 chromatogram regions of interest. 
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# Check if there are new samples to process and MS level 1 spectral data is available
 if (!newStatus) {
   print("Unable to perform Principal Component Analysis: No new samples to analyse")
 } else if (!msStatus) {
-  print("Unable to perform Principal Component Analysis: No available MS level 1 data")
+  print("Unable to perform Principal Component Analysis: No available MS level 1 spectral data")
 } else {
+  # Set toggles for PCA plot printing
   screePlt <- TRUE
   scoresPlt <- FALSE
   loadingsPlt <- FALSE
@@ -726,14 +725,14 @@ if (!newStatus) {
 ### LTR {.tabset}
 #### LTR Plasma
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
-  # Set pattern to check
+  # Set patterns to check
   pattern <- c("sLTR Plasma", "LTR Plasma")
   
-  # If pattern exist in sample type list
+  # Check if any of the patterns exists in sample type list
   if (any(pattern %in% sampleTypeList)) {
-    # Plot PCA results
+    # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
@@ -754,14 +753,14 @@ if (newStatus && msStatus) {
 
 #### LTR Serum
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
-  # Set pattern to check
+  # Set patterns to check
   pattern <- c("sLTR Serum", "LTR Serum")
   
-  # If pattern exist in sample type list
+  # Check if any of the patterns exists in sample type list
   if (any(pattern %in% sampleTypeList)) {
-    # Plot PCA results
+    # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
@@ -782,14 +781,14 @@ if (newStatus && msStatus) {
 
 #### LTR Urine
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
-  # Set pattern to check
+  # Set patterns to check
   pattern <- c("sLTR Urine", "LTR Urine")
   
-  # If pattern exist in sample type list
+  # Check if any of the patterns exists in sample type list
   if (any(pattern %in% sampleTypeList)) {
-    # Plot PCA results
+    # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
@@ -811,14 +810,14 @@ if (newStatus && msStatus) {
 ### dLTR {.tabset}
 #### dLTR Plasma
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
-  # Set pattern to check
+  # Set patterns to check
   pattern <- c("dLTR Plasma")
   
-  # If pattern exist in sample type list
+  # Check if any of the patterns exists in sample type list
   if (any(pattern %in% sampleTypeList)) {
-    # Plot PCA results
+    # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
@@ -839,14 +838,14 @@ if (newStatus && msStatus) {
 
 #### dLTR Serum
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
-  # Set pattern to check
+  # Set patterns to check
   pattern <- c("dLTR Serum")
   
-  # If pattern exist in sample type list
+  # Check if any of the patterns exists in sample type list
   if (any(pattern %in% sampleTypeList)) {
-    # Plot PCA results
+    # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
@@ -867,14 +866,14 @@ if (newStatus && msStatus) {
 
 #### dLTR Urine
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
-  # Set pattern to check
+  # Set patterns to check
   pattern <- c("dLTR Urine")
   
-  # If pattern exist in sample type list
+  # Check if any of the patterns exists in sample type list
   if (any(pattern %in% sampleTypeList)) {
-    # Plot PCA results
+    # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
@@ -896,14 +895,14 @@ if (newStatus && msStatus) {
 ### PQC {.tabset}
 #### PQC Plasma
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
-  # Set pattern to check
+  # Set patterns to check
   pattern <- c("PQC Plasma")
   
-  # If pattern exist in sample type list
+  # Check if any of the patterns exists in sample type list
   if (any(pattern %in% sampleTypeList)) {
-    # Plot PCA results
+    # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
@@ -924,14 +923,14 @@ if (newStatus && msStatus) {
 
 #### PQC Serum
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
-  # Set pattern to check
+  # Set patterns to check
   pattern <- c("PQC Serum")
   
-  # If pattern exist in sample type list
+  # Check if any of the patterns exists in sample type list
   if (any(pattern %in% sampleTypeList)) {
-    # Plot PCA results
+    # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
@@ -952,14 +951,14 @@ if (newStatus && msStatus) {
 
 #### PQC Urine
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
-  # Set pattern to check
+  # Set patterns to check
   pattern <- c("PQC Urine")
   
-  # If pattern exist in sample type list
+  # Check if any of the patterns exists in sample type list
   if (any(pattern %in% sampleTypeList)) {
-    # Plot PCA results
+    # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
@@ -981,14 +980,14 @@ if (newStatus && msStatus) {
 ### dPQC {.tabset}
 #### dPQC Plasma
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
-  # Set pattern to check
+  # Set patterns to check
   pattern <- c("dPQC Plasma")
   
-  # If pattern exist in sample type list
+  # Check if any of the patterns exists in sample type list
   if (any(pattern %in% sampleTypeList)) {
-    # Plot PCA results
+    # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
@@ -1009,14 +1008,14 @@ if (newStatus && msStatus) {
 
 #### dPQC Serum
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
-  # Set pattern to check
+  # Set patterns to check
   pattern <- c("dPQC Serum")
   
-  # If pattern exist in sample type list
+  # Check if any of the patterns exists in sample type list
   if (any(pattern %in% sampleTypeList)) {
-    # Plot PCA results
+    # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
@@ -1037,14 +1036,14 @@ if (newStatus && msStatus) {
 
 #### dPQC Urine
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
-  # Set pattern to check
+  # Set patterns to check
   pattern <- c("dPQC Urine")
   
-  # If pattern exist in sample type list
+  # Check if any of the patterns exists in sample type list
   if (any(pattern %in% sampleTypeList)) {
-    # Plot PCA results
+    # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
@@ -1066,14 +1065,14 @@ if (newStatus && msStatus) {
 ### QC {.tabset}
 #### QC01
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
-  # Set pattern to check
+  # Set patterns to check
   pattern <- c("QC01")
   
-  # If pattern exist in sample type list
+  # Check if any of the patterns exists in sample type list
   if (any(pattern %in% sampleTypeList)) {
-    # Plot PCA results
+    # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
@@ -1094,14 +1093,14 @@ if (newStatus && msStatus) {
 
 #### QC02
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
-  # Set pattern to check
+  # Set patterns to check
   pattern <- c("QC02")
   
-  # If pattern exist in sample type list
+  # Check if any of the patterns exists in sample type list
   if (any(pattern %in% sampleTypeList)) {
-    # Plot PCA results
+    # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
@@ -1122,14 +1121,14 @@ if (newStatus && msStatus) {
 
 #### QC03
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
-  # Set pattern to check
+  # Set patterns to check
   pattern <- c("QC03")
   
-  # If pattern exist in sample type list
+  # Check if any of the patterns exists in sample type list
   if (any(pattern %in% sampleTypeList)) {
-    # Plot PCA results
+    # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
@@ -1150,14 +1149,14 @@ if (newStatus && msStatus) {
 
 #### QC04
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
-  # Set pattern to check
+  # Set patterns to check
   pattern <- c("QC04")
   
-  # If pattern exist in sample type list
+  # Check if any of the patterns exists in sample type list
   if (any(pattern %in% sampleTypeList)) {
-    # Plot PCA results
+    # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
@@ -1179,14 +1178,14 @@ if (newStatus && msStatus) {
 ### CAL {.tabset}
 #### CAL01
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
-  # Set pattern to check
+  # Set patterns to check
   pattern <- c("CAL01")
   
-  # If pattern exist in sample type list
+  # Check if any of the patterns exists in sample type list
   if (any(pattern %in% sampleTypeList)) {
-    # Plot PCA results
+    # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
@@ -1207,14 +1206,14 @@ if (newStatus && msStatus) {
 
 #### CAL02
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
-  # Set pattern to check
+  # Set patterns to check
   pattern <- c("CAL02")
   
-  # If pattern exist in sample type list
+  # Check if any of the patterns exists in sample type list
   if (any(pattern %in% sampleTypeList)) {
-    # Plot PCA results
+    # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
@@ -1235,14 +1234,14 @@ if (newStatus && msStatus) {
 
 #### CAL03
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
-  # Set pattern to check
+  # Set patterns to check
   pattern <- c("CAL03")
   
-  # If pattern exist in sample type list
+  # Check if any of the patterns exists in sample type list
   if (any(pattern %in% sampleTypeList)) {
-    # Plot PCA results
+    # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
@@ -1263,14 +1262,14 @@ if (newStatus && msStatus) {
 
 #### CAL04
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
-  # Set pattern to check
+  # Set patterns to check
   pattern <- c("CAL04")
   
-  # If pattern exist in sample type list
+  # Check if any of the patterns exists in sample type list
   if (any(pattern %in% sampleTypeList)) {
-    # Plot PCA results
+    # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
@@ -1291,14 +1290,14 @@ if (newStatus && msStatus) {
 
 #### CAL05
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
-  # Set pattern to check
+  # Set patterns to check
   pattern <- c("CAL05")
   
-  # If pattern exist in sample type list
+  # Check if any of the patterns exists in sample type list
   if (any(pattern %in% sampleTypeList)) {
-    # Plot PCA results
+    # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
@@ -1319,14 +1318,14 @@ if (newStatus && msStatus) {
 
 #### CAL06
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
-  # Set pattern to check
+  # Set patterns to check
   pattern <- c("CAL06")
   
-  # If pattern exist in sample type list
+  # Check if any of the patterns exists in sample type list
   if (any(pattern %in% sampleTypeList)) {
-    # Plot PCA results
+    # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
@@ -1347,14 +1346,14 @@ if (newStatus && msStatus) {
 
 #### CAL07
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
-  # Set pattern to check
+  # Set patterns to check
   pattern <- c("CAL07")
   
-  # If pattern exist in sample type list
+  # Check if any of the patterns exists in sample type list
   if (any(pattern %in% sampleTypeList)) {
-    # Plot PCA results
+    # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
@@ -1375,14 +1374,14 @@ if (newStatus && msStatus) {
 
 #### CAL08
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
-  # Set pattern to check
+  # Set patterns to check
   pattern <- c("CAL08")
   
-  # If pattern exist in sample type list
+  # Check if any of the patterns exists in sample type list
   if (any(pattern %in% sampleTypeList)) {
-    # Plot PCA results
+    # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
@@ -1404,14 +1403,14 @@ if (newStatus && msStatus) {
 ### Blank {.tabset}
 #### Single Blank
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
-  # Set pattern to check
+  # Set patterns to check
   pattern <- c("Single Blank")
   
-  # If pattern exist in sample type list
+  # Check if any of the patterns exists in sample type list
   if (any(pattern %in% sampleTypeList)) {
-    # Plot PCA results
+    # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
@@ -1432,14 +1431,14 @@ if (newStatus && msStatus) {
 
 #### Double Blank
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
-  # Set pattern to check
+  # Set patterns to check
   pattern <- c("Double Blank")
   
-  # If pattern exist in sample type list
+  # Check if any of the patterns exists in sample type list
   if (any(pattern %in% sampleTypeList)) {
-    # Plot PCA results
+    # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
@@ -1461,14 +1460,14 @@ if (newStatus && msStatus) {
 ### Sample {.tabset}
 #### Sample Plasma
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
-  # Set pattern to check
+  # Set patterns to check
   pattern <- c("sLTR Plasma", "LTR Plasma", "Sample Plasma")
   
-  # If pattern exist in sample type list
+  # Check if any of the patterns exists in sample type list
   if (any(pattern %in% sampleTypeList)) {
-    # Plot PCA results
+    # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
@@ -1489,14 +1488,14 @@ if (newStatus && msStatus) {
 
 #### Sample Serum
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
-  # Set pattern to check
+  # Set patterns to check
   pattern <- c("sLTR Serum", "LTR Serum", "Sample Serum")
   
-  # If pattern exist in sample type list
+  # Check if any of the patterns exists in sample type list
   if (any(pattern %in% sampleTypeList)) {
-    # Plot PCA results
+    # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
@@ -1517,14 +1516,14 @@ if (newStatus && msStatus) {
 
 #### Sample Urine
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
-  # Set pattern to check
+  # Set patterns to check
   pattern <- c("sLTR Urine", "LTR Urine", "Sample Urine")
   
-  # If pattern exist in sample type list
+  # Check if any of the patterns exists in sample type list
   if (any(pattern %in% sampleTypeList)) {
-    # Plot PCA results
+    # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
@@ -1546,14 +1545,14 @@ if (newStatus && msStatus) {
 ### dSample {.tabset}
 #### dSample Plasma
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
-  # Set pattern to check
+  # Set patterns to check
   pattern <- c("dLTR Plasma", "dSample Plasma")
   
-  # If pattern exist in sample type list
+  # Check if any of the patterns exists in sample type list
   if (any(pattern %in% sampleTypeList)) {
-    # Plot PCA results
+    # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
@@ -1574,14 +1573,14 @@ if (newStatus && msStatus) {
 
 #### dSample Serum
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
-  # Set pattern to check
+  # Set patterns to check
   pattern <- c("dLTR Serum", "dSample Serum")
   
-  # If pattern exist in sample type list
+  # Check if any of the patterns exists in sample type list
   if (any(pattern %in% sampleTypeList)) {
-    # Plot PCA results
+    # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
@@ -1602,14 +1601,14 @@ if (newStatus && msStatus) {
 
 #### dSample Urine
 ```{r, echo = FALSE, warning = FALSE}
-# If there is new samples to process and MS level 1 spectral data is available
+# If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
-  # Set pattern to check
+  # Set patterns to check
   pattern <- c("dLTR Urine", "dSample Urine")
   
-  # If pattern exist in sample type list
+  # Check if any of the patterns exists in sample type list
   if (any(pattern %in% sampleTypeList)) {
-    # Plot PCA results
+    # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
                   startIDX = which(colnames(plotData) == massCalRegion),
@@ -1633,6 +1632,299 @@ if (newStatus && msStatus) {
 
 ## Time Series Analysis {.tabset}
 Time series analysis focuses on the prewash region (mass calibration + analyte). This analysis provides a temporal trendline of the processed samples and assesses the combined performance of mass calibration references, ISTD and endogenous analytes in the region. A report is generated highlighting the samples that have a significant deviation (1st and 2nd standard deviation) from the average mean performance.
+```{r, echo = FALSE, warning = FALSE}
+# Check if there are new samples to process and MS level 1 spectral data is available
+if (newStatus && msStatus) {
+  # Set plot variables and labels
+  labelX <- "Date"
+  labelY <- "Prewash Region (TIC)"
+  boundary <- "sd"
+  xTick <- FALSE
+  
+  # Data frame to store analysis result
+  analysisResult <- data.frame()
+} else if (!newStatus) {
+  print("Unable to perform Time Series Analysis: No new samples to analyse")
+} else if (!msStatus) {
+  print("Unable to perform Time Series Analysis: No available MS level 1 spectral data")
+}
+```
+
+### LTR
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data is available
+if (newStatus && msStatus) {
+  # Set patterns to check
+  pattern <- c("sLTR Plasma", "LTR Plasma",
+               "sLTR Serum", "LTR Serum",
+               "sLTR Urine", "LTR Urine")
+
+  # Check if any of the patterns exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Generate time series plot for each pattern combination that exists
+    for (i in unique(sub("sLTR |LTR ", "", pattern))) {
+      # If combined pattern exists in sample type list
+      tmpPattern <- c(paste("sLTR", i), paste("LTR", i))
+      if (any(tmpPattern %in% sampleTypeList)) {
+        # Plot time series
+        result <- ticq::plotTimeSeries(data = plotData %>%
+                                         dplyr::filter(.data[[sampleType]] %in% tmpPattern),
+                                       x = date,
+                                       y = prewashRegion,
+                                       colour = colour,
+                                       shape = shape,
+                                       subtitle = paste("LTR", i),
+                                       labelX = labelX,
+                                       labelY = labelY,
+                                       colourLegend = colourLegend,
+                                       shapeLegend = shapeLegend,
+                                       boundary = boundary,
+                                       xTick = xTick)
+
+        # Append analysis result
+        analysisResult <- rbind(analysisResult, result)
+      }
+
+      # Clean environment
+      rm(tmpPattern)
+    }
+  } else {
+    print("No available data")
+  }
+}
+```
+
+### dLTR
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data is available
+if (newStatus && msStatus) {
+  # Set patterns to check
+  pattern <- c("dLTR Plasma", "dLTR Serum", "dLTR Urine")
+  
+  # Check if any of the patterns exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Generate time series plot for each pattern combination that exists
+    for (i in pattern) {
+      # If pattern exists in sample type list
+      if (i %in% sampleTypeList) {
+        # Plot time series
+        result <- ticq::plotTimeSeries(data = plotData %>% 
+                                         dplyr::filter(.data[[sampleType]] %in% i),
+                                       x = date,
+                                       y = prewashRegion,
+                                       colour = colour,
+                                       shape = shape,
+                                       subtitle = i,
+                                       labelX = labelX,
+                                       labelY = labelY,
+                                       colourLegend = colourLegend,
+                                       shapeLegend = shapeLegend,
+                                       boundary = boundary,
+                                       xTick = xTick)
+        
+        # Append analysis result
+        analysisResult <- rbind(analysisResult, result)
+      }
+    }
+  } else {
+    print("No available data")
+  }
+}
+```
+
+### PQC
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data is available
+if (newStatus && msStatus) {
+  # Set patterns to check
+  pattern <- c("PQC Plasma", "PQC Serum", "PQC Urine")
+  
+  # Check if any of the patterns exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Generate time series plot for each pattern combination that exists
+    for (i in pattern) {
+      # If pattern exists in sample type list
+      if (i %in% sampleTypeList) {
+        # Plot time series
+        result <- ticq::plotTimeSeries(data = plotData %>% 
+                                         dplyr::filter(.data[[sampleType]] %in% i),
+                                       x = date,
+                                       y = prewashRegion,
+                                       colour = colour,
+                                       shape = shape,
+                                       subtitle = i,
+                                       labelX = labelX,
+                                       labelY = labelY,
+                                       colourLegend = colourLegend,
+                                       shapeLegend = shapeLegend,
+                                       boundary = boundary,
+                                       xTick = xTick)
+        
+        # Append analysis result
+        analysisResult <- rbind(analysisResult, result)
+      }
+    }
+  } else {
+    print("No available data")
+  }
+}
+```
+
+### dPQC
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data is available
+if (newStatus && msStatus) {
+  # Set patterns to check
+  pattern <- c("dPQC Plasma", "dPQC Serum", "dPQC Urine")
+  
+  # Check if any of the patterns exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Generate time series plot for each pattern combination that exists
+    for (i in pattern) {
+      # If pattern exists in sample type list
+      if (i %in% sampleTypeList) {
+        # Plot time series
+        result <- ticq::plotTimeSeries(data = plotData %>% 
+                                         dplyr::filter(.data[[sampleType]] %in% i),
+                                       x = date,
+                                       y = prewashRegion,
+                                       colour = colour,
+                                       shape = shape,
+                                       subtitle = i,
+                                       labelX = labelX,
+                                       labelY = labelY,
+                                       colourLegend = colourLegend,
+                                       shapeLegend = shapeLegend,
+                                       boundary = boundary,
+                                       xTick = xTick)
+        
+        # Append analysis result
+        analysisResult <- rbind(analysisResult, result)
+      }
+    }
+  } else {
+    print("No available data")
+  }
+}
+```
+
+### QC
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data is available
+if (newStatus && msStatus) {
+  # Set patterns to check
+  pattern <- c("QC01", "QC02", "QC03", "QC04")
+  
+  # Check if any of the patterns exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Generate time series plot for each pattern combination that exists
+    for (i in pattern) {
+      # If pattern exists in sample type list
+      if (i %in% sampleTypeList) {
+        # Plot time series
+        result <- ticq::plotTimeSeries(data = plotData %>% 
+                                         dplyr::filter(.data[[sampleType]] %in% i),
+                                       x = date,
+                                       y = prewashRegion,
+                                       colour = colour,
+                                       shape = shape,
+                                       subtitle = i,
+                                       labelX = labelX,
+                                       labelY = labelY,
+                                       colourLegend = colourLegend,
+                                       shapeLegend = shapeLegend,
+                                       boundary = boundary,
+                                       xTick = xTick)
+        
+        # Append analysis result
+        analysisResult <- rbind(analysisResult, result)
+      }
+    }
+  } else {
+    print("No available data")
+  }
+}
+```
+
+### CAL
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data is available
+if (newStatus && msStatus) {
+  # Set patterns to check
+  pattern <- c("CAL01", "CAL02", "CAL03", "CAL04", "CAL05", "CAL06", "CAL07", "CAL08")
+  
+  # Check if any of the patterns exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Generate time series plot for each pattern combination that exists
+    for (i in pattern) {
+      # If pattern exists in sample type list
+      if (i %in% sampleTypeList) {
+        # Plot time series
+        result <- ticq::plotTimeSeries(data = plotData %>% 
+                                         dplyr::filter(.data[[sampleType]] %in% i),
+                                       x = date,
+                                       y = prewashRegion,
+                                       colour = colour,
+                                       shape = shape,
+                                       subtitle = i,
+                                       labelX = labelX,
+                                       labelY = labelY,
+                                       colourLegend = colourLegend,
+                                       shapeLegend = shapeLegend,
+                                       boundary = boundary,
+                                       xTick = xTick)
+        
+        # Append analysis result
+        analysisResult <- rbind(analysisResult, result)
+      }
+    }
+  } else {
+    print("No available data")
+  }
+}
+```
+
+### Blank
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data is available
+if (newStatus && msStatus) {
+  # Set patterns to check
+  pattern <- c("Single Blank", "Double Blank")
+  
+  # Check if any of the patterns exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Generate time series plot for each pattern combination that exists
+    for (i in pattern) {
+      # If pattern exists in sample type list
+      if (i %in% sampleTypeList) {
+        # Plot time series
+        result <- ticq::plotTimeSeries(data = plotData %>% 
+                                         dplyr::filter(.data[[sampleType]] %in% i),
+                                       x = date,
+                                       y = prewashRegion,
+                                       colour = colour,
+                                       shape = shape,
+                                       subtitle = i,
+                                       labelX = labelX,
+                                       labelY = labelY,
+                                       colourLegend = colourLegend,
+                                       shapeLegend = shapeLegend,
+                                       boundary = boundary,
+                                       xTick = xTick)
+        
+        # Append analysis result
+        analysisResult <- rbind(analysisResult, result)
+      }
+    }
+  } else {
+    print("No available data")
+  }
+}
+```
+
+### Sample
+
+### dSample
 
 
 

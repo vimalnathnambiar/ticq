@@ -16,18 +16,19 @@ anonymiseMetadata(
 )
 }
 \arguments{
-\item{data}{Data frame that containing spectral information of samples: data frame}
+\item{data}{Data frame that contains spectral information of samples: data frame}
 
-\item{commonColumn}{A vector of column names that are common across all samples: character vector}
+\item{commonColumn}{Column names that are common across all samples: character vector}
 }
 \value{
-A data frame containing spectral information of samples (Anonymised)
+Data frame containing spectral information of anonymised samples
 }
 \description{
 Anonymise sample metadata.
 }
 \details{
-Only Applicable to data acquired at the Australian National Phenome Centre (ANPC). Information anonymised includes sample ID, project name, cohort name, method name, instrument name, and plate number.
+Only applicable to data acquired at the Australian National Phenome Centre (ANPC).
+Information anonymised includes sample ID, project name, cohort name, method name, instrument name, and plate number.
 }
 \examples{
 data <- data.frame(sampleID = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29",
@@ -38,11 +39,11 @@ data <- data.frame(sampleID = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_
                    instrument = "PAI05",
                    plate = 88)
 anonymiseMetadata <- ticq::anonymiseMetadata(data = data, 
-#'                                          sampleID = "sampleID",
-#'                                          project = "project", 
-#'                                          cohort = "cohort", 
-#'                                          projectCohort = "projectCohort", 
-#'                                          method = "method", 
-#'                                          instrument = "instrument",
-#'                                          plate = "plate")
+                                             sampleID = "sampleID",
+                                             project = "project", 
+                                             cohort = "cohort", 
+                                             projectCohort = "projectCohort", 
+                                             method = "method", 
+                                             instrument = "instrument",
+                                             plate = "plate")
 }

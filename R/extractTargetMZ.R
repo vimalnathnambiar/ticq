@@ -1,30 +1,30 @@
 #' extractTargetMZ
 #' 
-#' Extract target m/z data from target file (published to web URL or local TSV document) or in-house method library used at the Australian National Phenome Centre (ANPC).
+#' Extract target m/z data from a target file (published to web URL or local TSV document) or an in-house method library used at the Australian National Phenome Centre (ANPC).
 #' 
 #' @import httr
 #' @import readr
 #' 
 #' @export
-#' @param targetFile TSV document that contains target m/z data (Default: NULL, Options: Published to web URL link or local file path): NULL or character
-#' @param anpcMethodLibrary ANPC method library (Default: NULL, Options: "MS-AA-POS", "MS-HIL-POS", "MS-HIL-NEG", "MS-RP-POS" or "MS-RP-NEG"): NULL or character
-#' @param roundDecimal The number of decimal places to round the target m/z values to for analysis (Default: NULL): NULL or double
-#' @returns A data frame containing the extracted target m/z data
+#' @param targetFile TSV document that contains target m/z data (Default: NULL, Options: Published to web URL or local file path): NULL or character
+#' @param anpcMethodLibrary In-house method library used at the ANPC (Default: NULL, Options: "MS-AA-POS", "MS-HIL-POS", "MS-HIL-NEG", "MS-RP-POS" or "MS-RP-NEG"): NULL or character
+#' @param roundDecimal Number of decimal places to round target m/z precision values (Default: NULL): NULL or double
+#' @returns Data frame containing the target m/z data
 #' 
 #' @examples
-#' # Example 1: Specifying a target file with no rounding of decimal places for the target m/z values
+#' # Example 1: Specify a target file and perform no rounding of m/z precision values
 #' targetMZ <- ticq::extractTargetMZ(targetFile = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSeo31hlruA3QuwoESz5IDJ9Nu6ndSAgLTRn3uc45rOPO4BlksfHzh9xtNB22Oes9JOxhEbI4NK-zxl/pub?gid=0&single=true&output=tsv", 
 #'                                   anpcMethodLibrary = NULL, 
 #'                                   roundDecimal = NULL)
 #' 
-#' # Example 2: Choosing an in-house method library used at the Australian National Phenome Centre (ANPC) and rounding the target m/z values to 4 decimal places
+#' # Example 2: Specify an in-house method library and round the m/z precision values to 4 decimal places
 #' targetMZ <- ticq::extractTargetMZ(targetFile = NULL, 
 #'                                   anpcMethodLibrary = "MS-AA-POS", 
 #'                                   roundDecimal = 4)
 extractTargetMZ <- function(targetFile = NULL, 
                             anpcMethodLibrary = NULL, 
                             roundDecimal = NULL) {
-  # Set defaults
+  # Defaults
   targetMZ <- NULL
   
   # Check if either target file or anpc method library is specified

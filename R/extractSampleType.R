@@ -7,7 +7,7 @@
 #' @import dplyr
 #'
 #' @export
-#' @param input Input to extract sample type from: character
+#' @param input Input to extract sample type: character
 #' @param matrix Associated sample matrix type: character
 #' @returns Sample type
 #'

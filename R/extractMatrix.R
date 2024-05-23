@@ -7,7 +7,7 @@
 #' @import dplyr
 #'
 #' @export
-#' @param input Input to extract matrix type from: character
+#' @param input Input to extract matrix type: character
 #' @returns Matrix type
 #'
 #' @examples

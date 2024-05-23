@@ -7,7 +7,7 @@
 extractInstrument(input)
 }
 \arguments{
-\item{input}{Input to extract instrument name from: character}
+\item{input}{Input to extract instrument name: character}
 }
 \value{
 Instrument name

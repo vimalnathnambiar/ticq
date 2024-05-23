@@ -7,7 +7,7 @@
 #' @import dplyr
 #'
 #' @export
-#' @param input Input to extract method name from: character
+#' @param input Input to extract method name: character
 #' @returns Method name
 #'
 #' @examples

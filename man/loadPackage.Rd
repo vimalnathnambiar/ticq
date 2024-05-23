@@ -7,15 +7,15 @@
 loadPackage(packageList)
 }
 \arguments{
-\item{packageList}{A vector of package names: character vector}
+\item{packageList}{Package names: character vector}
 }
 \description{
-Identify, install and load packages for usage.
+Load packages for usage. Automatically identifies and installs missing packages.
 }
 \examples{
-# Example 1: Loading a single package
+# Example 1: Load a single package
 ticq::loadPackage(packageList = c("DT"))
 
-# Example 2: Loading multiple packages
+# Example 2: Load multiple packages
 ticq::loadPackage(packageList = c("DT", "dplyr"))
 }

@@ -7,7 +7,7 @@
 #' @import dplyr
 #' 
 #' @export
-#' @param input Input to extract cohort name from: character
+#' @param input Input to extract cohort name: character
 #' @returns Cohort name
 #' 
 #' @examples

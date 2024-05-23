@@ -7,7 +7,7 @@
 extractMatrix(input)
 }
 \arguments{
-\item{input}{Input to extract matrix type from: character}
+\item{input}{Input to extract matrix type: character}
 }
 \value{
 Matrix type

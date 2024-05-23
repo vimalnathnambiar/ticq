@@ -12,10 +12,10 @@ retrieveFileList(input, fileExtension = NULL)
 \item{fileExtension}{File extension to filter for (Default: NULL): NULL or character}
 }
 \value{
-List of files within the input path that matches the file extension specified: character vector
+List of files stored within the input path that matches the file extension specified: character vector
 }
 \description{
-Filter and retrieve file list of a specified extension type from input path.
+Filter and retrieve file list of a specified extension type stored within an input path.
 }
 \examples{
 inputFiles <- ticq::retrieveFileList(input = "/path/to/input/directory/", fileExtension = "JSON")

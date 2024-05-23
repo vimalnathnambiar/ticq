@@ -5,8 +5,8 @@
 #' Applicable only to data acquired at the Australian National Phenome Centre (ANPC).
 #'
 #' @export
-#' @param input Input to extract metadata from: character
-#' @returns A list of metadata
+#' @param input Input to extract metadata: character
+#' @returns List containing the metadata associated to the data
 #'
 #' @examples
 #' metadata <- ticq::extractMetadata(input = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29.json")

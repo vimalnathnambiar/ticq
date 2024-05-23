@@ -7,7 +7,7 @@
 #' @import dplyr
 #'
 #' @export
-#' @param input Input to extract project name from: character
+#' @param input Input to extract project name: character
 #' @returns Project name
 #'
 #' @examples

@@ -8,13 +8,13 @@
 #' @import stringr
 #'
 #' @export
-#' @param input Input to extract plate number from: character
+#' @param input Input to extract plate number: character
 #' @returns Plate number
 #'
 #' @examples
 #' plate <- ticq::extractPlate(input = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29.json")
 extractPlate <- function(input) {
-  # Default patterns
+  # Plate patterns
   pattern <- c("[pP][0-9]+", "PLATE[0-9]+", "PLASMA[0-9]+")
   
   # Loop through patterns

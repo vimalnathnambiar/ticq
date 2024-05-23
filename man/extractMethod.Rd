@@ -7,7 +7,7 @@
 extractMethod(input)
 }
 \arguments{
-\item{input}{Input to extract method name from: character}
+\item{input}{Input to extract method name: character}
 }
 \value{
 Method name

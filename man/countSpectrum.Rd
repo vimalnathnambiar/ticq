@@ -9,13 +9,13 @@ countSpectrum(data, commonColumn, spectrumCount)
 \arguments{
 \item{data}{Data frame that contains spectral information of samples: data frame}
 
-\item{commonColumn}{A vector of column names that are common across all samples: character vector}
+\item{commonColumn}{Column names that are common across all samples: character vector}
 
-\item{spectrumCount}{The name of the column that represents spectrum count: character}
+\item{spectrumCount}{Name of the column that represents spectrum count: character}
 }
 \value{
-A summarised data frame grouped by common columns and their respective number of spectrum available
+Summarised data frame grouped by common columns and their respective total number of spectral data (spectrum count)
 }
 \description{
-Count and summarise the total number of spectral data for each sample present within the data frame.
+Count and summarise the total number of spectral data (spectrum count) for each sample present within the data frame.
 }

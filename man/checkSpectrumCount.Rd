@@ -9,17 +9,17 @@ checkSpectrumCount(data, commonColumn, sampleID, spectrumCount, threshold = 20)
 \arguments{
 \item{data}{Data frame that contains spectral information of samples: data frame}
 
-\item{commonColumn}{A vector of column names that are common across all samples: character vector}
+\item{commonColumn}{Column names that are common across all samples: character vector}
 
-\item{sampleID}{The name of the column that represents sample ID: character}
+\item{sampleID}{Name of the column that represents sample ID: character}
 
-\item{spectrumCount}{The name of the column that represents spectrum count: character}
+\item{spectrumCount}{Name of the column that represents spectrum count: character}
 
-\item{threshold}{Accepted threshold percentage (Default: 20): double}
+\item{threshold}{Accepted threshold limit \% (Default: 20): double}
 }
 \value{
-A list containing statistical result generated from the spectrum check (sample size, total and mean of spectrum count, and the threshold value), and two data frames (samples that passed and failed the check)
+List containing the statistical result (sample size, total and mean of spectrum count, and the threshold limit value), and two data frames (passed and failed data)
 }
 \description{
-Check and filter for samples against a specific threshold set on the average spectrum count (mean) of all samples being processed.
+Check and filter samples against a specific threshold limit set on the average mean of spectral data (spectrum count) present.
 }

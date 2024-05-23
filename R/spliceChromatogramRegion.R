@@ -1,22 +1,22 @@
 #' spliceChromatogramRegion
 #' 
-#' Splice chromatogram regions and sum values of a specific data column together for each sample. 
+#' Splice chromatogram regions and sum values of a specific data column together. 
 #' 
 #' @export
 #' @param data Data frame that contains spectral information of samples: data frame
-#' @param commonColumn A vector of column names that are common across all samples: character vector
-#' @param spectrumCount The name of the column that represents spectrum count: character
-#' @param chromatogramRegion A list that represent the different chromatogram regions (Default: NULL): NULL or list
-#' @param filterBy The name of the column that represents the retention time to be filtered: character
-#' @param sumBy The name of the column that represents the data to be summed for each chromatogram region: character
-#' @returns A data frame containing the sum values of the spliced regions of the chromatogram
+#' @param commonColumn Column names that are common across all samples: character vector
+#' @param spectrumCount Name of the column that represents spectrum count: character
+#' @param chromatogramRegion List that represents the different chromatogram regions of interest (Default: NULL): NULL or list
+#' @param filterBy Name of the column that represents the retention time to be filtered: character
+#' @param sumBy Name of the column that represents the data to be summed for each chromatogram region: character
+#' @returns Data frame containing the sum values of the spliced chromatogram regions
 spliceChromatogramRegion <- function(data, 
                                      commonColumn, 
                                      spectrumCount, 
                                      chromatogramRegion = NULL, 
                                      filterBy, 
                                      sumBy) {
-  # splicedData (A temporary data frame) with common columns for data append
+  # Data frame with common columns to append spliced chromatogram region data
   splicedData <- ticq::countSpectrum(data = data, 
                                      commonColumn = commonColumn, 
                                      spectrumCount = spectrumCount)
@@ -27,7 +27,7 @@ spliceChromatogramRegion <- function(data,
                              sumBy = sumBy)
   splicedData <- cbind(splicedData, overallRegion = tmp$sum)
   
-  # If spliceRegion is NOT NULL
+  # Splice chromatogram regions of interest
   if (!is.null(chromatogramRegion)) {
     # Prewash region
     tmp <- ticq::filterChromatogramRegion(data = data, 

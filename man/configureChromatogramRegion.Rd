@@ -27,17 +27,17 @@ configureChromatogramRegion(
 \item{washEnd}{Fixed time point that the MS instrument ends its wash cycle (Default: NULL): NULL or double}
 }
 \value{
-A list containing the time points representing the different regions of the chromatogram
+List containing the time points representing the different chromatogram regions of interest
 }
 \description{
-Configure chromatogram regions based on specific time points.
+Configure chromatogram regions of interest based on specific time points.
 }
 \examples{
 # Example 1: Using default values for analyteStart, analyteEnd and washEnd
 chromatogramRegion <- ticq::configureChromatogramRegion(massCalStart = 0, massCalEnd = 0.3, 
                                                         washStart = 5)
 
-# Example 2: Defining values for analyteStart, analyteEnd and washEnd
+# Example 2: Define values for analyteStart, analyteEnd and washEnd
 chromatogramRegion <- ticq::configureChromatogramRegion(massCalStart = 0, massCalEnd = 0.3,
                                                         analyteStart = 2, analyteEnd = 4
                                                         washStart = 5, washEnd = 6)

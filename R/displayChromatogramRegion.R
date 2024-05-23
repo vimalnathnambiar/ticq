@@ -7,24 +7,24 @@
 #' 
 #' @import ggplot2
 #' 
-#' @param plot A ggplot that represents a chromatogram: ggplot
-#' @param maxX The maximum value of the x-axis: double
-#' @param maxY The maximum value of the y-axis: double
-#' @param chromatogramRegion The chromatogram region to be displayed: list
-#' @param label The region label to be displayed: character
-#' @returns ggplot with the added vertical lines representing the chromatogram region
+#' @param plot ggplot object that represents a chromatogram: ggplot
+#' @param maxX Maximum value of the x-axis: double
+#' @param maxY Maximum value of the y-axis: double
+#' @param chromatogramRegion Chromatogram region to be displayed: list
+#' @param label Chromatogram region label: character
+#' @returns ggplot object with the added vertical lines displaying the chromatogram region start and end points
 displayChromatogramRegion <- function(plot, 
                                       maxX, 
                                       maxY, 
                                       chromatogramRegion, 
                                       label) {
-  # If region endpoint is NULL
+  # If chromatogram region endpoint is NULL
   if (is.null(chromatogramRegion$end)) {
     # Set region endpoint to maximum value of x-axis
     chromatogramRegion$end <- maxX
   }
   
-  # Add vertical line to chromatogram
+  # Add vertical lines for the chromatogram region start and end points
   plot <- plot + 
     ggplot2::geom_vline(xintercept = chromatogramRegion$start,
                         linetype = "dashed",

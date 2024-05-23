@@ -7,10 +7,10 @@
 extractMetadata(input)
 }
 \arguments{
-\item{input}{Input to extract metadata from: character}
+\item{input}{Input to extract metadata: character}
 }
 \value{
-A list of metadata
+List containing the metadata associated to the data
 }
 \description{
 Extract metadata. This includes project name, cohort name, matrix type, sample type, acquisition method, instrument name, and plate number.

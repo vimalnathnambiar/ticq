@@ -7,7 +7,7 @@
 extractProject(input)
 }
 \arguments{
-\item{input}{Input to extract project name from: character}
+\item{input}{Input to extract project name: character}
 }
 \value{
 Project name

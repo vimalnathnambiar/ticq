@@ -6,10 +6,9 @@ input <- "/path/to/input/directory/or/file.json"
 
 # Extract metadata (if JSON file)
 metadata <- ticq::extractMetadata(input = input)
-# metadata$method <- "MS-AA-POS"
 
 # Configure parameters (Dynamically based on input metadata - ANPC specific)
-  # Define output path
+  # Output path
   outputDir <- paste0(getwd(), "/report/")
   
   # Chromatogram region
@@ -18,15 +17,17 @@ metadata <- ticq::extractMetadata(input = input)
                     "MS-HIL-NEG" = list(massCalStart = 0, massCalEnd = 0.7, washStart = 11),
                     "MS-RP-POS" = list(massCalStart = 0, massCalEnd = 0.7, washStart = 11),
                     "MS-RP-NEG" = list(massCalStart = 0, massCalEnd = 0.7, washStart = 11))
-  if (!is.na(metadata$method) && metadata$method %in% names(timepoint)) {
-    timepoint <- timepoint[[metadata$method]]
-    chromatogramRegion <- ticq::configureChromatogramRegion(massCalStart = timepoint$massCalStart,
-                                                            massCalEnd = timepoint$massCalEnd,
-                                                            washStart = timepoint$washStart)
-  } else {
-    chromatogramRegion <- NULL
-    metadata$method <- NULL
-  }
+  
+    # Check if method was extracted in the metadata and is one of the in-house ANPC method library
+    if (!is.na(metadata$method) && metadata$method %in% names(timepoint)) {
+      timepoint <- timepoint[[metadata$method]]
+      chromatogramRegion <- ticq::configureChromatogramRegion(massCalStart = timepoint$massCalStart,
+                                                              massCalEnd = timepoint$massCalEnd,
+                                                              washStart = timepoint$washStart)
+    } else {
+      chromatogramRegion <- NULL
+      metadata$method <- NULL
+    }
 
 
 # Render TICQ R Markdown script

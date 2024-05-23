@@ -7,7 +7,7 @@
 extractCohort(input)
 }
 \arguments{
-\item{input}{Input to extract cohort name from: character}
+\item{input}{Input to extract cohort name: character}
 }
 \value{
 Cohort name

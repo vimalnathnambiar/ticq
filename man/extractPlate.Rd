@@ -7,7 +7,7 @@
 extractPlate(input)
 }
 \arguments{
-\item{input}{Input to extract plate number from: character}
+\item{input}{Input to extract plate number: character}
 }
 \value{
 Plate number

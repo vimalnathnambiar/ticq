@@ -9,12 +9,12 @@ filterChromatogramRegion(data, regionOfInterest = NULL, filterBy)
 \arguments{
 \item{data}{Data frame that contains spectral information of samples: data frame}
 
-\item{regionOfInterest}{A list that represent the start and end point of a regions on the chromatogram (Default: NULL): NULL or list}
+\item{regionOfInterest}{List that represents the start and end point of a chromatogram region (Default: NULL): NULL or list}
 
-\item{filterBy}{The name of the column that represents the retention time to be filtered: character}
+\item{filterBy}{Name of the column that represents the retention time to be filtered: character}
 }
 \value{
-A data frame containing spliced chromatogram region of interest
+A data frame containing the spliced chromatogram region of interest
 }
 \description{
 Filter for a chromatogram region of interest.

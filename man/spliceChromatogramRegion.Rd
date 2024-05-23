@@ -16,19 +16,19 @@ spliceChromatogramRegion(
 \arguments{
 \item{data}{Data frame that contains spectral information of samples: data frame}
 
-\item{commonColumn}{A vector of column names that are common across all samples: character vector}
+\item{commonColumn}{Column names that are common across all samples: character vector}
 
-\item{spectrumCount}{The name of the column that represents spectrum count: character}
+\item{spectrumCount}{Name of the column that represents spectrum count: character}
 
-\item{chromatogramRegion}{A list that represent the different chromatogram regions (Default: NULL): NULL or list}
+\item{chromatogramRegion}{List that represents the different chromatogram regions of interest (Default: NULL): NULL or list}
 
-\item{filterBy}{The name of the column that represents the retention time to be filtered: character}
+\item{filterBy}{Name of the column that represents the retention time to be filtered: character}
 
-\item{sumBy}{The name of the column that represents the data to be summed for each chromatogram region: character}
+\item{sumBy}{Name of the column that represents the data to be summed for each chromatogram region: character}
 }
 \value{
-A data frame containing the sum values of the spliced regions of the chromatogram
+Data frame containing the sum values of the spliced chromatogram regions
 }
 \description{
-Splice chromatogram regions and sum values of a specific data column together for each sample.
+Splice chromatogram regions and sum values of a specific data column together.
 }

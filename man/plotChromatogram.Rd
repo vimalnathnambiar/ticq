@@ -19,28 +19,28 @@ plotChromatogram(
 )
 }
 \arguments{
-\item{data}{Data frame that contains the data to plot: data frame}
+\item{data}{Data frame that contains plot data: data frame}
 
-\item{x}{The name of the column that represents the continuous data series for the x-axis: character}
+\item{x}{Name of the column that represents the continuous data series for the x-axis: character}
 
-\item{y}{The name of the column that represents the continuous data series that represents the y-axis: character}
+\item{y}{Name of the column that represents the continuous data series for the y-axis: character}
 
-\item{colour}{The name of the column that will be used to colour categorise the data (Default: NULL): NULL or character}
+\item{colour}{Name of the column used for colour grouping (Default: NULL): NULL or character}
 
-\item{title}{The title for the plot (Default: "Chromatogram"): character}
+\item{title}{Plot title (Default: "Chromatogram"): character}
 
-\item{subtitle}{The subtitle for the plot (Default: NULL): NULL or character}
+\item{subtitle}{Plot subtitle (Default: NULL): NULL or character}
 
-\item{caption}{The caption for the plot (Default: NULL): NULL or character}
+\item{caption}{Plot caption (Default: NULL): NULL or character}
 
-\item{labelX}{Label for x-axis (Default: the name of the column used for the x-axis): NULL or character}
+\item{labelX}{x-axis label (Default: Value used for x): NULL or character}
 
-\item{labelY}{Label for y-axis (Default: the name of the column used for the y-axis): NULL or character}
+\item{labelY}{y-axis label (Default:Value used for y): NULL or character}
 
-\item{legend}{Legend label that represents the different colour categories (Default: the name of the column used to colour categorise the data): NULL or character}
+\item{legend}{Legend label for colour grouping (Default: Value used for colour): NULL or character}
 
-\item{chromatogramRegion}{A list that represents the different chromatogram regions (Default: NULL): NULL or list}
+\item{chromatogramRegion}{List that represents the different chromatogram regions of interest (Default: NULL): NULL or list}
 }
 \description{
-Plot chromatogram data using continuous data for x- and y-axis.
+Plot chromatogram data.
 }

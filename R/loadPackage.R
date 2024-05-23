@@ -1,15 +1,15 @@
 #' loadPackage
 #'
-#' Identify, install and load packages for usage.
+#' Load packages for usage. Automatically identifies and installs missing packages.
 #'
 #' @export
-#' @param packageList A vector of package names: character vector
+#' @param packageList Package names: character vector
 #'
 #' @examples
-#' # Example 1: Loading a single package
+#' # Example 1: Load a single package
 #' ticq::loadPackage(packageList = c("DT"))
 #'
-#' # Example 2: Loading multiple packages
+#' # Example 2: Load multiple packages
 #' ticq::loadPackage(packageList = c("DT", "dplyr"))
 loadPackage <- function(packageList) {
   # Identify and install missing packages
@@ -18,6 +18,6 @@ loadPackage <- function(packageList) {
     install.packages(missingPackage)
   }
   
-  # Load packages for usage
+  # Load packages
   lapply(packageList, require, character.only = TRUE)
 }

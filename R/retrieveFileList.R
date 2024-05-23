@@ -1,23 +1,23 @@
 #' retrieveFileList
 #' 
-#' Filter and retrieve file list of a specified extension type from input path.
+#' Filter and retrieve file list of a specified extension type stored within an input path.
 #' 
 #' @export
 #' @param input Input path containing a list of files to retrieve: character
 #' @param fileExtension File extension to filter for (Default: NULL): NULL or character
-#' @returns List of files within the input path that matches the file extension specified: character vector
+#' @returns List of files stored within the input path that matches the file extension specified: character vector
 #' 
 #' @examples
 #' inputFiles <- ticq::retrieveFileList(input = "/path/to/input/directory/", fileExtension = "JSON")
 retrieveFileList <- function(input, fileExtension = NULL) {
   # Check if input specified exists (either as a directory or a file)
   if (dir.exists(input) || file.exists(input)) {
-    # Retrieve file information
+    # Extract file information
     fileInfo <- file.info(input)
     
-    # Check if input is a directory or a file
-    # Retrieve file list accordingly
+    # Check if input is a directory or a file, and retrieve file list
     if (fileInfo$isdir) {
+      # Check if file extension is specified
       if (!is.null(fileExtension)) {
         inputFiles <- list.files(path = input, 
                                  pattern = paste0("\\.", fileExtension, "$"), 
@@ -26,6 +26,7 @@ retrieveFileList <- function(input, fileExtension = NULL) {
         inputFiles <- list.files(path = input)
       }
     } else {
+      # Check if file extension is specified
       if (!is.null(fileExtension)) {
         if (grepl(paste0("\\.", fileExtension, "$"), input, ignore.case = TRUE)) {
           inputFiles <- basename(input)

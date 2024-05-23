@@ -23,36 +23,36 @@ plotPCA(
 )
 }
 \arguments{
-\item{data}{An equal size data frame that contains columns representing data (variance) to perform PCA on. Should not contain NA values: data frame}
+\item{data}{Data frame that contains columns representing data to perform PCA on. Should be equal sized and not contain NA values: data frame}
 
-\item{startIDX}{The index of the first column data to perform PCA on: double}
+\item{startIDX}{Index of the first data column to perform PCA on: double}
 
-\item{endIDX}{The index of the last column data to perform PCA on (Default: NULL): NULL or double}
+\item{endIDX}{Index of the last data column data to perform PCA on (Default: NULL): NULL or double}
 
 \item{scale}{Scaling status for the PCA (Default: TRUE, Options: TRUE or FALSE): boolean}
 
-\item{confidence}{Confidence value of the data (Default: 95): double}
+\item{confidence}{Data confidence \% (Default: 95): double}
 
-\item{distribution}{Add distribution boundaries to the PCA scores plot (Default: NULL, Options: "normal" or "t"): NULL or character}
+\item{distribution}{Data distribution. Distribution boundary is drawn on scores plot and biplot (Default: NULL, Options: "normal" or "t"): NULL or character}
 
-\item{colour}{The name of the column that will be used to colour categorise the data (Default: NULL): NULL or character}
+\item{colour}{Name of the column used for colour grouping (Default: NULL): NULL or character}
 
-\item{shape}{The name of the column that will be used to shape categorise the data (Default: NULL): NULL or character}
+\item{shape}{Name of the column used for shape grouping (Default: NULL): NULL or character}
 
-\item{subtitle}{The subtitle for the plot (Default: NULL): NULL or character}
+\item{subtitle}{Plot subtitle (Default: NULL): NULL or character}
 
-\item{colourLegend}{Legend label that represents the different colour categories (Default: the name of the column used to colour categorise the data): NULL or character}
+\item{colourLegend}{Legend label for colour grouping (Default: Value used for colour): NULL or character}
 
-\item{shapeLegend}{Legend label that represents the different shape categories (Default: the name of the column used to shape categorise the data): NULL or character}
+\item{shapeLegend}{Legend label for shape grouping (Default: Value used for shape): NULL or character}
 
-\item{screePlt}{Toggle to display scree plot (Default: FALSE, Options: TRUE or FALSE): boolean}
+\item{screePlt}{Toggle printing of scree plot (Default: FALSE, Options: TRUE or FALSE): boolean}
 
-\item{scoresPlt}{Toggle to display scpres plot (Default: FALSE, Options: TRUE or FALSE): boolean}
+\item{scoresPlt}{Toggle printing of scores plot (Default: FALSE, Options: TRUE or FALSE): boolean}
 
-\item{loadingsPlt}{Toggle to display laodings plot (Default: FALSE, Options: TRUE or FALSE): boolean}
+\item{loadingsPlt}{Toggle printing of loadings plot (Default: FALSE, Options: TRUE or FALSE): boolean}
 
-\item{biPlt}{Toggle to display biplot (Default: FALSE, Options: TRUE or FALSE): boolean}
+\item{biPlt}{Toggle printing of biplot (Default: FALSE, Options: TRUE or FALSE): boolean}
 }
 \description{
-Plot data generated from Principle Component Analysis (PCA): Scree plot, scores plot, loadings plot and biplot.
+Perform Principle Component Analysis (PCA) and plot all associated plots (scree plot, scores plot, loadings plot and biplot).
 }

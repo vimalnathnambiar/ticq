@@ -7,7 +7,7 @@
 extractSampleType(input, matrix)
 }
 \arguments{
-\item{input}{Input to extract sample type from: character}
+\item{input}{Input to extract sample type: character}
 
 \item{matrix}{Associated sample matrix type: character}
 }

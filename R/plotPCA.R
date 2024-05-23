@@ -1,27 +1,27 @@
 #' plotPCA
 #' 
-#' Plot data generated from Principle Component Analysis (PCA): Scree plot, scores plot, loadings plot and biplot.
+#' Perform Principle Component Analysis (PCA) and plot all associated plots (scree plot, scores plot, loadings plot and biplot).
 #' 
 #' @import ggplot2
 #' @import HotellingEllipse
 #' @import ggforce
 #' 
 #' @export
-#' @param data An equal size data frame that contains columns representing data (variance) to perform PCA on. Should not contain NA values: data frame
-#' @param startIDX The index of the first column data to perform PCA on: double
-#' @param endIDX The index of the last column data to perform PCA on (Default: NULL): NULL or double
+#' @param data Data frame that contains columns representing data to perform PCA on. Should be equal sized and not contain NA values: data frame
+#' @param startIDX Index of the first data column to perform PCA on: double
+#' @param endIDX Index of the last data column data to perform PCA on (Default: NULL): NULL or double
 #' @param scale Scaling status for the PCA (Default: TRUE, Options: TRUE or FALSE): boolean
-#' @param confidence Confidence value of the data (Default: 95): double
-#' @param distribution Add distribution boundaries to the PCA scores plot (Default: NULL, Options: "normal" or "t"): NULL or character
-#' @param colour The name of the column that will be used to colour categorise the data (Default: NULL): NULL or character
-#' @param shape The name of the column that will be used to shape categorise the data (Default: NULL): NULL or character
-#' @param subtitle The subtitle for the plot (Default: NULL): NULL or character
-#' @param colourLegend Legend label that represents the different colour categories (Default: the name of the column used to colour categorise the data): NULL or character
-#' @param shapeLegend Legend label that represents the different shape categories (Default: the name of the column used to shape categorise the data): NULL or character
-#' @param screePlt Toggle to display scree plot (Default: FALSE, Options: TRUE or FALSE): boolean 
-#' @param scoresPlt Toggle to display scpres plot (Default: FALSE, Options: TRUE or FALSE): boolean 
-#' @param loadingsPlt Toggle to display laodings plot (Default: FALSE, Options: TRUE or FALSE): boolean 
-#' @param biPlt Toggle to display biplot (Default: FALSE, Options: TRUE or FALSE): boolean 
+#' @param confidence Data confidence % (Default: 95): double
+#' @param distribution Data distribution. Distribution boundary is drawn on scores plot and biplot (Default: NULL, Options: "normal" or "t"): NULL or character
+#' @param colour Name of the column used for colour grouping (Default: NULL): NULL or character
+#' @param shape Name of the column used for shape grouping (Default: NULL): NULL or character
+#' @param subtitle Plot subtitle (Default: NULL): NULL or character
+#' @param colourLegend Legend label for colour grouping (Default: Value used for colour): NULL or character
+#' @param shapeLegend Legend label for shape grouping (Default: Value used for shape): NULL or character
+#' @param screePlt Toggle printing of scree plot (Default: FALSE, Options: TRUE or FALSE): boolean 
+#' @param scoresPlt Toggle printing of scores plot (Default: FALSE, Options: TRUE or FALSE): boolean 
+#' @param loadingsPlt Toggle printing of loadings plot (Default: FALSE, Options: TRUE or FALSE): boolean 
+#' @param biPlt Toggle printing of biplot (Default: FALSE, Options: TRUE or FALSE): boolean 
 plotPCA <- function(data,
                     startIDX,
                     endIDX = NULL,
@@ -38,7 +38,7 @@ plotPCA <- function(data,
                     loadingsPlt = FALSE,
                     biPlt = FALSE) {
   tryCatch({
-    # Ensure no NA values in data frame
+    # Check and ensure no NA values in data frame
     if (is.null(endIDX)) {
       tmp <- data[, startIDX:ncol(data)]
     } else {
@@ -46,20 +46,19 @@ plotPCA <- function(data,
     }
     tmp <- tmp[complete.cases(tmp), ]
     
-    # Generate PCA data
+    # Perform PCA
     pca <- summary(prcomp(tmp, scale = scale))
     
-    # Variance data
+    # Identify variance based on the PCA
     variance <- data.frame(principalComponent = paste0("PC", 1:length(pca$importance[1, ])),
                            standardDev = pca$importance[1, ],
                            varianceProportion = pca$importance[2, ] * 100,
                            cumulativeProportion = pca$importance[3, ] * 100)
     
-    # Threshold based on variance
+    # Threshold limit based on variance and data confidence %
     threshold <- which(variance$cumulativeProportion >= confidence)[1]
     
-    # Print plots
-    # If threshold is more than 1
+    # Check if threshold is more than 1
     if (threshold > 1) {
       # Plot scree plot
       screePlot <- ggplot2::ggplot(data = variance,
@@ -92,13 +91,13 @@ plotPCA <- function(data,
                       x = "Principal Components",
                       y = "Proportion of Variance (%)")
       
-      
-      if (screePlt == TRUE) {
-        print(screePlot)
-      }
+        # Print scree plot
+        if (screePlt == TRUE) {
+          print(screePlot)
+        }
       
       tryCatch({
-        # Plot scores and loadings of the PCA
+        # PCA scores and loadings data
         scores <- data.frame(pca$x)
         loading <- data.frame(pca$rotation)
         
@@ -117,7 +116,7 @@ plotPCA <- function(data,
                                               y = .data[[paste0("PC", j)]]))
             
             
-              # Set colour and shapes
+              # Add colour and shape grouping
               if (is.null(colour)) {
                 if (is.null(shape)) {
                   scoresPlot <- scoresPlot +
@@ -178,8 +177,7 @@ plotPCA <- function(data,
                               shape = shapeLegend,
                               caption = paste0("Hotelling T² Ellipse (Blue: 95% Confidence; Red: 99% Confidence)"))
               
-              # Add distribution at a specific confidence
-              # If distribution is NOT NULL
+              # Add distribution boundary at a specific confidence
               if (!is.null(distribution)) {
                 if (distribution == "normal") {
                   scoresPlot <- scoresPlot +
@@ -194,6 +192,7 @@ plotPCA <- function(data,
                 }
               }
               
+              # Print scores plot
               if (scoresPlt == TRUE) {
                 print(scoresPlot)
               }
@@ -213,6 +212,7 @@ plotPCA <- function(data,
                             y = paste0("PC", j, " [", round(pca$importance[2, j] * 100, 2), "%]"),
                             colour = "Variables")
             
+              # Print loadings plot
               if (loadingsPlt == TRUE) {
                 print(loadingsPlot)
               }
@@ -230,7 +230,8 @@ plotPCA <- function(data,
                                      y = .data[[paste0("PC", j)]], 
                                      label = row.names(loading))) + 
               ggplot2::labs(title = "PCA Biplot")
-            
+              
+              # Print biplot
               if (biPlt == TRUE) {
                 print(biplot)
               }

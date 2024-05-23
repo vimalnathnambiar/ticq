@@ -7,7 +7,7 @@
 #' @import dplyr
 #'
 #' @export
-#' @param input Input to extract instrument name from: character
+#' @param input Input to extract instrument name: character
 #' @returns Instrument name
 #'
 #' @examples
