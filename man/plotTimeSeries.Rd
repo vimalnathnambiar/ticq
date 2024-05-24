@@ -49,7 +49,7 @@ plotTimeSeries(
 
 \item{boundary}{Boundary analysis to perform based on a +/- value from 0 (value) or 100 (percentage), or up to 2 standard deviation (sd) from average mean (Default: NULL, Options: "value", "percentage", "sd"): NULL or character}
 
-\item{boundaryValue}{Value used for boundary analysis. Not applicable for "sd" boundary analysis (Default: 0): double}
+\item{boundaryValue}{Value used for boundary analysis. For "sd" boundary analysis, use list(mean = meanValue, sd = sdValue, sd2 = sd2Value) (Default: 0): double or list}
 
 \item{xTick}{Toggle ticks on x-axis (Default: TRUE, Options: TRUE or FALSE): boolean}
 }

@@ -26,6 +26,11 @@ params:
 # Configuration Parameters {.tabset}
 Parameters configured for TICQ assessment.
 ```{r, echo = FALSE, warning = FALSE, include = FALSE}
+library(roxygen2)
+library(devtools)
+roxygenize("../.")
+load_all("../.")
+
 # Load (and install missing) packages
 ticq::loadPackage(packageList = c("DT", "dplyr"))
 
@@ -682,8 +687,8 @@ if (newStatus && msStatus) {
 }
 ```
 
-# Total Ion Current (TIC) Analysis
-Samples are analysed using the TIC values across 3 different chromatogram regions of interest: mass calibration, analyte and wash region.
+# Statistical Analysis {.tabset}
+The chromatogram regions of interest (mass calibration, analyte, and wash regions) of the samples by their corresponding type using statistical methodologies such as PCA, time series, and violin plot analyses.
 ```{r, echo = FALSE, warning = FALSE, include = FALSE}
 # If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
@@ -1642,7 +1647,7 @@ if (newStatus && msStatus) {
   xTick <- FALSE
   
   # Data frame to store analysis result
-  analysisResult <- data.frame()
+  analysisResult_TS <- data.frame()
 } else if (!newStatus) {
   print("Unable to perform Time Series Analysis: No new samples to analyse")
 } else if (!msStatus) {
@@ -1682,7 +1687,7 @@ if (newStatus && msStatus) {
                                        xTick = xTick)
 
         # Append analysis result
-        analysisResult <- rbind(analysisResult, result)
+        analysisResult_TS <- rbind(analysisResult_TS, result)
       }
 
       # Clean environment
@@ -1723,7 +1728,7 @@ if (newStatus && msStatus) {
                                        xTick = xTick)
         
         # Append analysis result
-        analysisResult <- rbind(analysisResult, result)
+        analysisResult_TS <- rbind(analysisResult_TS, result)
       }
     }
   } else {
@@ -1761,7 +1766,7 @@ if (newStatus && msStatus) {
                                        xTick = xTick)
         
         # Append analysis result
-        analysisResult <- rbind(analysisResult, result)
+        analysisResult_TS <- rbind(analysisResult_TS, result)
       }
     }
   } else {
@@ -1799,7 +1804,7 @@ if (newStatus && msStatus) {
                                        xTick = xTick)
         
         # Append analysis result
-        analysisResult <- rbind(analysisResult, result)
+        analysisResult_TS <- rbind(analysisResult_TS, result)
       }
     }
   } else {
@@ -1837,7 +1842,7 @@ if (newStatus && msStatus) {
                                        xTick = xTick)
         
         # Append analysis result
-        analysisResult <- rbind(analysisResult, result)
+        analysisResult_TS <- rbind(analysisResult_TS, result)
       }
     }
   } else {
@@ -1875,7 +1880,7 @@ if (newStatus && msStatus) {
                                        xTick = xTick)
         
         # Append analysis result
-        analysisResult <- rbind(analysisResult, result)
+        analysisResult_TS <- rbind(analysisResult_TS, result)
       }
     }
   } else {
@@ -1913,7 +1918,7 @@ if (newStatus && msStatus) {
                                        xTick = xTick)
         
         # Append analysis result
-        analysisResult <- rbind(analysisResult, result)
+        analysisResult_TS <- rbind(analysisResult_TS, result)
       }
     }
   } else {
@@ -1923,15 +1928,157 @@ if (newStatus && msStatus) {
 ```
 
 ### Sample
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data is available
+if (newStatus && msStatus) {
+  # Set patterns to check
+  pattern <- c("Sample Plasma", "Sample Serum", "Sample Urine")
+  
+  # Check if any of the patterns exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Generate time series plot for each pattern combination that exists
+    for (i in pattern) {
+      # If pattern exists in sample type list
+      if (i %in% sampleTypeList) {
+        # Set patterns to search for long term references to compare against
+        tmpPattern <- sub("Sample ", "", i)
+        tmpPattern <- c(paste("sLTR", tmpPattern), paste("LTR", tmpPattern))
+        
+        # Calculate mean and standard deviations (sd and sd2) of long term references if applicable
+        tmpReferenceData <- plotData %>%
+          dplyr::filter(.data[[sampleType]] %in% tmpPattern)
+        if (nrow(tmpReferenceData) > 1) {
+          boundaryValue <- ticq::generateStat(data = tmpReferenceData[[prewashRegion]]) %>%
+            dplyr::select(mean, sd, sd2) %>%
+            as.list()
+        } else {
+          boundaryValue <- 0
+        }
+                
+        # Plot time series
+        result <- ticq::plotTimeSeries(data = plotData %>% 
+                                         dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, i)),
+                                       x = date,
+                                       y = prewashRegion,
+                                       colour = colour,
+                                       shape = shape,
+                                       subtitle = i,
+                                       labelX = labelX,
+                                       labelY = labelY,
+                                       colourLegend = colourLegend,
+                                       shapeLegend = shapeLegend,
+                                       boundary = boundary,
+                                       boundaryValue = boundaryValue,
+                                       xTick = xTick) %>%
+          dplyr::filter(.data[[sampleType]] %in% i)
+        
+        # Append analysis result
+        analysisResult_TS <- rbind(analysisResult_TS, result)
+        
+        # Clean environment
+        rm(tmpPattern, tmpReferenceData, boundaryValue)
+        invisible(gc())
+      }
+    }
+  } else {
+    print("No available data")
+  }
+}
+```
 
 ### dSample
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data is available
+if (newStatus && msStatus) {
+  # Set patterns to check
+  pattern <- c("dSample Plasma", "dSample Serum", "dSample Urine")
+  
+  # Check if any of the patterns exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Generate time series plot for each pattern combination that exists
+    for (i in pattern) {
+      # If pattern exists in sample type list
+      if (i %in% sampleTypeList) {
+        # Set patterns to search for long term references to compare against
+        tmpPattern <- sub("dSample ", "", i)
+        tmpPattern <- c(paste("dLTR", tmpPattern))
+        
+        # Calculate mean and standard deviations (sd and sd2) of long term references if applicable
+        tmpReferenceData <- plotData %>%
+          dplyr::filter(.data[[sampleType]] %in% tmpPattern)
+        if (nrow(tmpReferenceData) > 1) {
+          boundaryValue <- ticq::generateStat(data = tmpReferenceData[[prewashRegion]]) %>%
+            dplyr::select(mean, sd, sd2) %>%
+            as.list()
+        } else {
+          boundaryValue <- 0
+        }
+                
+        # Plot time series
+        result <- ticq::plotTimeSeries(data = plotData %>% 
+                                         dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, i)),
+                                       x = date,
+                                       y = prewashRegion,
+                                       colour = colour,
+                                       shape = shape,
+                                       subtitle = i,
+                                       labelX = labelX,
+                                       labelY = labelY,
+                                       colourLegend = colourLegend,
+                                       shapeLegend = shapeLegend,
+                                       boundary = boundary,
+                                       boundaryValue = boundaryValue,
+                                       xTick = xTick) %>%
+          dplyr::filter(.data[[sampleType]] %in% i)
+        
+        # Append analysis result
+        analysisResult_TS <- rbind(analysisResult_TS, result)
+        
+        # Clean environment
+        rm(tmpPattern, tmpReferenceData, boundaryValue)
+        invisible(gc())
+      }
+    }
+  } else {
+    print("No available data")
+  }
+  
+  # Clean environment
+  rm(labelX, labelY, boundary, xTick, pattern, i, result)
+  invisible(gc())
+}
+```
 
+# Report {.tabset}
+## Time Series Analysis
+The report highlights the deviation significance of the samples from the average mean performance of the prewash region.
 
-
-
-
-
-
-
-
+**RED** = Very High or Very Low  
+**YELLOW** = Low or High    
+**GREEN** = Normal    
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data is available
+if (newStatus && msStatus) {
+  # If result table is not empty
+  if (ncol(analysisResult_TS) != 0) {
+    print(DT::datatable(data = analysisResult_TS %>%
+                          dplyr::select(all_of(colnames(analysisResult_TS)[which(colnames(analysisResult_TS) == sampleID):
+                                                                           which(colnames(analysisResult_TS) == spectrumCount)]), 
+                                        prewashRegion, sampleRange) %>%
+                          dplyr::filter(.data[[projectCohort]] != "Historical"),
+                        filter = "top",
+                        options = list(scrollX = TRUE)) %>%
+            DT::formatStyle("sampleRange",
+                            target = "row",
+                            backgroundColor = styleEqual(c("Very Low", "Low", "Normal", "High", "Very High"), 
+                                                         c("red", "yellow", "green", "yellow", "red"))))
+  } else {
+    print("Unable to display results - No available data")
+  }
+  
+  # Clean environment
+  rm(analysisResult_TS)
+  invisible(gc())
+}
+```
 

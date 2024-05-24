@@ -19,7 +19,7 @@
 #' @param colourLegend Legend label for colour grouping (Default: Value used for colour): NULL or character
 #' @param shapeLegend Legend label for shape grouping (Default: Value used for shape)
 #' @param boundary Boundary analysis to perform based on a +/- value from 0 (value) or 100 (percentage), or up to 2 standard deviation (sd) from average mean (Default: NULL, Options: "value", "percentage", "sd"): NULL or character
-#' @param boundaryValue Value used for boundary analysis. Not applicable for "sd" boundary analysis (Default: 0): double
+#' @param boundaryValue Value used for boundary analysis. For "sd" boundary analysis, use list(mean = meanValue, sd = sdValue, sd2 = sd2Value) (Default: 0): double or list
 #' @param xTick Toggle ticks on x-axis (Default: TRUE, Options: TRUE or FALSE): boolean
 #' @returns Data frame containing the boundary analysis result (if specified)
 plotTimeSeries <- function(data, 
@@ -89,10 +89,8 @@ plotTimeSeries <- function(data,
     }
     
     # Add and perform boundary analysis
+    result <- NULL
     if (!is.null(boundary)) {
-      # Data frame to store analysis result
-      result <- data.frame()
-      
       # Check the type of boundary to draw (value, percentage or sd)
       if (boundary == "value") {
         # Add boundaries
@@ -123,7 +121,7 @@ plotTimeSeries <- function(data,
           dplyr::filter(.data[[y]] > upperBound) %>%
           dplyr::mutate(sampleRange = "High")
         
-        result <- rbind(result, low, normal, high)
+        result <- rbind(low, normal, high)
       } else if (boundary == "percentage") {
         # Add boundaries
         lowerBound <- 100 - boundaryValue
@@ -153,14 +151,20 @@ plotTimeSeries <- function(data,
           dplyr::filter(.data[[y]] > upperBound) %>%
           dplyr::mutate(sampleRange = "High")
         
-        result <- rbind(result, low, normal, high)
+        result <- rbind(low, normal, high)
       } else if (boundary == "sd") {
-        # Check if there are more than 1 data point to generate stats on
-        if (nrow(data) > 1) {
-          # Generate stats
-          mean <- mean(data[[y]])
-          sd <- sd(data[[y]])
-          sd2 <- sd(2 * data[[y]])
+        # Check if there are more than 1 data point or if boundaryValue (list containing mean and necessary standard deviation values) is provided
+        if (nrow(data) > 1 || is.list(boundaryValue)) {
+          # Get mean and standard deviation values
+          if (is.list(boundaryValue)) {
+            mean <- boundaryValue$mean
+            sd <- boundaryValue$sd
+            sd2 <- boundaryValue$sd2
+          } else {
+            mean <- mean(data[[y]])
+            sd <- sd(data[[y]])
+            sd2 <- sd(2 * data[[y]])
+          }
           
           # Add boundaries
           lowerBound1 <- mean - sd
@@ -206,18 +210,20 @@ plotTimeSeries <- function(data,
             dplyr::filter(.data[[y]] > upperBound2) %>%
             dplyr::mutate(sampleRange = "Very High")
           
-          result <- rbind(result, veryLow, low, normal, high, veryHigh)
+          result <- rbind(veryLow, low, normal, high, veryHigh)
         } else {
           result <- data %>%
             dplyr::mutate(sampleRange = "Normal")
         }
-      } else {
-        result <- NULL
       }
     }
     
     print(timeSeries)
-    return(result)
+    
+    # If boundary analysis generated results
+    if (!is.null(result)) {
+      return(result)
+    }
   }, 
   warning = function(w) {
     print(paste0("Unable to perform Time Series Analysis - ", w))
