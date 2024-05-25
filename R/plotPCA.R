@@ -18,10 +18,10 @@
 #' @param subtitle Plot subtitle (Default: NULL): NULL or character
 #' @param colourLegend Legend label for colour grouping (Default: Value used for colour): NULL or character
 #' @param shapeLegend Legend label for shape grouping (Default: Value used for shape): NULL or character
-#' @param screePlt Toggle printing of scree plot (Default: FALSE, Options: TRUE or FALSE): boolean 
-#' @param scoresPlt Toggle printing of scores plot (Default: FALSE, Options: TRUE or FALSE): boolean 
-#' @param loadingsPlt Toggle printing of loadings plot (Default: FALSE, Options: TRUE or FALSE): boolean 
-#' @param biPlt Toggle printing of biplot (Default: FALSE, Options: TRUE or FALSE): boolean 
+#' @param screePlotToggle Toggle printing of scree plot (Default: TRUE, Options: TRUE or FALSE): boolean 
+#' @param scoresPlotToggle Toggle printing of scores plot (Default: TRUE, Options: TRUE or FALSE): boolean 
+#' @param loadingsPlotToggle Toggle printing of loadings plot (Default: TRUE, Options: TRUE or FALSE): boolean 
+#' @param biPlotToggle Toggle printing of biplot (Default: TRUE, Options: TRUE or FALSE): boolean 
 plotPCA <- function(data,
                     startIDX,
                     endIDX = NULL,
@@ -33,10 +33,10 @@ plotPCA <- function(data,
                     subtitle = NULL,
                     colourLegend = colour,
                     shapeLegend = shape,
-                    screePlt = FALSE,
-                    scoresPlt = FALSE,
-                    loadingsPlt = FALSE,
-                    biPlt = FALSE) {
+                    screePlotToggle = TRUE,
+                    scoresPlotToggle = TRUE,
+                    loadingsPlotToggle = TRUE,
+                    biPlotToggle = TRUE) {
   tryCatch({
     # Check and ensure no NA values in data frame
     if (is.null(endIDX)) {
@@ -62,7 +62,7 @@ plotPCA <- function(data,
     if (threshold > 1) {
       # Plot scree plot
       screePlot <- ggplot2::ggplot(data = variance,
-                                   aes(x = principalComponent,
+                                   aes(x = principalComponent, 
                                        y = varianceProportion,
                                        group = 1)) + 
         ggplot2::geom_col(fill = "orange") +
@@ -92,7 +92,7 @@ plotPCA <- function(data,
                       y = "Proportion of Variance (%)")
       
         # Print scree plot
-        if (screePlt == TRUE) {
+        if (screePlotToggle == TRUE) {
           print(screePlot)
         }
       
@@ -112,70 +112,45 @@ plotPCA <- function(data,
             
             # Plot scores
             scoresPlot <- ggplot2::ggplot(data = scores,
-                                          aes(x = .data[[paste0("PC", i)]],
-                                              y = .data[[paste0("PC", j)]]))
-            
-            
-              # Add colour and shape grouping
-              if (is.null(colour)) {
-                if (is.null(shape)) {
-                  scoresPlot <- scoresPlot +
-                    ggplot2::geom_point(alpha = 0.25)
-                } else {
-                  scoresPlot <- scoresPlot +
-                    ggplot2::geom_point(aes(shape = data[[shape]]),
-                                        alpha = 0.25)
-                }
-              } else {
-                if (is.null(shape)) {
-                  scoresPlot <- scoresPlot +
-                    ggplot2::geom_point(aes(colour = data[[colour]],
-                                            group = ifelse(data[[colour]] == "Historical", 1, 2)),
-                                        alpha = 0.25)
-                } else {
-                  scoresPlot <- scoresPlot +
-                    ggplot2::geom_point(aes(colour = data[[colour]],
-                                            shape = data[[shape]],
-                                            group = ifelse(data[[colour]] == "Historical", 1, 2)),
-                                        alpha = 0.25)
-                }
-              }
-              
-              # Add lines
-              scoresPlot <- scoresPlot +
-                ggplot2::geom_vline(xintercept = 0,
-                                    linetype = "solid",
-                                    colour = "grey",
-                                    linewidth = 0.2) +
-                ggplot2::geom_hline(yintercept = 0,
-                                    linetype = "solid",
-                                    colour = "grey",
-                                    linewidth = 0.2) +
-                ggforce::geom_ellipse(aes(x0 = 0,
-                                          y0 = 0,
-                                          a = hotelling$Ellipse$a.95pct,
-                                          b = hotelling$Ellipse$b.95pct,
-                                          angle = 0),
-                                      linetype = "dashed",
-                                      colour = "blue") +
-                ggforce::geom_ellipse(aes(x0 = 0,
-                                          y0 = 0,
-                                          a = hotelling$Ellipse$a.99pct,
-                                          b = hotelling$Ellipse$b.99pct,
-                                          angle = 0),
-                                      linetype = "dashed",
-                                      colour = "red") +
-                ggplot2::theme(panel.background = element_blank(),
-                               axis.line = element_line(colour = "black"),
-                               legend.title = element_text(size = 8),
-                               legend.text = element_text(size = 8)) +
-                ggplot2::labs(title = "PCA Scores Plot",
-                              subtitle = subtitle,
-                              x = paste0("PC", i, " [", round(pca$importance[2, i] * 100, 2), "%]"),
-                              y = paste0("PC", j, " [", round(pca$importance[2, j] * 100, 2), "%]"),
-                              colour = colourLegend,
-                              shape = shapeLegend,
-                              caption = paste0("Hotelling T² Ellipse (Blue: 95% Confidence; Red: 99% Confidence)"))
+                                          aes(x = .data[[paste0("PC", i)]], 
+                                              y = .data[[paste0("PC", j)]])) +
+              ggplot2::geom_point(aes(colour = if (!is.null(colour)) data[[colour]] else NULL,
+                                      shape = if (!is.null(shape)) data[[shape]] else NULL,
+                                      group = if (!is.null(colour)) ifelse(data[[colour]] == "Historical", 1, 2) else NULL),
+                                  alpha = 0.25) +
+              ggplot2::geom_vline(xintercept = 0,
+                                  linetype = "solid",
+                                  colour = "grey",
+                                  linewidth = 0.2) +
+              ggplot2::geom_hline(yintercept = 0,
+                                  linetype = "solid",
+                                  colour = "grey",
+                                  linewidth = 0.2) +
+              ggforce::geom_ellipse(aes(x0 = 0,
+                                        y0 = 0,
+                                        a = hotelling$Ellipse$a.95pct,
+                                        b = hotelling$Ellipse$b.95pct,
+                                        angle = 0),
+                                    linetype = "dashed",
+                                    colour = "blue") +
+              ggforce::geom_ellipse(aes(x0 = 0,
+                                        y0 = 0,
+                                        a = hotelling$Ellipse$a.99pct,
+                                        b = hotelling$Ellipse$b.99pct,
+                                        angle = 0),
+                                    linetype = "dashed",
+                                    colour = "red") +
+              ggplot2::theme(panel.background = element_blank(),
+                             axis.line = element_line(colour = "black"),
+                             legend.title = element_text(size = 8),
+                             legend.text = element_text(size = 8)) +
+              ggplot2::labs(title = "PCA Scores Plot",
+                            subtitle = subtitle,
+                            x = paste0("PC", i, " [", round(pca$importance[2, i] * 100, 2), "%]"),
+                            y = paste0("PC", j, " [", round(pca$importance[2, j] * 100, 2), "%]"),
+                            colour = colourLegend,
+                            shape = shapeLegend,
+                            caption = paste0("Hotelling T² Ellipse (Blue: 95% Confidence; Red: 99% Confidence)"))
               
               # Add distribution boundary at a specific confidence
               if (!is.null(distribution)) {
@@ -193,7 +168,7 @@ plotPCA <- function(data,
               }
               
               # Print scores plot
-              if (scoresPlt == TRUE) {
+              if (scoresPlotToggle == TRUE) {
                 print(scoresPlot)
               }
             
@@ -213,7 +188,7 @@ plotPCA <- function(data,
                             colour = "Variables")
             
               # Print loadings plot
-              if (loadingsPlt == TRUE) {
+              if (loadingsPlotToggle == TRUE) {
                 print(loadingsPlot)
               }
             
@@ -232,17 +207,17 @@ plotPCA <- function(data,
               ggplot2::labs(title = "PCA Biplot")
               
               # Print biplot
-              if (biPlt == TRUE) {
+              if (biPlotToggle == TRUE) {
                 print(biplot)
               }
           }
         }
       },
       warning = function(w) {
-        print(paste0("Unable to plot PCA scores and loadings - ", w))
+        print(paste0("Unable to plot PCA results - ", w))
       },
       error = function(e) {
-        print(paste0("Unable to plot PCA scores and loadings - ", e))
+        print(paste0("Unable to plot PCA results - ", e))
       })
     } else {
       print(paste("Unable to plot PCA results - Only PC1 satisfies the threshold limit"))

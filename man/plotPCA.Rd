@@ -16,10 +16,10 @@ plotPCA(
   subtitle = NULL,
   colourLegend = colour,
   shapeLegend = shape,
-  screePlt = FALSE,
-  scoresPlt = FALSE,
-  loadingsPlt = FALSE,
-  biPlt = FALSE
+  screePlotToggle = TRUE,
+  scoresPlotToggle = TRUE,
+  loadingsPlotToggle = TRUE,
+  biPlotToggle = TRUE
 )
 }
 \arguments{
@@ -45,13 +45,13 @@ plotPCA(
 
 \item{shapeLegend}{Legend label for shape grouping (Default: Value used for shape): NULL or character}
 
-\item{screePlt}{Toggle printing of scree plot (Default: FALSE, Options: TRUE or FALSE): boolean}
+\item{screePlotToggle}{Toggle printing of scree plot (Default: TRUE, Options: TRUE or FALSE): boolean}
 
-\item{scoresPlt}{Toggle printing of scores plot (Default: FALSE, Options: TRUE or FALSE): boolean}
+\item{scoresPlotToggle}{Toggle printing of scores plot (Default: TRUE, Options: TRUE or FALSE): boolean}
 
-\item{loadingsPlt}{Toggle printing of loadings plot (Default: FALSE, Options: TRUE or FALSE): boolean}
+\item{loadingsPlotToggle}{Toggle printing of loadings plot (Default: TRUE, Options: TRUE or FALSE): boolean}
 
-\item{biPlt}{Toggle printing of biplot (Default: FALSE, Options: TRUE or FALSE): boolean}
+\item{biPlotToggle}{Toggle printing of biplot (Default: TRUE, Options: TRUE or FALSE): boolean}
 }
 \description{
 Perform Principle Component Analysis (PCA) and plot all associated plots (scree plot, scores plot, loadings plot and biplot).

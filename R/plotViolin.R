@@ -1,6 +1,6 @@
-#' plotTimeSeries
+#' plotViolin
 #' 
-#' Plot time series data and perform boundary analysis (if specified).
+#' Plot violin plots and perform boundary analysis (if specified).
 #' 
 #' @import ggplot2
 #' @import dplyr
@@ -11,6 +11,7 @@
 #' @param y Name of the column that represents the continuous data series for y-axis: character
 #' @param colour Name of the column used for colour grouping (Default: NULL): NULL or character
 #' @param shape Name of the column used for shape grouping (Default: NULL): NULL or character
+#' @param outlierShape Shape used to identify outliers ((Default: NA): NA or double)
 #' @param title Plot title (Default: "Time Series"): character
 #' @param subtitle Plot subtitle (Default: NULL): NULL or character
 #' @param caption Plot caption (Default: NULL): NULL or character
@@ -19,50 +20,69 @@
 #' @param colourLegend Legend label for colour grouping (Default: Value used for colour): NULL or character
 #' @param shapeLegend Legend label for shape grouping (Default: Value used for shape)
 #' @param boundary Boundary analysis to perform based on a +/- value from 0 (value) or 100 (percentage), or up to 2 standard deviation (sd) from average mean (Default: NULL, Options: "value", "percentage", "sd"): NULL or character
-#' @param boundaryValue Value used for boundary analysis. To specify values for "sd" boundary analysis, use list(mean = meanValue, sd = sdValue, sd2 = sd2Value) (Default: 0): double or list
-#' @param xTickToggle Toggle ticks on x-axis (Default: TRUE, Options: TRUE or FALSE): boolean
+#' @param boundaryValue Value used for boundary analysis. For "sd" boundary analysis, use list(mean = meanValue, sd = sdValue, sd2 = sd2Value) (Default: 0): double or list
+#' @param violinPlotToggle Toggle printing of violin plot (Default: TRUE, Options: TRUE or FALSE): boolean 
+#' @param tailTrimToggle Toggle to trim the tails of the violin plot. Applicable only if violinPlotToggle is set to TRUE (Default: FALSE, Options: TRUE or FALSE): boolean
+#' @param boxPlotToggle Toggle printing of box plot (Default: TRUE, Options: TRUE or FALSE): boolean 
+#' @param boxWidth Width of box plot. Applicable if boxPlotToggle is set to TRUE (Default: 1): double
 #' @returns Data frame containing the boundary analysis result (if specified)
-plotTimeSeries <- function(data, 
-                           x, 
-                           y, 
-                           colour = NULL, 
-                           shape = NULL,
-                           title = "Time Series", 
-                           subtitle = NULL, 
-                           caption = NULL, 
-                           labelX = x, 
-                           labelY = y, 
-                           colourLegend = colour, 
-                           shapeLegend = shape,
-                           boundary = NULL, 
-                           boundaryValue = 0, 
-                           xTickToggle = TRUE) {
+plotViolin <- function(data, 
+                       x, 
+                       y, 
+                       colour = NULL,
+                       shape = NULL,
+                       outlierShape = NA,
+                       title = "Violin Plot", 
+                       subtitle = NULL, 
+                       caption = NULL, 
+                       labelX = x, 
+                       labelY = y,
+                       colourLegend = colour, 
+                       shapeLegend = shape,
+                       boundary = NULL, 
+                       boundaryValue = 0,
+                       violinPlotToggle = TRUE,
+                       tailTrimToggle = FALSE,
+                       boxPlotToggle = TRUE,
+                       boxWidth = 1) {
   tryCatch({    
-    # Plot time series
-    timeSeries <- ggplot2::ggplot(data = data,
-                                  aes(x = .data[[x]], y = .data[[y]])) +
-      ggplot2::geom_point(aes(colour = if (!is.null(colour)) .data[[colour]] else NULL,
-                              shape = if (!is.null(shape)) .data[[shape]] else NULL,
-                              group = if (!is.null(colour)) ifelse(.data[[colour]] == "Historical", 1, 2) else NULL),
-                          alpha = 0.25) +
-      ggplot2::theme(panel.background = element_blank(),
-                     axis.line = element_line(colour = "black"),
-                     legend.title = element_text(size = 8),
-                     legend.text = element_text(size = 8)) + 
-      ggplot2::labs(title = title,
-                    subtitle = subtitle,
-                    caption = caption,
-                    x = labelX,
-                    y = labelY,
-                    colour = colourLegend,
-                    shape = shapeLegend)
+    # Plot violin plot
+    violinPlot <- ggplot2::ggplot(data = data,
+                                  aes(x = .data[[x]], y = .data[[y]]))
     
-      # Remove xTick
-      if (!xTickToggle) {
-        timeSeries <- timeSeries +
-          ggplot2::theme(axis.text.x = element_blank(),
-                         axis.ticks.x = element_blank())
-      }
+      # Display box or violin or both
+        # Violin plot
+        if (violinPlotToggle) {
+          violinPlot <- violinPlot + 
+            ggplot2::geom_violin(trim = tailTrimToggle)
+        }
+      
+        # Box plot
+        if (boxPlotToggle) {
+          violinPlot <- violinPlot +
+            ggplot2::geom_boxplot(outlier.color = "red",
+                                  outlier.shape = outlierShape,
+                                  width = boxWidth)
+        }
+    
+      # Add colour and shape grouping, theme and labels
+      violinPlot <- violinPlot +
+        ggplot2::geom_jitter(aes(colour = if (!is.null(colour)) .data[[colour]] else NULL,
+                                 shape = if (!is.null(shape)) .data[[shape]] else NULL,
+                                 group = if (!is.null(colour)) ifelse(.data[[colour]] == "Historical", 1, 2) else NULL),
+                             alpha = 0.25,
+                             position = position_jitter(seed = 1, width = 0.2)) +
+        ggplot2::theme(panel.background = element_blank(),
+                       axis.line = element_line(colour = "black"),
+                       legend.title = element_text(size = 8),
+                       legend.text = element_text(size = 8)) + 
+        ggplot2::labs(title = title,
+                      subtitle = subtitle,
+                      caption = caption,
+                      x = labelX,
+                      y = labelY,
+                      colour = colourLegend,
+                      shape = shapeLegend)
     
     # Add and perform boundary analysis
     result <- NULL
@@ -73,7 +93,7 @@ plotTimeSeries <- function(data,
         lowerBound <- 0 - boundaryValue
         upperBound <- 0 + boundaryValue
         
-        timeSeries <- timeSeries + 
+        violinPlot <- violinPlot + 
           ggplot2::geom_hline(yintercept = 0,
                               linetype = "dashed",
                               colour = "grey") +
@@ -103,7 +123,7 @@ plotTimeSeries <- function(data,
         lowerBound <- 100 - boundaryValue
         upperBound <- 100 + boundaryValue
         
-        timeSeries <- timeSeries + 
+        violinPlot <- violinPlot + 
           ggplot2::geom_hline(yintercept = 100,
                               linetype = "dashed",
                               colour = "grey") +
@@ -148,7 +168,7 @@ plotTimeSeries <- function(data,
           lowerBound2 <- mean - sd2
           upperBound2 <- mean + sd2
           
-          timeSeries <- timeSeries +
+          violinPlot <- violinPlot +
             ggplot2::geom_hline(yintercept = mean,
                                 linetype = "dashed",
                                 colour = "grey") +
@@ -194,7 +214,7 @@ plotTimeSeries <- function(data,
       }
     }
     
-    print(timeSeries)
+    print(violinPlot)
     
     # If boundary analysis generated results
     if (!is.null(result)) {
@@ -202,12 +222,12 @@ plotTimeSeries <- function(data,
     }
   }, 
   warning = function(w) {
-    print(paste0("Unable to perform Time Series Analysis - ", w))
+    print(paste0("Unable to perform Violin Plot Analysis - ", w))
     result <- NULL
     return(result)
   },
   error = function(e) {
-    print(paste0("Unable to perform Time Series Analysis - ", e))
+    print(paste0("Unable to perform Violin Plot Analysis - ", e))
     result <- NULL
     return(result)
   })

@@ -14,7 +14,7 @@ plotChromatogram(
   caption = NULL,
   labelX = x,
   labelY = y,
-  legend = colour,
+  colourLegend = colour,
   chromatogramRegion = NULL
 )
 }
@@ -37,7 +37,7 @@ plotChromatogram(
 
 \item{labelY}{y-axis label (Default:Value used for y): NULL or character}
 
-\item{legend}{Legend label for colour grouping (Default: Value used for colour): NULL or character}
+\item{colourLegend}{Legend label for colour grouping (Default: Value used for colour): NULL or character}
 
 \item{chromatogramRegion}{List that represents the different chromatogram regions of interest (Default: NULL): NULL or list}
 }

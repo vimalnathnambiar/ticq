@@ -26,11 +26,6 @@ params:
 # Configuration Parameters {.tabset}
 Parameters configured for TICQ assessment.
 ```{r, echo = FALSE, warning = FALSE, include = FALSE}
-library(roxygen2)
-library(devtools)
-roxygenize("../.")
-load_all("../.")
-
 # Load (and install missing) packages
 ticq::loadPackage(packageList = c("DT", "dplyr"))
 
@@ -407,7 +402,7 @@ if (newStatus && msStatus) {
                                subtitle = paste("LTR", i),
                                labelX = labelX,
                                labelY = labelY,
-                               legend = colourLegend,
+                               colourLegend = colourLegend,
                                chromatogramRegion = chromatogramRegion)
       }
       
@@ -443,7 +438,7 @@ if (newStatus && msStatus) {
                                subtitle = i,
                                labelX = labelX,
                                labelY = labelY,
-                               legend = colourLegend,
+                               colourLegend = colourLegend,
                                chromatogramRegion = chromatogramRegion)
       }
     }
@@ -476,7 +471,7 @@ if (newStatus && msStatus) {
                                subtitle = i,
                                labelX = labelX,
                                labelY = labelY,
-                               legend = colourLegend,
+                               colourLegend = colourLegend,
                                chromatogramRegion = chromatogramRegion)
       }
     }
@@ -509,7 +504,7 @@ if (newStatus && msStatus) {
                                subtitle = i,
                                labelX = labelX,
                                labelY = labelY,
-                               legend = colourLegend,
+                               colourLegend = colourLegend,
                                chromatogramRegion = chromatogramRegion)
       }
     }
@@ -542,7 +537,7 @@ if (newStatus && msStatus) {
                                subtitle = i,
                                labelX = labelX,
                                labelY = labelY,
-                               legend = colourLegend,
+                               colourLegend = colourLegend,
                                chromatogramRegion = chromatogramRegion)
       }
     }
@@ -575,7 +570,7 @@ if (newStatus && msStatus) {
                                subtitle = i,
                                labelX = labelX,
                                labelY = labelY,
-                               legend = colourLegend,
+                               colourLegend = colourLegend,
                                chromatogramRegion = chromatogramRegion)
       }
     }
@@ -608,7 +603,7 @@ if (newStatus && msStatus) {
                                subtitle = i,
                                labelX = labelX,
                                labelY = labelY,
-                               legend = colourLegend,
+                               colourLegend = colourLegend,
                                chromatogramRegion = chromatogramRegion)
       }
     }
@@ -641,7 +636,7 @@ if (newStatus && msStatus) {
                                subtitle = i,
                                labelX = labelX,
                                labelY = labelY,
-                               legend = colourLegend,
+                               colourLegend = colourLegend,
                                chromatogramRegion = chromatogramRegion)
       }
     }
@@ -674,7 +669,7 @@ if (newStatus && msStatus) {
                                subtitle = i,
                                labelX = labelX,
                                labelY = labelY,
-                               legend = colourLegend,
+                               colourLegend = colourLegend,
                                chromatogramRegion = chromatogramRegion)
       }
     }
@@ -711,7 +706,7 @@ if (newStatus && msStatus) {
 ```
 
 ## Principal Component Analysis (PCA) {.tabset}
-PCA provides an overview of the overall sample variance influenced by the 3 chromatogram regions of interest. 
+PCA provides an overview of the overall sample variance influenced by the 3 chromatogram regions of interest: mass calibration, analyte, and wash regions. 
 ```{r, echo = FALSE, warning = FALSE}
 # Check if there are new samples to process and MS level 1 spectral data is available
 if (!newStatus) {
@@ -720,10 +715,10 @@ if (!newStatus) {
   print("Unable to perform Principal Component Analysis: No available MS level 1 spectral data")
 } else {
   # Set toggles for PCA plot printing
-  screePlt <- TRUE
-  scoresPlt <- FALSE
-  loadingsPlt <- FALSE
-  biPlt <- TRUE
+  screePlotToggle <- TRUE
+  scoresPlotToggle <- FALSE
+  loadingsPlotToggle <- FALSE
+  biPlotToggle <- TRUE
 }
 ```
 
@@ -746,10 +741,10 @@ if (newStatus && msStatus) {
                   subtitle = "LTR Plasma",
                   colourLegend = colourLegend,
                   shapeLegend = shapeLegend,
-                  screePlt = screePlt,
-                  scoresPlt = scoresPlt,
-                  loadingsPlt = loadingsPlt,
-                  biPlt = biPlt)
+                  screePlotToggle = screePlotToggle,
+                  scoresPlotToggle = scoresPlotToggle,
+                  loadingsPlotToggle = loadingsPlotToggle,
+                  biPlotToggle = biPlotToggle)
   } else {
     print("No available data")
   }
@@ -774,10 +769,10 @@ if (newStatus && msStatus) {
                   subtitle = "LTR Serum",
                   colourLegend = colourLegend,
                   shapeLegend = shapeLegend,
-                  screePlt = screePlt,
-                  scoresPlt = scoresPlt,
-                  loadingsPlt = loadingsPlt,
-                  biPlt = biPlt)
+                  screePlotToggle = screePlotToggle,
+                  scoresPlotToggle = scoresPlotToggle,
+                  loadingsPlotToggle = loadingsPlotToggle,
+                  biPlotToggle = biPlotToggle)
   } else {
     print("No available data")
   }
@@ -802,10 +797,10 @@ if (newStatus && msStatus) {
                   subtitle = "LTR Urine",
                   colourLegend = colourLegend,
                   shapeLegend = shapeLegend,
-                  screePlt = screePlt,
-                  scoresPlt = scoresPlt,
-                  loadingsPlt = loadingsPlt,
-                  biPlt = biPlt)
+                  screePlotToggle = screePlotToggle,
+                  scoresPlotToggle = scoresPlotToggle,
+                  loadingsPlotToggle = loadingsPlotToggle,
+                  biPlotToggle = biPlotToggle)
   } else {
     print("No available data")
   }
@@ -831,10 +826,10 @@ if (newStatus && msStatus) {
                   subtitle = pattern,
                   colourLegend = colourLegend,
                   shapeLegend = shapeLegend,
-                  screePlt = screePlt,
-                  scoresPlt = scoresPlt,
-                  loadingsPlt = loadingsPlt,
-                  biPlt = biPlt)
+                  screePlotToggle = screePlotToggle,
+                  scoresPlotToggle = scoresPlotToggle,
+                  loadingsPlotToggle = loadingsPlotToggle,
+                  biPlotToggle = biPlotToggle)
   } else {
     print("No available data")
   }
@@ -859,10 +854,10 @@ if (newStatus && msStatus) {
                   subtitle = pattern,
                   colourLegend = colourLegend,
                   shapeLegend = shapeLegend,
-                  screePlt = screePlt,
-                  scoresPlt = scoresPlt,
-                  loadingsPlt = loadingsPlt,
-                  biPlt = biPlt)
+                  screePlotToggle = screePlotToggle,
+                  scoresPlotToggle = scoresPlotToggle,
+                  loadingsPlotToggle = loadingsPlotToggle,
+                  biPlotToggle = biPlotToggle)
   } else {
     print("No available data")
   }
@@ -887,10 +882,10 @@ if (newStatus && msStatus) {
                   subtitle = pattern,
                   colourLegend = colourLegend,
                   shapeLegend = shapeLegend,
-                  screePlt = screePlt,
-                  scoresPlt = scoresPlt,
-                  loadingsPlt = loadingsPlt,
-                  biPlt = biPlt)
+                  screePlotToggle = screePlotToggle,
+                  scoresPlotToggle = scoresPlotToggle,
+                  loadingsPlotToggle = loadingsPlotToggle,
+                  biPlotToggle = biPlotToggle)
   } else {
     print("No available data")
   }
@@ -916,10 +911,10 @@ if (newStatus && msStatus) {
                   subtitle = pattern,
                   colourLegend = colourLegend,
                   shapeLegend = shapeLegend,
-                  screePlt = screePlt,
-                  scoresPlt = scoresPlt,
-                  loadingsPlt = loadingsPlt,
-                  biPlt = biPlt)
+                  screePlotToggle = screePlotToggle,
+                  scoresPlotToggle = scoresPlotToggle,
+                  loadingsPlotToggle = loadingsPlotToggle,
+                  biPlotToggle = biPlotToggle)
   } else {
     print("No available data")
   }
@@ -944,10 +939,10 @@ if (newStatus && msStatus) {
                   subtitle = pattern,
                   colourLegend = colourLegend,
                   shapeLegend = shapeLegend,
-                  screePlt = screePlt,
-                  scoresPlt = scoresPlt,
-                  loadingsPlt = loadingsPlt,
-                  biPlt = biPlt)
+                  screePlotToggle = screePlotToggle,
+                  scoresPlotToggle = scoresPlotToggle,
+                  loadingsPlotToggle = loadingsPlotToggle,
+                  biPlotToggle = biPlotToggle)
   } else {
     print("No available data")
   }
@@ -972,10 +967,10 @@ if (newStatus && msStatus) {
                   subtitle = pattern,
                   colourLegend = colourLegend,
                   shapeLegend = shapeLegend,
-                  screePlt = screePlt,
-                  scoresPlt = scoresPlt,
-                  loadingsPlt = loadingsPlt,
-                  biPlt = biPlt)
+                  screePlotToggle = screePlotToggle,
+                  scoresPlotToggle = scoresPlotToggle,
+                  loadingsPlotToggle = loadingsPlotToggle,
+                  biPlotToggle = biPlotToggle)
   } else {
     print("No available data")
   }
@@ -1001,10 +996,10 @@ if (newStatus && msStatus) {
                   subtitle = pattern,
                   colourLegend = colourLegend,
                   shapeLegend = shapeLegend,
-                  screePlt = screePlt,
-                  scoresPlt = scoresPlt,
-                  loadingsPlt = loadingsPlt,
-                  biPlt = biPlt)
+                  screePlotToggle = screePlotToggle,
+                  scoresPlotToggle = scoresPlotToggle,
+                  loadingsPlotToggle = loadingsPlotToggle,
+                  biPlotToggle = biPlotToggle)
   } else {
     print("No available data")
   }
@@ -1029,10 +1024,10 @@ if (newStatus && msStatus) {
                   subtitle = pattern,
                   colourLegend = colourLegend,
                   shapeLegend = shapeLegend,
-                  screePlt = screePlt,
-                  scoresPlt = scoresPlt,
-                  loadingsPlt = loadingsPlt,
-                  biPlt = biPlt)
+                  screePlotToggle = screePlotToggle,
+                  scoresPlotToggle = scoresPlotToggle,
+                  loadingsPlotToggle = loadingsPlotToggle,
+                  biPlotToggle = biPlotToggle)
   } else {
     print("No available data")
   }
@@ -1057,10 +1052,10 @@ if (newStatus && msStatus) {
                   subtitle = pattern,
                   colourLegend = colourLegend,
                   shapeLegend = shapeLegend,
-                  screePlt = screePlt,
-                  scoresPlt = scoresPlt,
-                  loadingsPlt = loadingsPlt,
-                  biPlt = biPlt)
+                  screePlotToggle = screePlotToggle,
+                  scoresPlotToggle = scoresPlotToggle,
+                  loadingsPlotToggle = loadingsPlotToggle,
+                  biPlotToggle = biPlotToggle)
   } else {
     print("No available data")
   }
@@ -1086,10 +1081,10 @@ if (newStatus && msStatus) {
                   subtitle = pattern,
                   colourLegend = colourLegend,
                   shapeLegend = shapeLegend,
-                  screePlt = screePlt,
-                  scoresPlt = scoresPlt,
-                  loadingsPlt = loadingsPlt,
-                  biPlt = biPlt)
+                  screePlotToggle = screePlotToggle,
+                  scoresPlotToggle = scoresPlotToggle,
+                  loadingsPlotToggle = loadingsPlotToggle,
+                  biPlotToggle = biPlotToggle)
   } else {
     print("No available data")
   }
@@ -1114,10 +1109,10 @@ if (newStatus && msStatus) {
                   subtitle = pattern,
                   colourLegend = colourLegend,
                   shapeLegend = shapeLegend,
-                  screePlt = screePlt,
-                  scoresPlt = scoresPlt,
-                  loadingsPlt = loadingsPlt,
-                  biPlt = biPlt)
+                  screePlotToggle = screePlotToggle,
+                  scoresPlotToggle = scoresPlotToggle,
+                  loadingsPlotToggle = loadingsPlotToggle,
+                  biPlotToggle = biPlotToggle)
   } else {
     print("No available data")
   }
@@ -1142,10 +1137,10 @@ if (newStatus && msStatus) {
                   subtitle = pattern,
                   colourLegend = colourLegend,
                   shapeLegend = shapeLegend,
-                  screePlt = screePlt,
-                  scoresPlt = scoresPlt,
-                  loadingsPlt = loadingsPlt,
-                  biPlt = biPlt)
+                  screePlotToggle = screePlotToggle,
+                  scoresPlotToggle = scoresPlotToggle,
+                  loadingsPlotToggle = loadingsPlotToggle,
+                  biPlotToggle = biPlotToggle)
   } else {
     print("No available data")
   }
@@ -1170,10 +1165,10 @@ if (newStatus && msStatus) {
                   subtitle = pattern,
                   colourLegend = colourLegend,
                   shapeLegend = shapeLegend,
-                  screePlt = screePlt,
-                  scoresPlt = scoresPlt,
-                  loadingsPlt = loadingsPlt,
-                  biPlt = biPlt)
+                  screePlotToggle = screePlotToggle,
+                  scoresPlotToggle = scoresPlotToggle,
+                  loadingsPlotToggle = loadingsPlotToggle,
+                  biPlotToggle = biPlotToggle)
   } else {
     print("No available data")
   }
@@ -1199,10 +1194,10 @@ if (newStatus && msStatus) {
                   subtitle = pattern,
                   colourLegend = colourLegend,
                   shapeLegend = shapeLegend,
-                  screePlt = screePlt,
-                  scoresPlt = scoresPlt,
-                  loadingsPlt = loadingsPlt,
-                  biPlt = biPlt)
+                  screePlotToggle = screePlotToggle,
+                  scoresPlotToggle = scoresPlotToggle,
+                  loadingsPlotToggle = loadingsPlotToggle,
+                  biPlotToggle = biPlotToggle)
   } else {
     print("No available data")
   }
@@ -1227,10 +1222,10 @@ if (newStatus && msStatus) {
                   subtitle = pattern,
                   colourLegend = colourLegend,
                   shapeLegend = shapeLegend,
-                  screePlt = screePlt,
-                  scoresPlt = scoresPlt,
-                  loadingsPlt = loadingsPlt,
-                  biPlt = biPlt)
+                  screePlotToggle = screePlotToggle,
+                  scoresPlotToggle = scoresPlotToggle,
+                  loadingsPlotToggle = loadingsPlotToggle,
+                  biPlotToggle = biPlotToggle)
   } else {
     print("No available data")
   }
@@ -1255,10 +1250,10 @@ if (newStatus && msStatus) {
                   subtitle = pattern,
                   colourLegend = colourLegend,
                   shapeLegend = shapeLegend,
-                  screePlt = screePlt,
-                  scoresPlt = scoresPlt,
-                  loadingsPlt = loadingsPlt,
-                  biPlt = biPlt)
+                  screePlotToggle = screePlotToggle,
+                  scoresPlotToggle = scoresPlotToggle,
+                  loadingsPlotToggle = loadingsPlotToggle,
+                  biPlotToggle = biPlotToggle)
   } else {
     print("No available data")
   }
@@ -1283,10 +1278,10 @@ if (newStatus && msStatus) {
                   subtitle = pattern,
                   colourLegend = colourLegend,
                   shapeLegend = shapeLegend,
-                  screePlt = screePlt,
-                  scoresPlt = scoresPlt,
-                  loadingsPlt = loadingsPlt,
-                  biPlt = biPlt)
+                  screePlotToggle = screePlotToggle,
+                  scoresPlotToggle = scoresPlotToggle,
+                  loadingsPlotToggle = loadingsPlotToggle,
+                  biPlotToggle = biPlotToggle)
   } else {
     print("No available data")
   }
@@ -1311,10 +1306,10 @@ if (newStatus && msStatus) {
                   subtitle = pattern,
                   colourLegend = colourLegend,
                   shapeLegend = shapeLegend,
-                  screePlt = screePlt,
-                  scoresPlt = scoresPlt,
-                  loadingsPlt = loadingsPlt,
-                  biPlt = biPlt)
+                  screePlotToggle = screePlotToggle,
+                  scoresPlotToggle = scoresPlotToggle,
+                  loadingsPlotToggle = loadingsPlotToggle,
+                  biPlotToggle = biPlotToggle)
   } else {
     print("No available data")
   }
@@ -1339,10 +1334,10 @@ if (newStatus && msStatus) {
                   subtitle = pattern,
                   colourLegend = colourLegend,
                   shapeLegend = shapeLegend,
-                  screePlt = screePlt,
-                  scoresPlt = scoresPlt,
-                  loadingsPlt = loadingsPlt,
-                  biPlt = biPlt)
+                  screePlotToggle = screePlotToggle,
+                  scoresPlotToggle = scoresPlotToggle,
+                  loadingsPlotToggle = loadingsPlotToggle,
+                  biPlotToggle = biPlotToggle)
   } else {
     print("No available data")
   }
@@ -1367,10 +1362,10 @@ if (newStatus && msStatus) {
                   subtitle = pattern,
                   colourLegend = colourLegend,
                   shapeLegend = shapeLegend,
-                  screePlt = screePlt,
-                  scoresPlt = scoresPlt,
-                  loadingsPlt = loadingsPlt,
-                  biPlt = biPlt)
+                  screePlotToggle = screePlotToggle,
+                  scoresPlotToggle = scoresPlotToggle,
+                  loadingsPlotToggle = loadingsPlotToggle,
+                  biPlotToggle = biPlotToggle)
   } else {
     print("No available data")
   }
@@ -1395,10 +1390,10 @@ if (newStatus && msStatus) {
                   subtitle = pattern,
                   colourLegend = colourLegend,
                   shapeLegend = shapeLegend,
-                  screePlt = screePlt,
-                  scoresPlt = scoresPlt,
-                  loadingsPlt = loadingsPlt,
-                  biPlt = biPlt)
+                  screePlotToggle = screePlotToggle,
+                  scoresPlotToggle = scoresPlotToggle,
+                  loadingsPlotToggle = loadingsPlotToggle,
+                  biPlotToggle = biPlotToggle)
   } else {
     print("No available data")
   }
@@ -1424,10 +1419,10 @@ if (newStatus && msStatus) {
                   subtitle = pattern,
                   colourLegend = colourLegend,
                   shapeLegend = shapeLegend,
-                  screePlt = screePlt,
-                  scoresPlt = scoresPlt,
-                  loadingsPlt = loadingsPlt,
-                  biPlt = biPlt)
+                  screePlotToggle = screePlotToggle,
+                  scoresPlotToggle = scoresPlotToggle,
+                  loadingsPlotToggle = loadingsPlotToggle,
+                  biPlotToggle = biPlotToggle)
   } else {
     print("No available data")
   }
@@ -1452,10 +1447,10 @@ if (newStatus && msStatus) {
                   subtitle = pattern,
                   colourLegend = colourLegend,
                   shapeLegend = shapeLegend,
-                  screePlt = screePlt,
-                  scoresPlt = scoresPlt,
-                  loadingsPlt = loadingsPlt,
-                  biPlt = biPlt)
+                  screePlotToggle = screePlotToggle,
+                  scoresPlotToggle = scoresPlotToggle,
+                  loadingsPlotToggle = loadingsPlotToggle,
+                  biPlotToggle = biPlotToggle)
   } else {
     print("No available data")
   }
@@ -1481,10 +1476,10 @@ if (newStatus && msStatus) {
                   subtitle = "Sample Plasma",
                   colourLegend = colourLegend,
                   shapeLegend = shapeLegend,
-                  screePlt = screePlt,
-                  scoresPlt = scoresPlt,
-                  loadingsPlt = loadingsPlt,
-                  biPlt = biPlt)
+                  screePlotToggle = screePlotToggle,
+                  scoresPlotToggle = scoresPlotToggle,
+                  loadingsPlotToggle = loadingsPlotToggle,
+                  biPlotToggle = biPlotToggle)
   } else {
     print("No available data")
   }
@@ -1509,10 +1504,10 @@ if (newStatus && msStatus) {
                   subtitle = "Sample Serum",
                   colourLegend = colourLegend,
                   shapeLegend = shapeLegend,
-                  screePlt = screePlt,
-                  scoresPlt = scoresPlt,
-                  loadingsPlt = loadingsPlt,
-                  biPlt = biPlt)
+                  screePlotToggle = screePlotToggle,
+                  scoresPlotToggle = scoresPlotToggle,
+                  loadingsPlotToggle = loadingsPlotToggle,
+                  biPlotToggle = biPlotToggle)
   } else {
     print("No available data")
   }
@@ -1537,10 +1532,10 @@ if (newStatus && msStatus) {
                   subtitle = "Sample Urine",
                   colourLegend = colourLegend,
                   shapeLegend = shapeLegend,
-                  screePlt = screePlt,
-                  scoresPlt = scoresPlt,
-                  loadingsPlt = loadingsPlt,
-                  biPlt = biPlt)
+                  screePlotToggle = screePlotToggle,
+                  scoresPlotToggle = scoresPlotToggle,
+                  loadingsPlotToggle = loadingsPlotToggle,
+                  biPlotToggle = biPlotToggle)
   } else {
     print("No available data")
   }
@@ -1566,10 +1561,10 @@ if (newStatus && msStatus) {
                   subtitle = "dSample Plasma",
                   colourLegend = colourLegend,
                   shapeLegend = shapeLegend,
-                  screePlt = screePlt,
-                  scoresPlt = scoresPlt,
-                  loadingsPlt = loadingsPlt,
-                  biPlt = biPlt)
+                  screePlotToggle = screePlotToggle,
+                  scoresPlotToggle = scoresPlotToggle,
+                  loadingsPlotToggle = loadingsPlotToggle,
+                  biPlotToggle = biPlotToggle)
   } else {
     print("No available data")
   }
@@ -1594,10 +1589,10 @@ if (newStatus && msStatus) {
                   subtitle = "dSample Serum",
                   colourLegend = colourLegend,
                   shapeLegend = shapeLegend,
-                  screePlt = screePlt,
-                  scoresPlt = scoresPlt,
-                  loadingsPlt = loadingsPlt,
-                  biPlt = biPlt)
+                  screePlotToggle = screePlotToggle,
+                  scoresPlotToggle = scoresPlotToggle,
+                  loadingsPlotToggle = loadingsPlotToggle,
+                  biPlotToggle = biPlotToggle)
   } else {
     print("No available data")
   }
@@ -1622,21 +1617,21 @@ if (newStatus && msStatus) {
                   subtitle = "dSample Plasma",
                   colourLegend = colourLegend,
                   shapeLegend = shapeLegend,
-                  screePlt = screePlt,
-                  scoresPlt = scoresPlt,
-                  loadingsPlt = loadingsPlt,
-                  biPlt = biPlt)
+                  screePlotToggle = screePlotToggle,
+                  scoresPlotToggle = scoresPlotToggle,
+                  loadingsPlotToggle = loadingsPlotToggle,
+                  biPlotToggle = biPlotToggle)
   } else {
     print("No available data")
   }
   
   # Clean environment
-  rm(screePlt, scoresPlt, loadingsPlt, biPlt, pattern)
+  rm(screePlotToggle, scoresPlotToggle, loadingsPlotToggle, biPlotToggle, pattern)
 }
 ```
 
 ## Time Series Analysis {.tabset}
-Time series analysis focuses on the prewash region (mass calibration + analyte). This analysis provides a temporal trendline of the processed samples and assesses the combined performance of mass calibration references, ISTD and endogenous analytes in the region. A report is generated highlighting the samples that have a significant deviation (1st and 2nd standard deviation) from the average mean performance.
+Time series analysis focuses on the prewash region (combined mass calibration and analyte regions). This analysis provides a temporal trendline and assesses the combined performance of mass calibration references, internal standards and endogenous analytes of the samples within the region. A report is generated highlighting the samples that have a significant 1st and 2nd standard deviation from the average mean performance of the region.
 ```{r, echo = FALSE, warning = FALSE}
 # Check if there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
@@ -1644,7 +1639,7 @@ if (newStatus && msStatus) {
   labelX <- "Date"
   labelY <- "Prewash Region (TIC)"
   boundary <- "sd"
-  xTick <- FALSE
+  xTickToggle <- FALSE
   
   # Data frame to store analysis result
   analysisResult_TS <- data.frame()
@@ -1684,7 +1679,7 @@ if (newStatus && msStatus) {
                                        colourLegend = colourLegend,
                                        shapeLegend = shapeLegend,
                                        boundary = boundary,
-                                       xTick = xTick)
+                                       xTickToggle = xTickToggle)
 
         # Append analysis result
         analysisResult_TS <- rbind(analysisResult_TS, result)
@@ -1725,7 +1720,7 @@ if (newStatus && msStatus) {
                                        colourLegend = colourLegend,
                                        shapeLegend = shapeLegend,
                                        boundary = boundary,
-                                       xTick = xTick)
+                                       xTickToggle = xTickToggle)
         
         # Append analysis result
         analysisResult_TS <- rbind(analysisResult_TS, result)
@@ -1763,7 +1758,7 @@ if (newStatus && msStatus) {
                                        colourLegend = colourLegend,
                                        shapeLegend = shapeLegend,
                                        boundary = boundary,
-                                       xTick = xTick)
+                                       xTickToggle = xTickToggle)
         
         # Append analysis result
         analysisResult_TS <- rbind(analysisResult_TS, result)
@@ -1801,7 +1796,7 @@ if (newStatus && msStatus) {
                                        colourLegend = colourLegend,
                                        shapeLegend = shapeLegend,
                                        boundary = boundary,
-                                       xTick = xTick)
+                                       xTickToggle = xTickToggle)
         
         # Append analysis result
         analysisResult_TS <- rbind(analysisResult_TS, result)
@@ -1839,7 +1834,7 @@ if (newStatus && msStatus) {
                                        colourLegend = colourLegend,
                                        shapeLegend = shapeLegend,
                                        boundary = boundary,
-                                       xTick = xTick)
+                                       xTickToggle = xTickToggle)
         
         # Append analysis result
         analysisResult_TS <- rbind(analysisResult_TS, result)
@@ -1877,7 +1872,7 @@ if (newStatus && msStatus) {
                                        colourLegend = colourLegend,
                                        shapeLegend = shapeLegend,
                                        boundary = boundary,
-                                       xTick = xTick)
+                                       xTickToggle = xTickToggle)
         
         # Append analysis result
         analysisResult_TS <- rbind(analysisResult_TS, result)
@@ -1915,7 +1910,7 @@ if (newStatus && msStatus) {
                                        colourLegend = colourLegend,
                                        shapeLegend = shapeLegend,
                                        boundary = boundary,
-                                       xTick = xTick)
+                                       xTickToggle = xTickToggle)
         
         # Append analysis result
         analysisResult_TS <- rbind(analysisResult_TS, result)
@@ -1969,7 +1964,7 @@ if (newStatus && msStatus) {
                                        shapeLegend = shapeLegend,
                                        boundary = boundary,
                                        boundaryValue = boundaryValue,
-                                       xTick = xTick) %>%
+                                       xTickToggle = xTickToggle) %>%
           dplyr::filter(.data[[sampleType]] %in% i)
         
         # Append analysis result
@@ -2028,7 +2023,7 @@ if (newStatus && msStatus) {
                                        shapeLegend = shapeLegend,
                                        boundary = boundary,
                                        boundaryValue = boundaryValue,
-                                       xTick = xTick) %>%
+                                       xTickToggle = xTickToggle) %>%
           dplyr::filter(.data[[sampleType]] %in% i)
         
         # Append analysis result
@@ -2044,7 +2039,889 @@ if (newStatus && msStatus) {
   }
   
   # Clean environment
-  rm(labelX, labelY, boundary, xTick, pattern, i, result)
+  rm(labelX, labelY, boundary, xTickToggle, pattern, i, result)
+  invisible(gc())
+}
+```
+
+## Violin Plot Analysis {.tabset}
+Violin plot analysis focuses on the two distinct chromatogram regions that made up the prewash region previously assessed - mass calibration and analyte region. Two reports are generated highlighting the samples that have a significant 1st and 2nd standard deviation from the average mean of the overall data distribution in the two regions, respectively.
+```{r, echo = FALSE, warning = FALSE}
+# Check if there are new samples to process and MS level 1 spectral data is available
+if (newStatus && msStatus) {
+  # Set plot variables and labels
+  labelX <- "Instrument"
+  boundary <- "sd"
+  violinPlotToggle <- TRUE
+  boxPlotToggle <- TRUE
+  boxWidth <- 0.05
+} else if (!newStatus) {
+  print("Unable to perform Violin Plot Analysis: No new samples to analyse")
+} else if (!msStatus) {
+  print("Unable to perform Violin Plot Analysis: No available MS level 1 spectral data")
+}
+```
+
+### Mass Calibration Region {.tabset}
+Violin plot analysis of the mass calibration region assesses the performance of the mass calibration references present within the samples.
+```{r, echo = FALSE, warning = FALSE}
+# Check if there are new samples to process and MS level 1 spectral data is available
+if (newStatus && msStatus) {
+  # Set plot variables and labels
+  labelY <- "Mass Calibration Region (TIC)"
+  
+  # Data frame to store analysis result
+  analysisResult_VP_massCalRegion <- data.frame()
+}
+```
+
+#### LTR
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data is available
+if (newStatus && msStatus) {
+  # Set patterns to check
+  pattern <- c("sLTR Plasma", "LTR Plasma",
+               "sLTR Serum", "LTR Serum",
+               "sLTR Urine", "LTR Urine")
+
+  # Check if any of the patterns exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Generate violin plot for each pattern combination that exists
+    for (i in unique(sub("sLTR |LTR ", "", pattern))) {
+      # If combined pattern exists in sample type list
+      tmpPattern <- c(paste("sLTR", i), paste("LTR", i))
+      if (any(tmpPattern %in% sampleTypeList)) {
+        # Plot violin plot
+        result <- ticq::plotViolin(data = plotData %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% tmpPattern),
+                                   x = instrument,
+                                   y = massCalRegion,
+                                   colour = colour,
+                                   shape = shape,
+                                   subtitle = paste("LTR", i),
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   shapeLegend = shapeLegend,
+                                   boundary = boundary,
+                                   violinPlotToggle = violinPlotToggle,
+                                   boxPlotToggle = boxPlotToggle,
+                                   boxWidth = boxWidth)
+
+        # Append analysis result
+        analysisResult_VP_massCalRegion <- rbind(analysisResult_VP_massCalRegion, result)
+      }
+
+      # Clean environment
+      rm(tmpPattern)
+    }
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### dLTR
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data is available
+if (newStatus && msStatus) {
+  # Set patterns to check
+  pattern <- c("dLTR Plasma", "dLTR Serum", "dLTR Urine")
+  
+  # Check if any of the patterns exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Generate violin plot for each pattern combination that exists
+    for (i in pattern) {
+      # If pattern exists in sample type list
+      if (i %in% sampleTypeList) {
+        # Plot violin plot
+        result <- ticq::plotViolin(data = plotData %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% i),
+                                   x = instrument,
+                                   y = massCalRegion,
+                                   colour = colour,
+                                   shape = shape,
+                                   subtitle = i,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   shapeLegend = shapeLegend,
+                                   boundary = boundary,
+                                   violinPlotToggle = violinPlotToggle,
+                                   boxPlotToggle = boxPlotToggle,
+                                   boxWidth = boxWidth)
+
+        # Append analysis result
+        analysisResult_VP_massCalRegion <- rbind(analysisResult_VP_massCalRegion, result)
+      }
+    }
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### PQC
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data is available
+if (newStatus && msStatus) {
+  # Set patterns to check
+  pattern <- c("PQC Plasma", "PQC Serum", "PQC Urine")
+  
+  # Check if any of the patterns exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Generate violin plot for each pattern combination that exists
+    for (i in pattern) {
+      # If pattern exists in sample type list
+      if (i %in% sampleTypeList) {
+        # Plot violin plot
+        result <- ticq::plotViolin(data = plotData %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% i),
+                                   x = instrument,
+                                   y = massCalRegion,
+                                   colour = colour,
+                                   shape = shape,
+                                   subtitle = i,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   shapeLegend = shapeLegend,
+                                   boundary = boundary,
+                                   violinPlotToggle = violinPlotToggle,
+                                   boxPlotToggle = boxPlotToggle,
+                                   boxWidth = boxWidth)
+
+        # Append analysis result
+        analysisResult_VP_massCalRegion <- rbind(analysisResult_VP_massCalRegion, result)
+      }
+    }
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### dPQC
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data is available
+if (newStatus && msStatus) {
+  # Set patterns to check
+  pattern <- c("dPQC Plasma", "dPQC Serum", "dPQC Urine")
+  
+  # Check if any of the patterns exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Generate violin plot for each pattern combination that exists
+    for (i in pattern) {
+      # If pattern exists in sample type list
+      if (i %in% sampleTypeList) {
+        # Plot violin plot
+        result <- ticq::plotViolin(data = plotData %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% i),
+                                   x = instrument,
+                                   y = massCalRegion,
+                                   colour = colour,
+                                   shape = shape,
+                                   subtitle = i,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   shapeLegend = shapeLegend,
+                                   boundary = boundary,
+                                   violinPlotToggle = violinPlotToggle,
+                                   boxPlotToggle = boxPlotToggle,
+                                   boxWidth = boxWidth)
+
+        # Append analysis result
+        analysisResult_VP_massCalRegion <- rbind(analysisResult_VP_massCalRegion, result)
+      }
+    }
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### QC
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data is available
+if (newStatus && msStatus) {
+  # Set patterns to check
+  pattern <- c("QC01", "QC02", "QC03", "QC04")
+  
+  # Check if any of the patterns exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Generate violin plot for each pattern combination that exists
+    for (i in pattern) {
+      # If pattern exists in sample type list
+      if (i %in% sampleTypeList) {
+        # Plot violin plot
+        result <- ticq::plotViolin(data = plotData %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% i),
+                                   x = instrument,
+                                   y = massCalRegion,
+                                   colour = colour,
+                                   shape = shape,
+                                   subtitle = i,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   shapeLegend = shapeLegend,
+                                   boundary = boundary,
+                                   violinPlotToggle = violinPlotToggle,
+                                   boxPlotToggle = boxPlotToggle,
+                                   boxWidth = boxWidth)
+
+        # Append analysis result
+        analysisResult_VP_massCalRegion <- rbind(analysisResult_VP_massCalRegion, result)
+      }
+    }
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### CAL
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data is available
+if (newStatus && msStatus) {
+  # Set patterns to check
+  pattern <- c("CAL01", "CAL02", "CAL03", "CAL04", "CAL05", "CAL06", "CAL07", "CAL08")
+  
+  # Check if any of the patterns exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Generate violin plot for each pattern combination that exists
+    for (i in pattern) {
+      # If pattern exists in sample type list
+      if (i %in% sampleTypeList) {
+        # Plot violin plot
+        result <- ticq::plotViolin(data = plotData %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% i),
+                                   x = instrument,
+                                   y = massCalRegion,
+                                   colour = colour,
+                                   shape = shape,
+                                   subtitle = i,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   shapeLegend = shapeLegend,
+                                   boundary = boundary,
+                                   violinPlotToggle = violinPlotToggle,
+                                   boxPlotToggle = boxPlotToggle,
+                                   boxWidth = boxWidth)
+
+        # Append analysis result
+        analysisResult_VP_massCalRegion <- rbind(analysisResult_VP_massCalRegion, result)
+      }
+    }
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### Blank
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data is available
+if (newStatus && msStatus) {
+  # Set patterns to check
+  pattern <- c("Single Blank", "Double Blank")
+  
+  # Check if any of the patterns exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Generate violin plot for each pattern combination that exists
+    for (i in pattern) {
+      # If pattern exists in sample type list
+      if (i %in% sampleTypeList) {
+        # Plot violin plot
+        result <- ticq::plotViolin(data = plotData %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% i),
+                                   x = instrument,
+                                   y = massCalRegion,
+                                   colour = colour,
+                                   shape = shape,
+                                   subtitle = i,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   shapeLegend = shapeLegend,
+                                   boundary = boundary,
+                                   violinPlotToggle = violinPlotToggle,
+                                   boxPlotToggle = boxPlotToggle,
+                                   boxWidth = boxWidth)
+
+        # Append analysis result
+        analysisResult_VP_massCalRegion <- rbind(analysisResult_VP_massCalRegion, result)
+      }
+    }
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### Sample
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data is available
+if (newStatus && msStatus) {
+  # Set patterns to check
+  pattern <- c("Sample Plasma", "Sample Serum", "Sample Urine")
+  
+  # Check if any of the patterns exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Generate violin plot for each pattern combination that exists
+    for (i in pattern) {
+      # If pattern exists in sample type list
+      if (i %in% sampleTypeList) {
+        # Set patterns to search for long term references to compare against
+        tmpPattern <- sub("Sample ", "", i)
+        tmpPattern <- c(paste("sLTR", tmpPattern), paste("LTR", tmpPattern))
+        
+        # Calculate mean and standard deviations (sd and sd2) of long term references if applicable
+        tmpReferenceData <- plotData %>%
+          dplyr::filter(.data[[sampleType]] %in% tmpPattern)
+        if (nrow(tmpReferenceData) > 1) {
+          boundaryValue <- ticq::generateStat(data = tmpReferenceData[[massCalRegion]]) %>%
+            dplyr::select(mean, sd, sd2) %>%
+            as.list()
+        } else {
+          boundaryValue <- 0
+        }
+        
+        # Plot violin plot
+        result <- ticq::plotViolin(data = plotData %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, i)),
+                                   x = instrument,
+                                   y = massCalRegion,
+                                   colour = colour,
+                                   shape = shape,
+                                   subtitle = i,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   shapeLegend = shapeLegend,
+                                   boundary = boundary,
+                                   boundaryValue = boundaryValue,
+                                   violinPlotToggle = violinPlotToggle,
+                                   boxPlotToggle = boxPlotToggle,
+                                   boxWidth = boxWidth) %>%
+          dplyr::filter(.data[[sampleType]] %in% i)
+
+        # Append analysis result
+        analysisResult_VP_massCalRegion <- rbind(analysisResult_VP_massCalRegion, result)
+        
+        # Clean environment
+        rm(tmpPattern, tmpReferenceData, boundaryValue)
+        invisible(gc())
+      }
+    }
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### dSample
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data is available
+if (newStatus && msStatus) {
+  # Set patterns to check
+  pattern <- c("dSample Plasma", "dSample Serum", "dSample Urine")
+  
+  # Check if any of the patterns exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Generate violin plot for each pattern combination that exists
+    for (i in pattern) {
+      # If pattern exists in sample type list
+      if (i %in% sampleTypeList) {
+        # Set patterns to search for long term references to compare against
+        tmpPattern <- sub("dSample ", "", i)
+        tmpPattern <- c(paste("dLTR", tmpPattern))
+        
+        # Calculate mean and standard deviations (sd and sd2) of long term references if applicable
+        tmpReferenceData <- plotData %>%
+          dplyr::filter(.data[[sampleType]] %in% tmpPattern)
+        if (nrow(tmpReferenceData) > 1) {
+          boundaryValue <- ticq::generateStat(data = tmpReferenceData[[massCalRegion]]) %>%
+            dplyr::select(mean, sd, sd2) %>%
+            as.list()
+        } else {
+          boundaryValue <- 0
+        }
+        
+        # Plot violin plot
+        result <- ticq::plotViolin(data = plotData %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, i)),
+                                   x = instrument,
+                                   y = massCalRegion,
+                                   colour = colour,
+                                   shape = shape,
+                                   subtitle = i,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   shapeLegend = shapeLegend,
+                                   boundary = boundary,
+                                   boundaryValue = boundaryValue,
+                                   violinPlotToggle = violinPlotToggle,
+                                   boxPlotToggle = boxPlotToggle,
+                                   boxWidth = boxWidth) %>%
+          dplyr::filter(.data[[sampleType]] %in% i)
+
+        # Append analysis result
+        analysisResult_VP_massCalRegion <- rbind(analysisResult_VP_massCalRegion, result)
+        
+        # Clean environment
+        rm(tmpPattern, tmpReferenceData, boundaryValue)
+        invisible(gc())
+      }
+    }
+  } else {
+    print("No available data")
+  }
+}
+```
+
+### Analyte Region {.tabset}
+Violin plot analysis of the mass calibration region assesses the combined performance of the internal standards and endogenous analytes present within the samples.
+```{r, echo = FALSE, warning = FALSE}
+# Check if there are new samples to process and MS level 1 spectral data is available
+if (newStatus && msStatus) {
+  # Set plot variables and labels
+  labelY <- "Analyte Region (TIC)"
+  
+  # Data frame to store analysis result
+  analysisResult_VP_analyteRegion <- data.frame()
+}
+```
+
+#### LTR
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data is available
+if (newStatus && msStatus) {
+  # Set patterns to check
+  pattern <- c("sLTR Plasma", "LTR Plasma",
+               "sLTR Serum", "LTR Serum",
+               "sLTR Urine", "LTR Urine")
+
+  # Check if any of the patterns exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Generate violin plot for each pattern combination that exists
+    for (i in unique(sub("sLTR |LTR ", "", pattern))) {
+      # If combined pattern exists in sample type list
+      tmpPattern <- c(paste("sLTR", i), paste("LTR", i))
+      if (any(tmpPattern %in% sampleTypeList)) {
+        # Plot violin plot
+        result <- ticq::plotViolin(data = plotData %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% tmpPattern),
+                                   x = instrument,
+                                   y = analyteRegion,
+                                   colour = colour,
+                                   shape = shape,
+                                   subtitle = paste("LTR", i),
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   shapeLegend = shapeLegend,
+                                   boundary = boundary,
+                                   violinPlotToggle = violinPlotToggle,
+                                   boxPlotToggle = boxPlotToggle,
+                                   boxWidth = boxWidth)
+
+        # Append analysis result
+        analysisResult_VP_analyteRegion <- rbind(analysisResult_VP_analyteRegion, result)
+      }
+
+      # Clean environment
+      rm(tmpPattern)
+    }
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### dLTR
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data is available
+if (newStatus && msStatus) {
+  # Set patterns to check
+  pattern <- c("dLTR Plasma", "dLTR Serum", "dLTR Urine")
+  
+  # Check if any of the patterns exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Generate violin plot for each pattern combination that exists
+    for (i in pattern) {
+      # If pattern exists in sample type list
+      if (i %in% sampleTypeList) {
+        # Plot violin plot
+        result <- ticq::plotViolin(data = plotData %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% i),
+                                   x = instrument,
+                                   y = analyteRegion,
+                                   colour = colour,
+                                   shape = shape,
+                                   subtitle = i,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   shapeLegend = shapeLegend,
+                                   boundary = boundary,
+                                   violinPlotToggle = violinPlotToggle,
+                                   boxPlotToggle = boxPlotToggle,
+                                   boxWidth = boxWidth)
+
+        # Append analysis result
+        analysisResult_VP_analyteRegion <- rbind(analysisResult_VP_analyteRegion, result)
+      }
+    }
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### PQC
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data is available
+if (newStatus && msStatus) {
+  # Set patterns to check
+  pattern <- c("PQC Plasma", "PQC Serum", "PQC Urine")
+  
+  # Check if any of the patterns exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Generate violin plot for each pattern combination that exists
+    for (i in pattern) {
+      # If pattern exists in sample type list
+      if (i %in% sampleTypeList) {
+        # Plot violin plot
+        result <- ticq::plotViolin(data = plotData %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% i),
+                                   x = instrument,
+                                   y = analyteRegion,
+                                   colour = colour,
+                                   shape = shape,
+                                   subtitle = i,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   shapeLegend = shapeLegend,
+                                   boundary = boundary,
+                                   violinPlotToggle = violinPlotToggle,
+                                   boxPlotToggle = boxPlotToggle,
+                                   boxWidth = boxWidth)
+
+        # Append analysis result
+        analysisResult_VP_analyteRegion <- rbind(analysisResult_VP_analyteRegion, result)
+      }
+    }
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### dPQC
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data is available
+if (newStatus && msStatus) {
+  # Set patterns to check
+  pattern <- c("dPQC Plasma", "dPQC Serum", "dPQC Urine")
+  
+  # Check if any of the patterns exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Generate violin plot for each pattern combination that exists
+    for (i in pattern) {
+      # If pattern exists in sample type list
+      if (i %in% sampleTypeList) {
+        # Plot violin plot
+        result <- ticq::plotViolin(data = plotData %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% i),
+                                   x = instrument,
+                                   y = analyteRegion,
+                                   colour = colour,
+                                   shape = shape,
+                                   subtitle = i,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   shapeLegend = shapeLegend,
+                                   boundary = boundary,
+                                   violinPlotToggle = violinPlotToggle,
+                                   boxPlotToggle = boxPlotToggle,
+                                   boxWidth = boxWidth)
+
+        # Append analysis result
+        analysisResult_VP_analyteRegion <- rbind(analysisResult_VP_analyteRegion, result)
+      }
+    }
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### QC
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data is available
+if (newStatus && msStatus) {
+  # Set patterns to check
+  pattern <- c("QC01", "QC02", "QC03", "QC04")
+  
+  # Check if any of the patterns exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Generate violin plot for each pattern combination that exists
+    for (i in pattern) {
+      # If pattern exists in sample type list
+      if (i %in% sampleTypeList) {
+        # Plot violin plot
+        result <- ticq::plotViolin(data = plotData %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% i),
+                                   x = instrument,
+                                   y = analyteRegion,
+                                   colour = colour,
+                                   shape = shape,
+                                   subtitle = i,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   shapeLegend = shapeLegend,
+                                   boundary = boundary,
+                                   violinPlotToggle = violinPlotToggle,
+                                   boxPlotToggle = boxPlotToggle,
+                                   boxWidth = boxWidth)
+
+        # Append analysis result
+        analysisResult_VP_analyteRegion <- rbind(analysisResult_VP_analyteRegion, result)
+      }
+    }
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### CAL
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data is available
+if (newStatus && msStatus) {
+  # Set patterns to check
+  pattern <- c("CAL01", "CAL02", "CAL03", "CAL04", "CAL05", "CAL06", "CAL07", "CAL08")
+  
+  # Check if any of the patterns exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Generate violin plot for each pattern combination that exists
+    for (i in pattern) {
+      # If pattern exists in sample type list
+      if (i %in% sampleTypeList) {
+        # Plot violin plot
+        result <- ticq::plotViolin(data = plotData %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% i),
+                                   x = instrument,
+                                   y = analyteRegion,
+                                   colour = colour,
+                                   shape = shape,
+                                   subtitle = i,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   shapeLegend = shapeLegend,
+                                   boundary = boundary,
+                                   violinPlotToggle = violinPlotToggle,
+                                   boxPlotToggle = boxPlotToggle,
+                                   boxWidth = boxWidth)
+
+        # Append analysis result
+        analysisResult_VP_analyteRegion <- rbind(analysisResult_VP_analyteRegion, result)
+      }
+    }
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### Blank
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data is available
+if (newStatus && msStatus) {
+  # Set patterns to check
+  pattern <- c("Single Blank", "Double Blank")
+  
+  # Check if any of the patterns exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Generate violin plot for each pattern combination that exists
+    for (i in pattern) {
+      # If pattern exists in sample type list
+      if (i %in% sampleTypeList) {
+        # Plot violin plot
+        result <- ticq::plotViolin(data = plotData %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% i),
+                                   x = instrument,
+                                   y = analyteRegion,
+                                   colour = colour,
+                                   shape = shape,
+                                   subtitle = i,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   shapeLegend = shapeLegend,
+                                   boundary = boundary,
+                                   violinPlotToggle = violinPlotToggle,
+                                   boxPlotToggle = boxPlotToggle,
+                                   boxWidth = boxWidth)
+
+        # Append analysis result
+        analysisResult_VP_analyteRegion <- rbind(analysisResult_VP_analyteRegion, result)
+      }
+    }
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### Sample
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data is available
+if (newStatus && msStatus) {
+  # Set patterns to check
+  pattern <- c("Sample Plasma", "Sample Serum", "Sample Urine")
+  
+  # Check if any of the patterns exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Generate violin plot for each pattern combination that exists
+    for (i in pattern) {
+      # If pattern exists in sample type list
+      if (i %in% sampleTypeList) {
+        # Set patterns to search for long term references to compare against
+        tmpPattern <- sub("Sample ", "", i)
+        tmpPattern <- c(paste("sLTR", tmpPattern), paste("LTR", tmpPattern))
+        
+        # Calculate mean and standard deviations (sd and sd2) of long term references if applicable
+        tmpReferenceData <- plotData %>%
+          dplyr::filter(.data[[sampleType]] %in% tmpPattern)
+        if (nrow(tmpReferenceData) > 1) {
+          boundaryValue <- ticq::generateStat(data = tmpReferenceData[[analyteRegion]]) %>%
+            dplyr::select(mean, sd, sd2) %>%
+            as.list()
+        } else {
+          boundaryValue <- 0
+        }
+        
+        # Plot violin plot
+        result <- ticq::plotViolin(data = plotData %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, i)),
+                                   x = instrument,
+                                   y = analyteRegion,
+                                   colour = colour,
+                                   shape = shape,
+                                   subtitle = i,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   shapeLegend = shapeLegend,
+                                   boundary = boundary,
+                                   boundaryValue = boundaryValue,
+                                   violinPlotToggle = violinPlotToggle,
+                                   boxPlotToggle = boxPlotToggle,
+                                   boxWidth = boxWidth) %>%
+          dplyr::filter(.data[[sampleType]] %in% i)
+
+        # Append analysis result
+        analysisResult_VP_analyteRegion <- rbind(analysisResult_VP_analyteRegion, result)
+        
+        # Clean environment
+        rm(tmpPattern, tmpReferenceData, boundaryValue)
+        invisible(gc())
+      }
+    }
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### dSample
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data is available
+if (newStatus && msStatus) {
+  # Set patterns to check
+  pattern <- c("dSample Plasma", "dSample Serum", "dSample Urine")
+  
+  # Check if any of the patterns exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Generate violin plot for each pattern combination that exists
+    for (i in pattern) {
+      # If pattern exists in sample type list
+      if (i %in% sampleTypeList) {
+        # Set patterns to search for long term references to compare against
+        tmpPattern <- sub("dSample ", "", i)
+        tmpPattern <- c(paste("dLTR", tmpPattern))
+        
+        # Calculate mean and standard deviations (sd and sd2) of long term references if applicable
+        tmpReferenceData <- plotData %>%
+          dplyr::filter(.data[[sampleType]] %in% tmpPattern)
+        if (nrow(tmpReferenceData) > 1) {
+          boundaryValue <- ticq::generateStat(data = tmpReferenceData[[analyteRegion]]) %>%
+            dplyr::select(mean, sd, sd2) %>%
+            as.list()
+        } else {
+          boundaryValue <- 0
+        }
+        
+        # Plot violin plot
+        result <- ticq::plotViolin(data = plotData %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, i)),
+                                   x = instrument,
+                                   y = analyteRegion,
+                                   colour = colour,
+                                   shape = shape,
+                                   subtitle = i,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   shapeLegend = shapeLegend,
+                                   boundary = boundary,
+                                   boundaryValue = boundaryValue,
+                                   violinPlotToggle = violinPlotToggle,
+                                   boxPlotToggle = boxPlotToggle,
+                                   boxWidth = boxWidth) %>%
+          dplyr::filter(.data[[sampleType]] %in% i)
+
+        # Append analysis result
+        analysisResult_VP_analyteRegion <- rbind(analysisResult_VP_analyteRegion, result)
+        
+        # Clean environment
+        rm(tmpPattern, tmpReferenceData, boundaryValue)
+        invisible(gc())
+      }
+    }
+  } else {
+    print("No available data")
+  }
+  
+  # Clean environment
+  rm(shape,
+     shapeLegend,
+     colour,
+     colourLegend,
+     plotData, 
+     overallRegion, 
+     prewashRegion, 
+     massCalRegion, 
+     analyteRegion, 
+     washRegion,
+     labelX,
+     boundary,
+     violinPlotToggle,
+     boxPlotToggle,
+     boxWidth,
+     labelY,
+     pattern,
+     i,
+     result)
   invisible(gc())
 }
 ```
@@ -2054,7 +2931,7 @@ if (newStatus && msStatus) {
 The report highlights the deviation significance of the samples from the average mean performance of the prewash region.
 
 **RED** = Very High or Very Low  
-**YELLOW** = Low or High    
+**YELLOW** = Low or High  
 **GREEN** = Normal    
 ```{r, echo = FALSE, warning = FALSE}
 # If there are new samples to process and MS level 1 spectral data is available
@@ -2079,6 +2956,81 @@ if (newStatus && msStatus) {
   # Clean environment
   rm(analysisResult_TS)
   invisible(gc())
+}
+```
+
+## Violin Plot Analysis {.tabset}
+The reports below highlights the deviation significance of the samples from the average mean of the overall data distribution in the mass calibration and analyte regions, respectively. 
+
+### Mass Calibration Region
+The report highlights the performance of the mass calibration references present within the samples.
+
+**RED** = Very High or Very Low  
+**YELLOW** = Low or High  
+**GREEN** = Normal    
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data is available
+if (newStatus && msStatus) {
+  # If result table is not empty
+  if (ncol(analysisResult_VP_massCalRegion) != 0) {
+    print(DT::datatable(data = analysisResult_VP_massCalRegion %>%
+                          dplyr::select(all_of(
+                            colnames(analysisResult_VP_massCalRegion)[which(colnames(analysisResult_VP_massCalRegion) == sampleID):
+                                                                      which(colnames(analysisResult_VP_massCalRegion) == spectrumCount)]), 
+                            massCalRegion, sampleRange) %>%
+                          dplyr::filter(.data[[projectCohort]] != "Historical"),
+                        filter = "top",
+                        options = list(scrollX = TRUE)) %>%
+            DT::formatStyle("sampleRange",
+                            target = "row",
+                            backgroundColor = styleEqual(c("Very Low", "Low", "Normal", "High", "Very High"), 
+                                                         c("red", "yellow", "green", "yellow", "red"))))
+  } else {
+    print("Unable to display results - No available data")
+  }
+  
+  # Clean environment
+  rm(analysisResult_VP_massCalRegion)
+  invisible(gc())
+}
+```
+
+### Analyte Region
+The report highlights the combined performance of the internal standards and endogenous analytes present within the samples.
+
+**RED** = Very High or Very Low  
+**YELLOW** = Low or High  
+**GREEN** = Normal    
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data is available
+if (newStatus && msStatus) {
+  # If result table is not empty
+  if (ncol(analysisResult_VP_analyteRegion) != 0) {
+    print(DT::datatable(data = analysisResult_VP_analyteRegion %>%
+                          dplyr::select(all_of(
+                            colnames(analysisResult_VP_analyteRegion)[which(colnames(analysisResult_VP_analyteRegion) == sampleID):
+                                                                      which(colnames(analysisResult_VP_analyteRegion) == spectrumCount)]), 
+                            analyteRegion, sampleRange) %>%
+                          dplyr::filter(.data[[projectCohort]] != "Historical"),
+                        filter = "top",
+                        options = list(scrollX = TRUE)) %>%
+            DT::formatStyle("sampleRange",
+                            target = "row",
+                            backgroundColor = styleEqual(c("Very Low", "Low", "Normal", "High", "Very High"), 
+                                                         c("red", "yellow", "green", "yellow", "red"))))
+  } else {
+    print("Unable to display results - No available data")
+  }
+  
+  # Clean environment
+  rm(analysisResult_VP_analyteRegion)
+  invisible(gc())
+}
+
+# If there are new samples to process
+if (newStatus) {
+  # Clean environment
+  rm(msStatus)
 }
 ```
 
