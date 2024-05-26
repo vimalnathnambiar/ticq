@@ -3405,7 +3405,7 @@ if (newStatus) {
 ```
 
 # Extracted Ion Chromatogram {.tabset}
-Chromatogram overview (Extracted Ion Current, EIC vs Retention Time, RT) of targeted mass calibration references, internal standards, endogenous analytes, and product ions present within the samples are plotted by their corresponding sample type. The chromatograms are plotted using MS level 1 spectral data for mass calibration references, internal standards, and endogenous analytes; whereas MS level 2 spectral data is used for product ions. 
+Chromatogram overview (Extracted Ion Current, EIC vs Retention Time, RT) of targeted mass calibration references, internal standards, endogenous analytes, and product ions present within the samples are plotted by their corresponding chromatogram region and sample type. The chromatograms are plotted using MS level 1 spectral data for mass calibration references, internal standards, and endogenous analytes; whereas MS level 2 spectral data is used for product ions. 
 ```{r, echo = FALSE, warning = FALSE}
 # Check if there are new samples to process and target m/z data is available
 if (newStatus && !is.null(targetMZ)) {
@@ -7180,7 +7180,11 @@ if (newStatus) {
 ```
 
 # Statistical Analysis {.tabset}
-The mass calibration references, internal standards, endogenous analytes, and product ions of interest present within the samples are assessed by their corresponding sample type using statistical methodologies such as time series analysis. 
+The mass calibration references, internal standards, endogenous analytes, and product ions of interest present within the samples are assessed by their corresponding chromatogram region and sample type using statistical methodologies such as time series analysis.
+
+## Time Series Analysis {.tabset}
+Time series analysis provides a temporal trendline and assesses the performance of the mass calibration references, internal standards, endogenous analytes, and product ions by their corresponding target m/z, chromatogram region, and sample type. A report is generated highlighting the target m/z that have a significant 1st and 2nd standard deviation from the average mean performance.
+
 
 
 
