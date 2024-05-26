@@ -318,7 +318,7 @@ if (newStatus) {
 ```
 
 # Total Ion Chromatogram {.tabset}
-Chromatogram overview (Total ion current, TIC vs Retention Time, RT) of each sample type along with 3 chromatographic regions of interest outlined: mass calibration, analyte, and wash region. Chromatogram is plotted using full scan MS level 1 spectral data. 
+Chromatogram overview (Total ion current, TIC vs Retention Time, RT) of each sample type along with 3 chromatographic regions of interest (mass calibration, analyte, and wash regions) are plotted using full scan MS level 1 spectral data. 
 ```{r, echo = FALSE, warning = FALSE}
 # Check if there are new samples to process
 if (newStatus) {
@@ -683,7 +683,7 @@ if (newStatus && msStatus) {
 ```
 
 # Statistical Analysis {.tabset}
-The chromatogram regions of interest (mass calibration, analyte, and wash regions) of the samples by their corresponding type using statistical methodologies such as PCA, time series, and violin plot analyses.
+The chromatogram regions of interest (mass calibration, analyte, and wash regions) of the samples are assessed by their corresponding sample type using statistical methodologies such as PCA, time series, and violin plot analyses.
 ```{r, echo = FALSE, warning = FALSE, include = FALSE}
 # If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
@@ -1631,7 +1631,7 @@ if (newStatus && msStatus) {
 ```
 
 ## Time Series Analysis {.tabset}
-Time series analysis focuses on the prewash region (combined mass calibration and analyte regions). This analysis provides a temporal trendline and assesses the combined performance of mass calibration references, internal standards and endogenous analytes of the samples within the region. A report is generated highlighting the samples that have a significant 1st and 2nd standard deviation from the average mean performance of the region.
+Time series analysis focuses on the prewash region (combined mass calibration and analyte regions). This analysis provides a temporal trendline and assesses the combined performance of mass calibration references, internal standards and endogenous analytes present within the samples in the region. A report is generated highlighting the samples that have a significant 1st and 2nd standard deviation from the average mean performance of the region.
 ```{r, echo = FALSE, warning = FALSE}
 # Check if there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
@@ -2963,7 +2963,7 @@ if (newStatus && msStatus) {
 The reports below highlights the deviation significance of the samples from the average mean of the overall data distribution in the mass calibration and analyte regions, respectively. 
 
 ### Mass Calibration Region
-The report highlights the performance of the mass calibration references present within the samples.
+The report highlights the deviation significance of the performance of the mass calibration references present within the samples.
 
 **RED** = Very High or Very Low  
 **YELLOW** = Low or High  
@@ -2996,7 +2996,7 @@ if (newStatus && msStatus) {
 ```
 
 ### Analyte Region
-The report highlights the combined performance of the internal standards and endogenous analytes present within the samples.
+The report highlights deviation significance of the combined performance of the internal standards and endogenous analytes present within the samples.
 
 **RED** = Very High or Very Low  
 **YELLOW** = Low or High  
@@ -3035,7 +3035,7 @@ if (newStatus) {
 ```
 
 # Base Peak Chromatogram {.tabset}
-Chromatogram overview (Base Peak Intensity, BPI vs Retention Time, RT) of each sample type along with 3 chromatographic regions of interest outlined: mass calibration, analyte, and wash region. Chromatogram is plotted using full scan MS level 1 spectral data. 
+Chromatogram overview (Base Peak Intensity, BPI vs Retention Time, RT) of each sample type along with 3 chromatographic regions of interest (mass calibration, analyte, and wash regions) are plotted using full scan MS level 1 spectral data. 
 ```{r, echo = FALSE, warning = FALSE}
 # Check if there are new samples to process
 if (newStatus) {
@@ -3405,7 +3405,7 @@ if (newStatus) {
 ```
 
 # Extracted Ion Chromatogram {.tabset}
-Chromatogram overview (Extracted Ion Current, EIC vs Retention Time, RT) of targeted mass calibration references, internal standards, endogenous analytes, and product ions by sample type. Chromatogram is plotted using MS level 1 spectral data for mass calibration references, internal standards, and endogenous analytes; whereas MS level 2 spectral data is used for product ions. 
+Chromatogram overview (Extracted Ion Current, EIC vs Retention Time, RT) of targeted mass calibration references, internal standards, endogenous analytes, and product ions present within the samples are plotted by their corresponding sample type. The chromatograms are plotted using MS level 1 spectral data for mass calibration references, internal standards, and endogenous analytes; whereas MS level 2 spectral data is used for product ions. 
 ```{r, echo = FALSE, warning = FALSE}
 # Check if there are new samples to process and target m/z data is available
 if (newStatus && !is.null(targetMZ)) {
@@ -7179,7 +7179,8 @@ if (newStatus) {
 }
 ```
 
-
+# Statistical Analysis {.tabset}
+The mass calibration references, internal standards, endogenous analytes, and product ions of interest present within the samples are assessed by their corresponding sample type using statistical methodologies such as time series analysis. 
 
 
 
