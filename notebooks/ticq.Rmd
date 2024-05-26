@@ -67,7 +67,7 @@ if (!is.null(anpcMethodLibrary)) {
   historicalDataPath <- NULL
 }
 
-# Extract target m/z from target file or in-house ANPC method library
+# Extract target m/z data from target file or in-house ANPC method library
 targetMZ <- ticq::extractTargetMZ(targetFile = targetFile,
                                   anpcMethodLibrary = anpcMethodLibrary,
                                   roundDecimal = roundDecimal)
@@ -360,7 +360,7 @@ if (newStatus) {
     shapeLegend <- "Sample Type"
     
       # Dynamically set colour grouping variable and label
-      if (length(unique(plotData[[projectCohort]])) > 1) {s
+      if (length(unique(plotData[[projectCohort]])) > 1) {
         colour <- projectCohort
         colourLegend <- "Project"
       } else {
@@ -3075,7 +3075,7 @@ if (newStatus) {
     labelY <- "BPI"
     
       # Dynamically set colour grouping variable and label
-      if (length(unique(plotData[[projectCohort]])) > 1) {s
+      if (length(unique(plotData[[projectCohort]])) > 1) {
         colour <- projectCohort
         colourLegend <- "Project"
       } else {
@@ -3084,10 +3084,10 @@ if (newStatus) {
       }
   } else {
     msStatus <- FALSE
-    print("Unable to generate Total Ion Chromatogram: No available MS level 1 spectral data")
+    print("Unable to generate Base Peak Chromatogram: No available MS level 1 spectral data")
   }
 } else {
-  print("Unable to generate Total Ion Chromatogram: No new samples to analyse")
+  print("Unable to generate Base Peak Chromatogram: No new samples to analyse")
 }
 ```
 
@@ -3403,6 +3403,3783 @@ if (newStatus) {
   rm(msStatus)
 }
 ```
+
+# Extracted Ion Chromatogram {.tabset}
+Chromatogram overview (Extracted Ion Current, EIC vs Retention Time, RT) of targeted mass calibration references, internal standards, endogenous analytes, and product ions by sample type. Chromatogram is plotted using MS level 1 spectral data for mass calibration references, internal standards, and endogenous analytes; whereas MS level 2 spectral data is used for product ions. 
+```{r, echo = FALSE, warning = FALSE}
+# Check if there are new samples to process and target m/z data is available
+if (newStatus && !is.null(targetMZ)) {
+  # Check new sample status by filtering target m/z data based on MS level detected in passed spectral data
+  targetMZ <- targetMZ[targetMZ$msLevel %in% unique(passedData[[msLevel]]),]
+  if (nrow(targetMZ) == 0) {
+    newStatus <- FALSE
+    print("Unable to generate Extracted Ion Chromatogram: No available target m/z data")
+  }
+} else if (!newStatus) {
+  print("Unable to generate Extracted Ion Chromatogram: No new samples to analyse")
+} else if (is.null(targetMZ)) {
+  newStatus <- FALSE
+  print("Unable to generate Extracted Ion Chromatogram: No available target m/z data")
+}
+```
+
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process
+if (newStatus) {
+  # Set common data columns
+  commonColumn <- colnames(passedData)[which(colnames(passedData) == sampleID):
+                                       which(colnames(passedData) == spectrumCount)]
+  
+  # Set plot variables and labels
+  caption <- "m/z"
+  labelX <- "RT"
+  labelY <- "EIC"
+  nPlotCol <- 2
+  nPlotRow <- 2
+}
+```
+
+```{r, echo = FALSE, warning = FALSE, include = FALSE}
+# If there are new samples to process
+if (newStatus) {
+  # Check if MS level 1 spectral data is available
+  if (any(passedData[[msLevel]] == 1)) {
+    msStatus <- TRUE
+    
+    # Filter MS level 1 spectral data for plotting
+    plotData <- passedData %>% 
+      dplyr::filter(.data[[msLevel]] == 1)
+    
+    # If historical data exists
+    if (file.exists(historicalDataPath)) {
+      historicalData <- readRDS(historicalDataPath)
+      
+      # Filter historical data for MS level 1 spectral data
+      historicalData <- historicalData %>%
+        dplyr::filter(.data[[msLevel]] == 1)
+      
+      # Merge historical data into plot data
+      plotData <- rbind(historicalData, plotData)
+      
+      # Clean environment
+      rm(historicalData)
+      invisible(gc())
+    }
+    
+    # Set plot variables and labels
+      # Dynamically set colour grouping variable and label
+      if (length(unique(plotData[[projectCohort]])) > 1) {
+        colour <- projectCohort
+        colourLegend <- "Project"
+      } else {
+        colour <- plate
+        colourLegend <- "Plate"
+      }
+    
+    # Extract and append intensity (EIC) of each target m/z stored in spectra into their own respective columns
+    plotData <- ticq::extractEIC(data = plotData,
+                                 intensityArray = intensityArray,
+                                 targetList = as.character(sort(unique(targetMZ$mzValue))))
+  } else {
+    msStatus <- FALSE
+  }
+}
+```
+
+## Mass Calibration References {.tabset}
+```{r, echo = FALSE, warning = FALSE}
+# Check if there are new samples to process and MS level 1 spectral data is available
+if (newStatus && msStatus) {
+  # Filter and sort unique target m/z values
+  targetList <- targetMZ %>%
+    dplyr::filter(analyteType == "Mass Calibration"
+                  & msLevel == 1)
+  targetList <- as.character(sort(unique(targetList$mzValue)))
+  
+  # Check target status (based on availability of target list)
+  if (length(targetList) > 0) {
+    targetStatus <- TRUE
+    
+    # Filter plot data for specific chromatogram region
+    plotData_filtered <- ticq::filterChromatogramRegion(data = plotData %>%
+                                                          dplyr::select(all_of(c(commonColumn, 
+                                                                                 retentionTime,
+                                                                                 targetList))),
+                                                        regionOfInterest = chromatogramRegion$massCal,
+                                                        filterBy = retentionTime)
+  } else {
+    targetStatus <- FALSE
+    print("Unable to generate Extracted Ion Chromatogram: No available target m/z data")
+  }
+} else if (newStatus && !msStatus) {
+  print("Unable to generate Extracted Ion Chromatogram: No available MS level 1 spectral data")
+}
+```
+
+### LTR {.tabset}
+#### LTR Plasma
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("sLTR Plasma", "LTR Plasma")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### LTR Serum
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("sLTR Serum", "LTR Serum")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### LTR Urine
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("sLTR Urine", "LTR Urine")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+### dLTR {.tabset}
+#### dLTR Plasma
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("dLTR Plasma")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### dLTR Serum
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("dLTR Serum")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### dLTR Urine
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("dLTR Urine")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+### PQC {.tabset}
+#### PQC Plasma
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("PQC Plasma")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### PQC Serum
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("PQC Serum")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### PQC Urine
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("PQC Urine")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+### dPQC {.tabset}
+#### dPQC Plasma
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("dPQC Plasma")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### dPQC Serum
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("dPQC Serum")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### dPQC Urine
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("dPQC Urine")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+### QC {.tabset}
+#### QC01
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("QC01")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### QC02
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("QC02")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### QC03
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("QC03")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### QC04
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("QC04")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+### CAL {.tabset}
+#### CAL01
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("CAL01")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### CAL02
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("CAL02")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### CAL03
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("CAL03")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### CAL04
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("CAL04")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### CAL05
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("CAL05")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### CAL06
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("CAL06")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### CAL07
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("CAL07")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### CAL08
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("CAL08")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+### Blank {.tabset}
+#### Single Blank
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("Single Blank")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### Double Blank
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("Double Blank")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+### Sample {.tabset}
+#### Sample Plasma
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("Sample Plasma")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### Sample Serum
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("Sample Serum")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### Sample Urine
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("Sample Urine")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+### dSample {.tabset}
+#### dSample Plasma
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("dSample Plasma")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### dSample Serum
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("dSample Serum")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### dSample Urine
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("dSample Urine")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+  
+  # Clean environment
+  rm(plotData_filtered, pattern)
+  invisible(gc())
+}
+```
+
+## Internal Standards {.tabset}
+```{r, echo = FALSE, warning = FALSE}
+# Check if there are new samples to process and MS level 1 spectral data is available
+if (newStatus && msStatus) {
+  # Filter and sort unique target m/z values
+  targetList <- targetMZ %>%
+    dplyr::filter(analyteType == "Internal Standard"
+                  & msLevel == 1)
+  targetList <- as.character(sort(unique(targetList$mzValue)))
+  
+  # Check target status (based on availability of target list)
+  if (length(targetList) > 0) {
+    targetStatus <- TRUE
+    
+    # Filter plot data for specific chromatogram region
+    plotData_filtered <- ticq::filterChromatogramRegion(data = plotData %>%
+                                                          dplyr::select(all_of(c(commonColumn, 
+                                                                                 retentionTime,
+                                                                                 targetList))),
+                                                        regionOfInterest = chromatogramRegion$analyte,
+                                                        filterBy = retentionTime)
+  } else {
+    targetStatus <- FALSE
+    print("Unable to generate Extracted Ion Chromatogram: No available target m/z data")
+  }
+} else if (newStatus && !msStatus) {
+  print("Unable to generate Extracted Ion Chromatogram: No available MS level 1 spectral data")
+}
+```
+
+### LTR {.tabset}
+#### LTR Plasma
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("sLTR Plasma", "LTR Plasma")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### LTR Serum
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("sLTR Serum", "LTR Serum")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### LTR Urine
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("sLTR Urine", "LTR Urine")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+### dLTR {.tabset}
+#### dLTR Plasma
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("dLTR Plasma")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### dLTR Serum
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("dLTR Serum")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### dLTR Urine
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("dLTR Urine")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+### PQC {.tabset}
+#### PQC Plasma
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("PQC Plasma")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### PQC Serum
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("PQC Serum")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### PQC Urine
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("PQC Urine")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+### dPQC {.tabset}
+#### dPQC Plasma
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("dPQC Plasma")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### dPQC Serum
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("dPQC Serum")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### dPQC Urine
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("dPQC Urine")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+### QC {.tabset}
+#### QC01
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("QC01")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### QC02
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("QC02")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### QC03
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("QC03")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### QC04
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("QC04")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+### CAL {.tabset}
+#### CAL01
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("CAL01")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### CAL02
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("CAL02")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### CAL03
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("CAL03")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### CAL04
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("CAL04")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### CAL05
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("CAL05")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### CAL06
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("CAL06")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### CAL07
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("CAL07")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### CAL08
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("CAL08")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+### Blank {.tabset}
+#### Single Blank
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("Single Blank")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### Double Blank
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("Double Blank")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+### Sample {.tabset}
+#### Sample Plasma
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("Sample Plasma")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### Sample Serum
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("Sample Serum")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### Sample Urine
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("Sample Urine")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+### dSample {.tabset}
+#### dSample Plasma
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("dSample Plasma")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### dSample Serum
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("dSample Serum")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### dSample Urine
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("dSample Urine")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+  
+  # Clean environment
+  rm(plotData_filtered, pattern)
+  invisible(gc())
+}
+```
+
+## Endogenous Analytes {.tabset}
+```{r, echo = FALSE, warning = FALSE}
+# Check if there are new samples to process and MS level 1 spectral data is available
+if (newStatus && msStatus) {
+  # Filter and sort unique target m/z values
+  targetList <- targetMZ %>%
+    dplyr::filter(analyteType == "Analyte"
+                  & msLevel == 1)
+  targetList <- as.character(sort(unique(targetList$mzValue)))
+  
+  # Check target status (based on availability of target list)
+  if (length(targetList) > 0) {
+    targetStatus <- TRUE
+    
+    # Filter plot data for specific chromatogram region
+    plotData_filtered <- ticq::filterChromatogramRegion(data = plotData %>%
+                                                          dplyr::select(all_of(c(commonColumn, 
+                                                                                 retentionTime,
+                                                                                 targetList))),
+                                                        regionOfInterest = chromatogramRegion$analyte,
+                                                        filterBy = retentionTime)
+  } else {
+    targetStatus <- FALSE
+    print("Unable to generate Extracted Ion Chromatogram: No available target m/z data")
+  }
+} else if (newStatus && !msStatus) {
+  print("Unable to generate Extracted Ion Chromatogram: No available MS level 1 spectral data")
+}
+```
+
+### LTR {.tabset}
+#### LTR Plasma
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("sLTR Plasma", "LTR Plasma")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### LTR Serum
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("sLTR Serum", "LTR Serum")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### LTR Urine
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("sLTR Urine", "LTR Urine")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+### dLTR {.tabset}
+#### dLTR Plasma
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("dLTR Plasma")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### dLTR Serum
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("dLTR Serum")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### dLTR Urine
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("dLTR Urine")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+### PQC {.tabset}
+#### PQC Plasma
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("PQC Plasma")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### PQC Serum
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("PQC Serum")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### PQC Urine
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("PQC Urine")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+### dPQC {.tabset}
+#### dPQC Plasma
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("dPQC Plasma")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### dPQC Serum
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("dPQC Serum")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### dPQC Urine
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("dPQC Urine")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+### QC {.tabset}
+#### QC01
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("QC01")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### QC02
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("QC02")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### QC03
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("QC03")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### QC04
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("QC04")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+### CAL {.tabset}
+#### CAL01
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("CAL01")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### CAL02
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("CAL02")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### CAL03
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("CAL03")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### CAL04
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("CAL04")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### CAL05
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("CAL05")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### CAL06
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("CAL06")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### CAL07
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("CAL07")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### CAL08
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("CAL08")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+### Blank {.tabset}
+#### Single Blank
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("Single Blank")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### Double Blank
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("Double Blank")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+### Sample {.tabset}
+#### Sample Plasma
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("Sample Plasma")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### Sample Serum
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("Sample Serum")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### Sample Urine
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("Sample Urine")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+### dSample {.tabset}
+#### dSample Plasma
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("dSample Plasma")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### dSample Serum
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("dSample Serum")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### dSample Urine
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 1 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("dSample Urine")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+  
+  # Clean environment
+  rm(plotData_filtered, pattern)
+  invisible(gc())
+}
+
+# If there are new samples to process and MS level 1 spectral data is available
+if (newStatus && msStatus) {
+  # Clean environment
+  rm(msStatus, plotData, colour, colourLegend, targetList, targetStatus)
+}
+```
+
+```{r, echo = FALSE, warning = FALSE, include = FALSE}
+# If there are new samples to process
+if (newStatus) {
+  # Check if MS level 2 spectral data is available
+  if (any(passedData[[msLevel]] == 2)) {
+    msStatus <- TRUE
+    
+    # Filter MS level 2 spectral data for plotting
+    plotData <- passedData %>% 
+      dplyr::filter(.data[[msLevel]] == 2)
+    
+    # If historical data exists
+    if (file.exists(historicalDataPath)) {
+      historicalData <- readRDS(historicalDataPath)
+      
+      # Filter historical data for MS level 2 spectral data
+      historicalData <- historicalData %>%
+        dplyr::filter(.data[[msLevel]] == 2)
+      
+      # Merge historical data into plot data
+      plotData <- rbind(historicalData, plotData)
+      
+      # Clean environment
+      rm(historicalData)
+      invisible(gc())
+    }
+    
+    # Set plot variables and labels
+      # Dynamically set colour grouping variable and label
+      if (length(unique(plotData[[projectCohort]])) > 1) {
+        colour <- projectCohort
+        colourLegend <- "Project"
+      } else {
+        colour <- plate
+        colourLegend <- "Plate"
+      }
+    
+    # Extract and append intensity (EIC) of each target m/z stored in spectra into their own respective columns
+    plotData <- ticq::extractEIC(data = plotData,
+                                 intensityArray = intensityArray,
+                                 targetList = as.character(sort(unique(targetMZ$mzValue))))
+  } else {
+    msStatus <- FALSE
+  }
+}
+```
+
+## Product Ions {.tabset}
+```{r, echo = FALSE, warning = FALSE}
+# Check if there are new samples to process and MS level 2 spectral data is available
+if (newStatus && msStatus) {
+  # Filter and sort unique target m/z values
+  targetList <- targetMZ %>%
+    dplyr::filter(analyteType == "Product"
+                  & msLevel == 2)
+  targetList <- as.character(sort(unique(targetList$mzValue)))
+  
+  # Check target status (based on availability of target list)
+  if (length(targetList) > 0) {
+    targetStatus <- TRUE
+    
+    # Filter plot data for specific chromatogram region
+    plotData_filtered <- ticq::filterChromatogramRegion(data = plotData %>%
+                                                          dplyr::select(all_of(c(commonColumn, 
+                                                                                 retentionTime,
+                                                                                 targetList))),
+                                                        regionOfInterest = chromatogramRegion$analyte,
+                                                        filterBy = retentionTime)
+  } else {
+    targetStatus <- FALSE
+    print("Unable to generate Extracted Ion Chromatogram: No available target m/z data")
+  }
+} else if (newStatus && !msStatus) {
+  print("Unable to generate Extracted Ion Chromatogram: No available MS level 2 spectral data")
+}
+```
+
+### LTR {.tabset}
+#### LTR Plasma
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 2 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("sLTR Plasma", "LTR Plasma")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### LTR Serum
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 2 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("sLTR Serum", "LTR Serum")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### LTR Urine
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 2 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("sLTR Urine", "LTR Urine")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+### dLTR {.tabset}
+#### dLTR Plasma
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 2 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("dLTR Plasma")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### dLTR Serum
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 2 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("dLTR Serum")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### dLTR Urine
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 2 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("dLTR Urine")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+### PQC {.tabset}
+#### PQC Plasma
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 2 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("PQC Plasma")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### PQC Serum
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 2 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("PQC Serum")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### PQC Urine
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 2 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("PQC Urine")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+### dPQC {.tabset}
+#### dPQC Plasma
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 2 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("dPQC Plasma")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### dPQC Serum
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 2 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("dPQC Serum")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### dPQC Urine
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 2 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("dPQC Urine")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+### QC {.tabset}
+#### QC01
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 2 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("QC01")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### QC02
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 2 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("QC02")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### QC03
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 2 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("QC03")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### QC04
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 2 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("QC04")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+### CAL {.tabset}
+#### CAL01
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 2 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("CAL01")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### CAL02
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 2 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("CAL02")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### CAL03
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 2 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("CAL03")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### CAL04
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 2 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("CAL04")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### CAL05
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 2 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("CAL05")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### CAL06
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 2 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("CAL06")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### CAL07
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 2 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("CAL07")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### CAL08
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 2 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("CAL08")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+### Blank {.tabset}
+#### Single Blank
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 2 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("Single Blank")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### Double Blank
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 2 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("Double Blank")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+### Sample {.tabset}
+#### Sample Plasma
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 2 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("Sample Plasma")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### Sample Serum
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 2 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("Sample Serum")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### Sample Urine
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 2 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("Sample Urine")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+### dSample {.tabset}
+#### dSample Plasma
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 2 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("dSample Plasma")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### dSample Serum
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 2 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("dSample Serum")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+}
+```
+
+#### dSample Urine
+```{r, echo = FALSE, warning = FALSE}
+# If there are new samples to process and MS level 2 spectral data and target list is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("dSample Urine")
+  
+  # If pattern exists in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot chromatogram
+    ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
+                                     dplyr::filter(.data[[sampleType]] %in% pattern),
+                                   x = retentionTime,
+                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   colour = colour,
+                                   caption = caption,
+                                   labelX = labelX,
+                                   labelY = labelY,
+                                   colourLegend = colourLegend,
+                                   nPlotCol = nPlotCol,
+                                   nPlotRow = nPlotRow)
+  } else {
+    print("No available data")
+  }
+  
+  # Clean environment
+  rm(plotData_filtered, pattern)
+  invisible(gc())
+}
+
+# If there are new samples to process and MS level 1 spectral data is available
+if (newStatus && msStatus) {
+  # Clean environment
+  rm(msStatus, plotData, colour, colourLegend, targetList, targetStatus)
+}
+
+# If there are new samples to process
+if (newStatus) {
+  # Clean environment
+  rm(commonColumn, caption, labelX, labelY, nPlotCol, nPlotRow)
+}
+```
+
+
 
 
 
