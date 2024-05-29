@@ -6,9 +6,6 @@
 #' @param input Input path containing a list of files to retrieve: character
 #' @param fileExtension File extension to filter for (Default: NULL): NULL or character
 #' @returns List of files stored within the input path that matches the file extension specified: character vector
-#'
-#' @examples
-#' inputFiles <- ticq::retrieveFileList(input = "/path/to/input/directory/", fileExtension = "JSON")
 retrieveFileList <- function(input, fileExtension = NULL) {
   # Check if input specified exists (either as a directory or a file)
   if (dir.exists(input) || file.exists(input)) {

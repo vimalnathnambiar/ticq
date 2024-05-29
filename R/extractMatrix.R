@@ -12,6 +12,7 @@
 #'
 #' @examples
 #' matrix <- ticq::extractMatrix(input = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29.json")
+#' print(matrix)
 extractMatrix <- function(input) {
   matrix <- dplyr::case_when(
     grepl("PLASMA|PLA", input) ~ "Plasma",

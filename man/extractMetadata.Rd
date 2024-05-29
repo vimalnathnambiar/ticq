@@ -20,4 +20,5 @@ Applicable only to data acquired at the Australian National Phenome Centre (ANPC
 }
 \examples{
 metadata <- ticq::extractMetadata(input = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29.json")
+print(metadata)
 }

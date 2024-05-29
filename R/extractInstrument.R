@@ -12,6 +12,7 @@
 #'
 #' @examples
 #' instrument <- ticq::extractInstrument(input = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29.json")
+#' print(instrument)
 extractInstrument <- function(input) {
   instrument <- dplyr::case_when(
     grepl("PAI01|PAI-01", input) ~ "PAI01",

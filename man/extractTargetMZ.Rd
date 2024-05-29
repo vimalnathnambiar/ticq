@@ -28,9 +28,11 @@ Extract target m/z data from a target file (published to web URL or local TSV do
 targetMZ <- ticq::extractTargetMZ(targetFile = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSeo31hlruA3QuwoESz5IDJ9Nu6ndSAgLTRn3uc45rOPO4BlksfHzh9xtNB22Oes9JOxhEbI4NK-zxl/pub?gid=0&single=true&output=tsv",
                                   anpcMethodLibrary = NULL,
                                   roundDecimal = NULL)
+print(targetMZ)
 
 # Example 2: Specify an in-house method library and round the m/z precision values to 4 decimal places
 targetMZ <- ticq::extractTargetMZ(targetFile = NULL,
                                   anpcMethodLibrary = "MS-AA-POS",
                                   roundDecimal = 4)
+print(targetMZ)
 }

@@ -20,4 +20,5 @@ Only applicable to data acquired at the Australian National Phenome Centre (ANPC
 }
 \examples{
 instrument <- ticq::extractInstrument(input = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29.json")
+print(instrument)
 }

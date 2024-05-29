@@ -12,6 +12,7 @@
 #'
 #' @examples
 #' project <- ticq::extractProject(input = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29.json")
+#' print(project)
 extractProject <- function(input) {
   project <- dplyr::case_when(
     grepl("covid19|covid|COV", input) ~ "COVID-19",

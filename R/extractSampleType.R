@@ -14,6 +14,7 @@
 #' @examples
 #' sampleType <- ticq::extractSampleType(input = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29.json",
 #'                                       matrix = "Serum")
+#' print(sampleType)
 extractSampleType <- function(input, matrix) {
   sampleType <- dplyr::case_when(
     grepl("DLTR|dLTR|dltr", input) ~ ifelse(is.na(matrix), NA_character_, paste("dLTR", matrix)),

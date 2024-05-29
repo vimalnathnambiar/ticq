@@ -38,12 +38,13 @@ data <- data.frame(sampleID = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_
                    method = "MS-AA-POS",
                    instrument = "PAI05",
                    plate = 88)
-anonymiseMetadata <- ticq::anonymiseMetadata(data = data,
-                                             sampleID = "sampleID",
-                                             project = "project",
-                                             cohort = "cohort",
-                                             projectCohort = "projectCohort",
-                                             method = "method",
-                                             instrument = "instrument",
-                                             plate = "plate")
+data <- ticq::anonymiseMetadata(data = data,
+                                sampleID = "sampleID",
+                                project = "project",
+                                cohort = "cohort",
+                                projectCohort = "projectCohort",
+                                method = "method",
+                                instrument = "instrument",
+                                plate = "plate")
+print(data)
 }

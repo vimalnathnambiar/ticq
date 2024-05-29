@@ -12,6 +12,7 @@
 #'
 #' @examples
 #' cohort <- ticq::extractCohort(input = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29.json")
+#' print(cohort)
 extractCohort <- function(input) {
   cohort <- dplyr::case_when(
     grepl("System_Suitability|System|SS", input) ~ "System Suitability",

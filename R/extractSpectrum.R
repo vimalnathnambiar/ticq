@@ -10,11 +10,6 @@
 #' @param input Input path (can either a directory or a single file path) containing input files for extraction: character
 #' @param inputFiles Input files to be extracted: character vector
 #' @returns List containing two data frames (passed and failed data)
-#'
-#' @examples
-#' input <- "/path/to/input/directory/"
-#' result <- ticq::extractSpectrum(input = input,
-#'                                 inputFiles = ticq::retrieveFileList(input = input, fileExtension = "JSON"))
 extractSpectrum <- function(input, inputFiles) {
   # Defaults
   passedData <- data.frame()

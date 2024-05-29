@@ -17,6 +17,3 @@ List of files stored within the input path that matches the file extension speci
 \description{
 Filter and retrieve file list of a specified extension type stored within an input path.
 }
-\examples{
-inputFiles <- ticq::retrieveFileList(input = "/path/to/input/directory/", fileExtension = "JSON")
-}

@@ -13,6 +13,7 @@
 #'
 #' @examples
 #' plate <- ticq::extractPlate(input = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29.json")
+#' print(plate)
 extractPlate <- function(input) {
   # Plate patterns
   pattern <- c("[pP][0-9]+", "PLATE[0-9]+", "PLASMA[0-9]+")

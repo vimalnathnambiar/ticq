@@ -12,6 +12,7 @@
 #'
 #' @examples
 #' method <- ticq::extractMethod(input = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29.json")
+#' print(method)
 extractMethod <- function(input) {
   method <- dplyr::case_when(
     grepl("MS-AA-POS|MS-AApos|MS-AA|MS_AA|AAA|AA", input) ~ "MS-AA-POS",
