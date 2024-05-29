@@ -1,9 +1,9 @@
 #' checkSpectrumCount
-#' 
+#'
 #' Check and filter samples against a specific threshold limit set on the average mean of spectral data (spectrum count) present.
-#' 
+#'
 #' @import dplyr
-#' 
+#'
 #' @export
 #' @param data Data frame that contains spectral information of samples: data frame
 #' @param commonColumn Column names that are common across all samples: character vector
@@ -11,9 +11,9 @@
 #' @param spectrumCount Name of the column that represents spectrum count: character
 #' @param threshold Accepted threshold limit % (Default: 20): double
 #' @returns List containing the statistical result (sample size, total and mean of spectrum count, and the threshold limit value), and two data frames (passed and failed data)
-checkSpectrumCount <- function(data, 
-                               commonColumn, 
-                               sampleID, 
+checkSpectrumCount <- function(data,
+                               commonColumn,
+                               sampleID,
                                spectrumCount,
                                threshold = 20) {
   # Summarise data and obtain total number of spectrum of each sample
@@ -35,7 +35,7 @@ checkSpectrumCount <- function(data,
     threshold <- floor(mean - ((threshold / 100) * mean))
   
   # Filter for passed and failed samples
-  failedData <- summarisedData %>% 
+  failedData <- summarisedData %>%
     dplyr::filter(.data[[spectrumCount]] < threshold)
   
   passedData <- data %>%

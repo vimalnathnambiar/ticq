@@ -1,9 +1,9 @@
 #' plotChromatogram
-#' 
-#' Plot chromatogram data. 
-#' 
+#'
+#' Plot chromatogram data.
+#'
 #' @import ggplot2
-#' 
+#'
 #' @export
 #' @param data Data frame that contains plot data: data frame
 #' @param x Name of the column that represents the continuous data series for the x-axis: character
@@ -16,21 +16,20 @@
 #' @param labelY y-axis label (Default:Value used for y): NULL or character
 #' @param colourLegend Legend label for colour grouping (Default: Value used for colour): NULL or character
 #' @param chromatogramRegion List that represents the different chromatogram regions of interest (Default: NULL): NULL or list
-plotChromatogram <- function(data, 
-                             x, 
-                             y, 
-                             colour = NULL, 
-                             title = "Chromatogram", 
-                             subtitle = NULL, 
-                             caption = NULL, 
-                             labelX = x, 
-                             labelY = y, 
-                             colourLegend = colour, 
+plotChromatogram <- function(data,
+                             x,
+                             y,
+                             colour = NULL,
+                             title = "Chromatogram",
+                             subtitle = NULL,
+                             caption = NULL,
+                             labelX = x,
+                             labelY = y,
+                             colourLegend = colour,
                              chromatogramRegion = NULL) {
   tryCatch({
     # Plot chromatogram
-    chromatogram <- ggplot2::ggplot(data = data,
-                                    aes(x = .data[[x]], y = .data[[y]])) +
+    chromatogram <- ggplot2::ggplot(data = data, aes(x = .data[[x]], y = .data[[y]])) +
       ggplot2::geom_line(aes(colour = if (!is.null(colour)) .data[[colour]] else NULL,
                              group = if (!is.null(colour)) ifelse(.data[[colour]] == "Historical", 1, 2) else NULL),
                          alpha = 0.25) +
@@ -71,10 +70,6 @@ plotChromatogram <- function(data,
     
     print(chromatogram)
   },
-  warning = function(w) {
-    print(paste0("Unable to generate Chromatogram - ", w))
-  }, 
-  error = function(e) {
-    print(paste0("Unable to generate Chromatogram - ", e))
-  })
+  warning = function(w) print(paste0("Unable to generate Chromatogram - ", w)),
+  error = function(e) print(paste0("Unable to generate Chromatogram - ", e)))
 }

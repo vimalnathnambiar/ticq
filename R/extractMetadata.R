@@ -26,8 +26,7 @@ extractMetadata <- function(input) {
   matrix <- ticq::extractMatrix(input = input)
   
   # Extract sample type
-  sampleType <- ticq::extractSampleType(input = input,
-                                        matrix = matrix)
+  sampleType <- ticq::extractSampleType(input = input, matrix = matrix)
   
   # Extract method
   method <- ticq::extractMethod(input = input)

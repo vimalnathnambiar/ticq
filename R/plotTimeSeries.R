@@ -1,10 +1,10 @@
 #' plotTimeSeries
-#' 
+#'
 #' Plot time series data and perform boundary analysis (if specified).
-#' 
+#'
 #' @import ggplot2
 #' @import dplyr
-#' 
+#'
 #' @export
 #' @param data Data frame that contains plot data: data frame
 #' @param x Name of the column that represents the continuous data series for x-axis: character
@@ -22,25 +22,24 @@
 #' @param boundaryValue Value used for boundary analysis. To specify values for "sd" boundary analysis, use list(mean = meanValue, sd = sdValue, sd2 = sd2Value) (Default: 0): double or list
 #' @param xTickToggle Toggle ticks on x-axis (Default: TRUE, Options: TRUE or FALSE): boolean
 #' @returns Data frame containing the boundary analysis result (if specified)
-plotTimeSeries <- function(data, 
-                           x, 
-                           y, 
-                           colour = NULL, 
+plotTimeSeries <- function(data,
+                           x,
+                           y,
+                           colour = NULL,
                            shape = NULL,
-                           title = "Time Series", 
-                           subtitle = NULL, 
-                           caption = NULL, 
-                           labelX = x, 
-                           labelY = y, 
-                           colourLegend = colour, 
+                           title = "Time Series",
+                           subtitle = NULL,
+                           caption = NULL,
+                           labelX = x,
+                           labelY = y,
+                           colourLegend = colour,
                            shapeLegend = shape,
-                           boundary = NULL, 
-                           boundaryValue = 0, 
+                           boundary = NULL,
+                           boundaryValue = 0,
                            xTickToggle = TRUE) {
-  tryCatch({    
+  tryCatch({
     # Plot time series
-    timeSeries <- ggplot2::ggplot(data = data,
-                                  aes(x = .data[[x]], y = .data[[y]])) +
+    timeSeries <- ggplot2::ggplot(data = data, aes(x = .data[[x]], y = .data[[y]])) +
       ggplot2::geom_point(aes(colour = if (!is.null(colour)) .data[[colour]] else NULL,
                               shape = if (!is.null(shape)) .data[[shape]] else NULL,
                               group = if (!is.null(colour)) ifelse(.data[[colour]] == "Historical", 1, 2) else NULL),
@@ -60,8 +59,7 @@ plotTimeSeries <- function(data,
       # Remove xTick
       if (!xTickToggle) {
         timeSeries <- timeSeries +
-          ggplot2::theme(axis.text.x = element_blank(),
-                         axis.ticks.x = element_blank())
+          ggplot2::theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
       }
     
     # Add and perform boundary analysis
@@ -73,7 +71,7 @@ plotTimeSeries <- function(data,
         lowerBound <- 0 - boundaryValue
         upperBound <- 0 + boundaryValue
         
-        timeSeries <- timeSeries + 
+        timeSeries <- timeSeries +
           ggplot2::geom_hline(yintercept = 0,
                               linetype = "dashed",
                               colour = "grey") +
@@ -103,7 +101,7 @@ plotTimeSeries <- function(data,
         lowerBound <- 100 - boundaryValue
         upperBound <- 100 + boundaryValue
         
-        timeSeries <- timeSeries + 
+        timeSeries <- timeSeries +
           ggplot2::geom_hline(yintercept = 100,
                               linetype = "dashed",
                               colour = "grey") +
@@ -195,20 +193,14 @@ plotTimeSeries <- function(data,
     }
     
     print(timeSeries)
-    
-    # If boundary analysis generated results
-    if (!is.null(result)) {
-      return(result)
-    }
+    return(result)
   }, 
   warning = function(w) {
     print(paste0("Unable to perform Time Series Analysis - ", w))
-    result <- NULL
-    return(result)
+    return(NULL)
   },
   error = function(e) {
     print(paste0("Unable to perform Time Series Analysis - ", e))
-    result <- NULL
-    return(result)
+    return(NULL)
   })
 }

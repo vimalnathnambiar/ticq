@@ -1,10 +1,10 @@
 #' plotMultipleChromatogram
-#' 
+#'
 #' Plot multiple chromatogram data in specified number of rows and columns based on the same x-axis but different y-axis.
-#' 
+#'
 #' @import ggplot2
 #' @import ggpubr
-#' 
+#'
 #' @export
 #' @param data Data frame that contains plot data: data frame
 #' @param x Name of the column that represents the continuous data series for the x-axis: character
@@ -13,21 +13,21 @@
 #' @param colour Name of the column used for colour grouping (Default: NULL): NULL or character
 #' @param caption Plot caption. This will append a caption value to the column name used for the y-axis (Default: Column name used for y-axis): NULL or character
 #' @param labelX x-axis label (Default: the name of the column used for the x-axis): NULL or character
-#' @param labelY y-axis label (Default: the name of the column used for the y-axis): NULL or character
+#' @param labelY y-axis label (Default: NULL): NULL or character
 #' @param colourLegend Legend label for colour grouping (Default: Value used for colour): NULL or character
 #' @param nPlotCol Number of plots in a single columns (Default: 1): double
 #' @param nPlotRow Number of plot in a single row (Default: 1): double
 #' @returns Print multiple chromatogram plot
-plotMultipleChromatogram <- function(data, 
-                                     x, 
-                                     startIDX, 
+plotMultipleChromatogram <- function(data,
+                                     x,
+                                     startIDX,
                                      endIDX = NULL,
-                                     colour = NULL, 
+                                     colour = NULL,
                                      caption = NULL,
-                                     labelX = x, 
-                                     labelY = y, 
-                                     colourLegend = colour, 
-                                     nPlotCol = 1, 
+                                     labelX = x,
+                                     labelY = NULL,
+                                     colourLegend = colour,
+                                     nPlotCol = 1,
                                      nPlotRow = 1) {
   tryCatch({
     # Defaults
@@ -36,19 +36,18 @@ plotMultipleChromatogram <- function(data,
     nPlotData <- nPlotCol * nPlotRow
     
     
-    # If index of last column is NULL
-    if (is.null(endIDX)) {
-      endIDX <- ncol(data)
-    }
+      # If index of last column is NULL
+      if (is.null(endIDX)) {
+        endIDX <- ncol(data)
+      }
     
-    # Loop through y-axis data columns
+    # Loop through y-axis data columns for plotting
     for (i in startIDX:endIDX) {
       # y-axis column name
       y <- colnames(data)[i]
       
       # Plot chromatogram
-      chromatogram <- ggplot2::ggplot(data = data,
-                                      aes(x = .data[[x]], y = .data[[y]])) +
+      chromatogram <- ggplot2::ggplot(data = data, aes(x = .data[[x]], y = .data[[y]])) +
         ggplot2::geom_line(aes(colour = if (!is.null(colour)) .data[[colour]] else NULL,
                                group = if (!is.null(colour)) ifelse(.data[[colour]] == "Historical", 1, 2) else NULL),
                            alpha = 0.25) +
@@ -78,10 +77,6 @@ plotMultipleChromatogram <- function(data,
       }
     }
   },
-  warning = function(w) {
-    print(paste0("Unable to generate Chromatogram - ", w))
-  }, 
-  error = function(e) {
-    print(paste0("Unable to generate Chromatogram - ", e))
-  })
+  warning = function(w) print(paste0("Unable to generate Chromatogram - ", w)), 
+  error = function(e) print(paste0("Unable to generate Chromatogram - ", e)))
 }

@@ -22,6 +22,6 @@ Metadata extraction only applicable to data acquired at the Australian National 
 }
 \examples{
 input <- "/path/to/input/directory/"
-result <- ticq::extractSpectrum(input = input, 
+result <- ticq::extractSpectrum(input = input,
                                 inputFiles = ticq::retrieveFileList(input = input, fileExtension = "JSON"))
 }

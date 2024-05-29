@@ -1,5 +1,5 @@
 ---
-title: "TICQ Report"
+title: "TICQ Report: `r params$title`"
 subtitle: "Total Ion Current Quality Assessment of Mass Spectrometry Spectral Data"
 author: "Vimalnath Nambiar and Shabarinath Nambiar"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
@@ -15,6 +15,7 @@ output:
     toc_depth: 6
     theme: paper
 params:
+    title: NULL
     input: NULL
     chromatogramRegion: NULL
     targetFile: NULL
@@ -147,8 +148,8 @@ if (newStatus) {
   print(paste("Number of files that failed spectral data extraction:", nrow(result$failedData)))
   if (nrow(result$failedData) != 0) {
     print(DT::datatable(data = result$failedData,
-                  filter = "top",
-                  options = list(scrollX = TRUE)))
+                        filter = "top",
+                        options = list(scrollX = TRUE)))
   }
   
   # Clean environment
@@ -227,8 +228,8 @@ if (newStatus) {
   print(paste("Number of samples with undefined sample type:", nrow(result$failedData)))
   if (nrow(result$failedData) != 0) {
     print(DT::datatable(data = result$failedData,
-                  filter = "top",
-                  options = list(scrollX = TRUE)))
+                        filter = "top",
+                        options = list(scrollX = TRUE)))
   }
   
   # Clean environment
@@ -326,23 +327,23 @@ if (newStatus) {
   if (any(passedData[[msLevel]] == 1)) {
     msStatus <- TRUE
     
-    # Filter MS level 1 spectral data for plotting
+    # Filter data for plotting
     plotData <- passedData %>% 
       dplyr::filter(.data[[msLevel]] == 1) %>%
-      dplyr::select(all_of(c(colnames(passedData)[which(colnames(passedData) == sampleID):
-                                                  which(colnames(passedData) == spectrumCount)],
-                             retentionTime, totalIonCurrent)))
+      dplyr::select(all_of(colnames(passedData)[which(colnames(passedData) == sampleID):
+                                                which(colnames(passedData) == spectrumCount)]),
+                    retentionTime, totalIonCurrent)
     
     # If historical data exists
     if (file.exists(historicalDataPath)) {
       historicalData <- readRDS(historicalDataPath)
       
-      # Filter historical data for MS level 1 spectral data
+      # Filter historical data
       historicalData <- historicalData %>%
         dplyr::filter(.data[[msLevel]] == 1) %>%
-        dplyr::select(all_of(c(colnames(historicalData)[which(colnames(historicalData) == sampleID):
-                                                        which(colnames(historicalData) == spectrumCount)],
-                               retentionTime, totalIonCurrent)))
+        dplyr::select(all_of(colnames(historicalData)[which(colnames(historicalData) == sampleID):
+                                                      which(colnames(historicalData) == spectrumCount)]),
+                      retentionTime, totalIonCurrent)
       
       # Merge historical data into plot data
       plotData <- rbind(historicalData, plotData)
@@ -353,6 +354,8 @@ if (newStatus) {
     }
     
     # Set plot variables and labels
+    x <- retentionTime
+    y <- totalIonCurrent
     title <- "Total Ion Chromatogram"
     labelX <- "RT"
     labelY <- "TIC"
@@ -395,8 +398,8 @@ if (newStatus && msStatus) {
         # Plot chromatogram
         ticq::plotChromatogram(data = plotData %>% 
                                  dplyr::filter(.data[[sampleType]] %in% tmpPattern),
-                               x = retentionTime,
-                               y = totalIonCurrent,
+                               x = x,
+                               y = y,
                                colour = colour,
                                title = title,
                                subtitle = paste("LTR", i),
@@ -431,8 +434,8 @@ if (newStatus && msStatus) {
         # Plot chromatogram
         ticq::plotChromatogram(data = plotData %>% 
                                  dplyr::filter(.data[[sampleType]] %in% i),
-                               x = retentionTime,
-                               y = totalIonCurrent,
+                               x = x,
+                               y = y,
                                colour = colour,
                                title = title,
                                subtitle = i,
@@ -464,8 +467,8 @@ if (newStatus && msStatus) {
         # Plot chromatogram
         ticq::plotChromatogram(data = plotData %>% 
                                  dplyr::filter(.data[[sampleType]] %in% i),
-                               x = retentionTime,
-                               y = totalIonCurrent,
+                               x = x,
+                               y = y,
                                colour = colour,
                                title = title,
                                subtitle = i,
@@ -497,8 +500,8 @@ if (newStatus && msStatus) {
         # Plot chromatogram
         ticq::plotChromatogram(data = plotData %>% 
                                  dplyr::filter(.data[[sampleType]] %in% i),
-                               x = retentionTime,
-                               y = totalIonCurrent,
+                               x = x,
+                               y = y,
                                colour = colour,
                                title = title,
                                subtitle = i,
@@ -530,8 +533,8 @@ if (newStatus && msStatus) {
         # Plot chromatogram
         ticq::plotChromatogram(data = plotData %>% 
                                  dplyr::filter(.data[[sampleType]] %in% i),
-                               x = retentionTime,
-                               y = totalIonCurrent,
+                               x = x,
+                               y = y,
                                colour = colour,
                                title = title,
                                subtitle = i,
@@ -563,8 +566,8 @@ if (newStatus && msStatus) {
         # Plot chromatogram
         ticq::plotChromatogram(data = plotData %>% 
                                  dplyr::filter(.data[[sampleType]] %in% i),
-                               x = retentionTime,
-                               y = totalIonCurrent,
+                               x = x,
+                               y = y,
                                colour = colour,
                                title = title,
                                subtitle = i,
@@ -596,8 +599,8 @@ if (newStatus && msStatus) {
         # Plot chromatogram
         ticq::plotChromatogram(data = plotData %>% 
                                  dplyr::filter(.data[[sampleType]] %in% i),
-                               x = retentionTime,
-                               y = totalIonCurrent,
+                               x = x,
+                               y = y,
                                colour = colour,
                                title = title,
                                subtitle = i,
@@ -629,8 +632,8 @@ if (newStatus && msStatus) {
         # Plot chromatogram
         ticq::plotChromatogram(data = plotData %>% 
                                  dplyr::filter(.data[[sampleType]] %in% i),
-                               x = retentionTime,
-                               y = totalIonCurrent,
+                               x = x,
+                               y = y,
                                colour = colour,
                                title = title,
                                subtitle = i,
@@ -662,8 +665,8 @@ if (newStatus && msStatus) {
         # Plot chromatogram
         ticq::plotChromatogram(data = plotData %>% 
                                  dplyr::filter(.data[[sampleType]] %in% i),
-                               x = retentionTime,
-                               y = totalIonCurrent,
+                               x = x,
+                               y = y,
                                colour = colour,
                                title = title,
                                subtitle = i,
@@ -678,7 +681,7 @@ if (newStatus && msStatus) {
   }
   
   # Clean environment
-  rm(title, labelX, labelY, pattern, i)
+  rm(x, y, title, labelX, labelY, pattern, i)
 }
 ```
 
@@ -715,6 +718,7 @@ if (!newStatus) {
   print("Unable to perform Principal Component Analysis: No available MS level 1 spectral data")
 } else {
   # Set toggles for PCA plot printing
+  startIDX <- which(colnames(plotData) == massCalRegion)
   screePlotToggle <- TRUE
   scoresPlotToggle <- FALSE
   loadingsPlotToggle <- FALSE
@@ -735,7 +739,7 @@ if (newStatus && msStatus) {
     # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
-                  startIDX = which(colnames(plotData) == massCalRegion),
+                  startIDX = startIDX,
                   colour = colour,
                   shape = shape,
                   subtitle = "LTR Plasma",
@@ -763,7 +767,7 @@ if (newStatus && msStatus) {
     # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
-                  startIDX = which(colnames(plotData) == massCalRegion),
+                  startIDX = startIDX,
                   colour = colour,
                   shape = shape,
                   subtitle = "LTR Serum",
@@ -791,7 +795,7 @@ if (newStatus && msStatus) {
     # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
-                  startIDX = which(colnames(plotData) == massCalRegion),
+                  startIDX = startIDX,
                   colour = colour,
                   shape = shape,
                   subtitle = "LTR Urine",
@@ -820,7 +824,7 @@ if (newStatus && msStatus) {
     # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
-                  startIDX = which(colnames(plotData) == massCalRegion),
+                  startIDX = startIDX,
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
@@ -848,7 +852,7 @@ if (newStatus && msStatus) {
     # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
-                  startIDX = which(colnames(plotData) == massCalRegion),
+                  startIDX = startIDX,
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
@@ -876,7 +880,7 @@ if (newStatus && msStatus) {
     # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
-                  startIDX = which(colnames(plotData) == massCalRegion),
+                  startIDX = startIDX,
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
@@ -905,7 +909,7 @@ if (newStatus && msStatus) {
     # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
-                  startIDX = which(colnames(plotData) == massCalRegion),
+                  startIDX = startIDX,
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
@@ -933,7 +937,7 @@ if (newStatus && msStatus) {
     # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
-                  startIDX = which(colnames(plotData) == massCalRegion),
+                  startIDX = startIDX,
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
@@ -961,7 +965,7 @@ if (newStatus && msStatus) {
     # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
-                  startIDX = which(colnames(plotData) == massCalRegion),
+                  startIDX = startIDX,
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
@@ -990,7 +994,7 @@ if (newStatus && msStatus) {
     # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
-                  startIDX = which(colnames(plotData) == massCalRegion),
+                  startIDX = startIDX,
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
@@ -1018,7 +1022,7 @@ if (newStatus && msStatus) {
     # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
-                  startIDX = which(colnames(plotData) == massCalRegion),
+                  startIDX = startIDX,
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
@@ -1046,7 +1050,7 @@ if (newStatus && msStatus) {
     # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
-                  startIDX = which(colnames(plotData) == massCalRegion),
+                  startIDX = startIDX,
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
@@ -1075,7 +1079,7 @@ if (newStatus && msStatus) {
     # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
-                  startIDX = which(colnames(plotData) == massCalRegion),
+                  startIDX = startIDX,
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
@@ -1103,7 +1107,7 @@ if (newStatus && msStatus) {
     # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
-                  startIDX = which(colnames(plotData) == massCalRegion),
+                  startIDX = startIDX,
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
@@ -1131,7 +1135,7 @@ if (newStatus && msStatus) {
     # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
-                  startIDX = which(colnames(plotData) == massCalRegion),
+                  startIDX = startIDX,
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
@@ -1159,7 +1163,7 @@ if (newStatus && msStatus) {
     # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
-                  startIDX = which(colnames(plotData) == massCalRegion),
+                  startIDX = startIDX,
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
@@ -1188,7 +1192,7 @@ if (newStatus && msStatus) {
     # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
-                  startIDX = which(colnames(plotData) == massCalRegion),
+                  startIDX = startIDX,
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
@@ -1216,7 +1220,7 @@ if (newStatus && msStatus) {
     # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
-                  startIDX = which(colnames(plotData) == massCalRegion),
+                  startIDX = startIDX,
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
@@ -1244,7 +1248,7 @@ if (newStatus && msStatus) {
     # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
-                  startIDX = which(colnames(plotData) == massCalRegion),
+                  startIDX = startIDX,
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
@@ -1272,7 +1276,7 @@ if (newStatus && msStatus) {
     # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
-                  startIDX = which(colnames(plotData) == massCalRegion),
+                  startIDX = startIDX,
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
@@ -1300,7 +1304,7 @@ if (newStatus && msStatus) {
     # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
-                  startIDX = which(colnames(plotData) == massCalRegion),
+                  startIDX = startIDX,
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
@@ -1328,7 +1332,7 @@ if (newStatus && msStatus) {
     # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
-                  startIDX = which(colnames(plotData) == massCalRegion),
+                  startIDX = startIDX,
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
@@ -1356,7 +1360,7 @@ if (newStatus && msStatus) {
     # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
-                  startIDX = which(colnames(plotData) == massCalRegion),
+                  startIDX = startIDX,
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
@@ -1384,7 +1388,7 @@ if (newStatus && msStatus) {
     # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
-                  startIDX = which(colnames(plotData) == massCalRegion),
+                  startIDX = startIDX,
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
@@ -1413,7 +1417,7 @@ if (newStatus && msStatus) {
     # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
-                  startIDX = which(colnames(plotData) == massCalRegion),
+                  startIDX = startIDX,
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
@@ -1441,7 +1445,7 @@ if (newStatus && msStatus) {
     # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
-                  startIDX = which(colnames(plotData) == massCalRegion),
+                  startIDX = startIDX,
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
@@ -1470,7 +1474,7 @@ if (newStatus && msStatus) {
     # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
-                  startIDX = which(colnames(plotData) == massCalRegion),
+                  startIDX = startIDX,
                   colour = colour,
                   shape = shape,
                   subtitle = "Sample Plasma",
@@ -1498,7 +1502,7 @@ if (newStatus && msStatus) {
     # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
-                  startIDX = which(colnames(plotData) == massCalRegion),
+                  startIDX = startIDX,
                   colour = colour,
                   shape = shape,
                   subtitle = "Sample Serum",
@@ -1526,7 +1530,7 @@ if (newStatus && msStatus) {
     # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
-                  startIDX = which(colnames(plotData) == massCalRegion),
+                  startIDX = startIDX,
                   colour = colour,
                   shape = shape,
                   subtitle = "Sample Urine",
@@ -1555,7 +1559,7 @@ if (newStatus && msStatus) {
     # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
-                  startIDX = which(colnames(plotData) == massCalRegion),
+                  startIDX = startIDX,
                   colour = colour,
                   shape = shape,
                   subtitle = "dSample Plasma",
@@ -1583,7 +1587,7 @@ if (newStatus && msStatus) {
     # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
-                  startIDX = which(colnames(plotData) == massCalRegion),
+                  startIDX = startIDX,
                   colour = colour,
                   shape = shape,
                   subtitle = "dSample Serum",
@@ -1611,7 +1615,7 @@ if (newStatus && msStatus) {
     # Plot PCA
     ticq::plotPCA(data = plotData %>%
                     dplyr::filter(.data[[sampleType]] %in% pattern),
-                  startIDX = which(colnames(plotData) == massCalRegion),
+                  startIDX = startIDX,
                   colour = colour,
                   shape = shape,
                   subtitle = "dSample Plasma",
@@ -1626,7 +1630,7 @@ if (newStatus && msStatus) {
   }
   
   # Clean environment
-  rm(screePlotToggle, scoresPlotToggle, loadingsPlotToggle, biPlotToggle, pattern)
+  rm(startIDX, screePlotToggle, scoresPlotToggle, loadingsPlotToggle, biPlotToggle, pattern)
 }
 ```
 
@@ -1636,6 +1640,8 @@ Time series analysis focuses on the prewash region (combined mass calibration an
 # Check if there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
   # Set plot variables and labels
+  x <- date
+  y <- prewashRegion
   labelX <- "Date"
   labelY <- "Prewash Region (TIC)"
   boundary <- "sd"
@@ -1669,8 +1675,8 @@ if (newStatus && msStatus) {
         # Plot time series
         result <- ticq::plotTimeSeries(data = plotData %>%
                                          dplyr::filter(.data[[sampleType]] %in% tmpPattern),
-                                       x = date,
-                                       y = prewashRegion,
+                                       x = x,
+                                       y = y,
                                        colour = colour,
                                        shape = shape,
                                        subtitle = paste("LTR", i),
@@ -1710,8 +1716,8 @@ if (newStatus && msStatus) {
         # Plot time series
         result <- ticq::plotTimeSeries(data = plotData %>% 
                                          dplyr::filter(.data[[sampleType]] %in% i),
-                                       x = date,
-                                       y = prewashRegion,
+                                       x = x,
+                                       y = y,
                                        colour = colour,
                                        shape = shape,
                                        subtitle = i,
@@ -1748,8 +1754,8 @@ if (newStatus && msStatus) {
         # Plot time series
         result <- ticq::plotTimeSeries(data = plotData %>% 
                                          dplyr::filter(.data[[sampleType]] %in% i),
-                                       x = date,
-                                       y = prewashRegion,
+                                       x = x,
+                                       y = y,
                                        colour = colour,
                                        shape = shape,
                                        subtitle = i,
@@ -1786,8 +1792,8 @@ if (newStatus && msStatus) {
         # Plot time series
         result <- ticq::plotTimeSeries(data = plotData %>% 
                                          dplyr::filter(.data[[sampleType]] %in% i),
-                                       x = date,
-                                       y = prewashRegion,
+                                       x = x,
+                                       y = y,
                                        colour = colour,
                                        shape = shape,
                                        subtitle = i,
@@ -1824,8 +1830,8 @@ if (newStatus && msStatus) {
         # Plot time series
         result <- ticq::plotTimeSeries(data = plotData %>% 
                                          dplyr::filter(.data[[sampleType]] %in% i),
-                                       x = date,
-                                       y = prewashRegion,
+                                       x = x,
+                                       y = y,
                                        colour = colour,
                                        shape = shape,
                                        subtitle = i,
@@ -1862,8 +1868,8 @@ if (newStatus && msStatus) {
         # Plot time series
         result <- ticq::plotTimeSeries(data = plotData %>% 
                                          dplyr::filter(.data[[sampleType]] %in% i),
-                                       x = date,
-                                       y = prewashRegion,
+                                       x = x,
+                                       y = y,
                                        colour = colour,
                                        shape = shape,
                                        subtitle = i,
@@ -1900,8 +1906,8 @@ if (newStatus && msStatus) {
         # Plot time series
         result <- ticq::plotTimeSeries(data = plotData %>% 
                                          dplyr::filter(.data[[sampleType]] %in% i),
-                                       x = date,
-                                       y = prewashRegion,
+                                       x = x,
+                                       y = y,
                                        colour = colour,
                                        shape = shape,
                                        subtitle = i,
@@ -1943,7 +1949,7 @@ if (newStatus && msStatus) {
         tmpReferenceData <- plotData %>%
           dplyr::filter(.data[[sampleType]] %in% tmpPattern)
         if (nrow(tmpReferenceData) > 1) {
-          boundaryValue <- ticq::generateStat(data = tmpReferenceData[[prewashRegion]]) %>%
+          boundaryValue <- ticq::generateStat(data = tmpReferenceData[[y]]) %>%
             dplyr::select(mean, sd, sd2) %>%
             as.list()
         } else {
@@ -1953,8 +1959,8 @@ if (newStatus && msStatus) {
         # Plot time series
         result <- ticq::plotTimeSeries(data = plotData %>% 
                                          dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, i)),
-                                       x = date,
-                                       y = prewashRegion,
+                                       x = x,
+                                       y = y,
                                        colour = colour,
                                        shape = shape,
                                        subtitle = i,
@@ -2002,7 +2008,7 @@ if (newStatus && msStatus) {
         tmpReferenceData <- plotData %>%
           dplyr::filter(.data[[sampleType]] %in% tmpPattern)
         if (nrow(tmpReferenceData) > 1) {
-          boundaryValue <- ticq::generateStat(data = tmpReferenceData[[prewashRegion]]) %>%
+          boundaryValue <- ticq::generateStat(data = tmpReferenceData[[y]]) %>%
             dplyr::select(mean, sd, sd2) %>%
             as.list()
         } else {
@@ -2012,8 +2018,8 @@ if (newStatus && msStatus) {
         # Plot time series
         result <- ticq::plotTimeSeries(data = plotData %>% 
                                          dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, i)),
-                                       x = date,
-                                       y = prewashRegion,
+                                       x = x,
+                                       y = y,
                                        colour = colour,
                                        shape = shape,
                                        subtitle = i,
@@ -2039,7 +2045,7 @@ if (newStatus && msStatus) {
   }
   
   # Clean environment
-  rm(labelX, labelY, boundary, xTickToggle, pattern, i, result)
+  rm(x, y, labelX, labelY, boundary, xTickToggle, pattern, i, result)
   invisible(gc())
 }
 ```
@@ -2050,6 +2056,7 @@ Violin plot analysis focuses on the two distinct chromatogram regions that made 
 # Check if there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
   # Set plot variables and labels
+  x <- instrument
   labelX <- "Instrument"
   boundary <- "sd"
   violinPlotToggle <- TRUE
@@ -2068,6 +2075,7 @@ Violin plot analysis of the mass calibration region assesses the performance of 
 # Check if there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
   # Set plot variables and labels
+  y <- massCalRegion
   labelY <- "Mass Calibration Region (TIC)"
   
   # Data frame to store analysis result
@@ -2094,8 +2102,8 @@ if (newStatus && msStatus) {
         # Plot violin plot
         result <- ticq::plotViolin(data = plotData %>% 
                                      dplyr::filter(.data[[sampleType]] %in% tmpPattern),
-                                   x = instrument,
-                                   y = massCalRegion,
+                                   x = x,
+                                   y = y,
                                    colour = colour,
                                    shape = shape,
                                    subtitle = paste("LTR", i),
@@ -2137,8 +2145,8 @@ if (newStatus && msStatus) {
         # Plot violin plot
         result <- ticq::plotViolin(data = plotData %>% 
                                      dplyr::filter(.data[[sampleType]] %in% i),
-                                   x = instrument,
-                                   y = massCalRegion,
+                                   x = x,
+                                   y = y,
                                    colour = colour,
                                    shape = shape,
                                    subtitle = i,
@@ -2177,8 +2185,8 @@ if (newStatus && msStatus) {
         # Plot violin plot
         result <- ticq::plotViolin(data = plotData %>% 
                                      dplyr::filter(.data[[sampleType]] %in% i),
-                                   x = instrument,
-                                   y = massCalRegion,
+                                   x = x,
+                                   y = y,
                                    colour = colour,
                                    shape = shape,
                                    subtitle = i,
@@ -2217,8 +2225,8 @@ if (newStatus && msStatus) {
         # Plot violin plot
         result <- ticq::plotViolin(data = plotData %>% 
                                      dplyr::filter(.data[[sampleType]] %in% i),
-                                   x = instrument,
-                                   y = massCalRegion,
+                                   x = x,
+                                   y = y,
                                    colour = colour,
                                    shape = shape,
                                    subtitle = i,
@@ -2257,8 +2265,8 @@ if (newStatus && msStatus) {
         # Plot violin plot
         result <- ticq::plotViolin(data = plotData %>% 
                                      dplyr::filter(.data[[sampleType]] %in% i),
-                                   x = instrument,
-                                   y = massCalRegion,
+                                   x = x,
+                                   y = y,
                                    colour = colour,
                                    shape = shape,
                                    subtitle = i,
@@ -2297,8 +2305,8 @@ if (newStatus && msStatus) {
         # Plot violin plot
         result <- ticq::plotViolin(data = plotData %>% 
                                      dplyr::filter(.data[[sampleType]] %in% i),
-                                   x = instrument,
-                                   y = massCalRegion,
+                                   x = x,
+                                   y = y,
                                    colour = colour,
                                    shape = shape,
                                    subtitle = i,
@@ -2337,8 +2345,8 @@ if (newStatus && msStatus) {
         # Plot violin plot
         result <- ticq::plotViolin(data = plotData %>% 
                                      dplyr::filter(.data[[sampleType]] %in% i),
-                                   x = instrument,
-                                   y = massCalRegion,
+                                   x = x,
+                                   y = y,
                                    colour = colour,
                                    shape = shape,
                                    subtitle = i,
@@ -2382,7 +2390,7 @@ if (newStatus && msStatus) {
         tmpReferenceData <- plotData %>%
           dplyr::filter(.data[[sampleType]] %in% tmpPattern)
         if (nrow(tmpReferenceData) > 1) {
-          boundaryValue <- ticq::generateStat(data = tmpReferenceData[[massCalRegion]]) %>%
+          boundaryValue <- ticq::generateStat(data = tmpReferenceData[[y]]) %>%
             dplyr::select(mean, sd, sd2) %>%
             as.list()
         } else {
@@ -2392,8 +2400,8 @@ if (newStatus && msStatus) {
         # Plot violin plot
         result <- ticq::plotViolin(data = plotData %>% 
                                      dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, i)),
-                                   x = instrument,
-                                   y = massCalRegion,
+                                   x = x,
+                                   y = y,
                                    colour = colour,
                                    shape = shape,
                                    subtitle = i,
@@ -2443,7 +2451,7 @@ if (newStatus && msStatus) {
         tmpReferenceData <- plotData %>%
           dplyr::filter(.data[[sampleType]] %in% tmpPattern)
         if (nrow(tmpReferenceData) > 1) {
-          boundaryValue <- ticq::generateStat(data = tmpReferenceData[[massCalRegion]]) %>%
+          boundaryValue <- ticq::generateStat(data = tmpReferenceData[[y]]) %>%
             dplyr::select(mean, sd, sd2) %>%
             as.list()
         } else {
@@ -2453,8 +2461,8 @@ if (newStatus && msStatus) {
         # Plot violin plot
         result <- ticq::plotViolin(data = plotData %>% 
                                      dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, i)),
-                                   x = instrument,
-                                   y = massCalRegion,
+                                   x = x,
+                                   y = y,
                                    colour = colour,
                                    shape = shape,
                                    subtitle = i,
@@ -2489,6 +2497,7 @@ Violin plot analysis of the mass calibration region assesses the combined perfor
 # Check if there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
   # Set plot variables and labels
+  y <- analyteRegion
   labelY <- "Analyte Region (TIC)"
   
   # Data frame to store analysis result
@@ -2515,8 +2524,8 @@ if (newStatus && msStatus) {
         # Plot violin plot
         result <- ticq::plotViolin(data = plotData %>% 
                                      dplyr::filter(.data[[sampleType]] %in% tmpPattern),
-                                   x = instrument,
-                                   y = analyteRegion,
+                                   x = x,
+                                   y = y,
                                    colour = colour,
                                    shape = shape,
                                    subtitle = paste("LTR", i),
@@ -2558,8 +2567,8 @@ if (newStatus && msStatus) {
         # Plot violin plot
         result <- ticq::plotViolin(data = plotData %>% 
                                      dplyr::filter(.data[[sampleType]] %in% i),
-                                   x = instrument,
-                                   y = analyteRegion,
+                                   x = x,
+                                   y = y,
                                    colour = colour,
                                    shape = shape,
                                    subtitle = i,
@@ -2598,8 +2607,8 @@ if (newStatus && msStatus) {
         # Plot violin plot
         result <- ticq::plotViolin(data = plotData %>% 
                                      dplyr::filter(.data[[sampleType]] %in% i),
-                                   x = instrument,
-                                   y = analyteRegion,
+                                   x = x,
+                                   y = y,
                                    colour = colour,
                                    shape = shape,
                                    subtitle = i,
@@ -2638,8 +2647,8 @@ if (newStatus && msStatus) {
         # Plot violin plot
         result <- ticq::plotViolin(data = plotData %>% 
                                      dplyr::filter(.data[[sampleType]] %in% i),
-                                   x = instrument,
-                                   y = analyteRegion,
+                                   x = x,
+                                   y = y,
                                    colour = colour,
                                    shape = shape,
                                    subtitle = i,
@@ -2678,8 +2687,8 @@ if (newStatus && msStatus) {
         # Plot violin plot
         result <- ticq::plotViolin(data = plotData %>% 
                                      dplyr::filter(.data[[sampleType]] %in% i),
-                                   x = instrument,
-                                   y = analyteRegion,
+                                   x = x,
+                                   y = y,
                                    colour = colour,
                                    shape = shape,
                                    subtitle = i,
@@ -2718,8 +2727,8 @@ if (newStatus && msStatus) {
         # Plot violin plot
         result <- ticq::plotViolin(data = plotData %>% 
                                      dplyr::filter(.data[[sampleType]] %in% i),
-                                   x = instrument,
-                                   y = analyteRegion,
+                                   x = x,
+                                   y = y,
                                    colour = colour,
                                    shape = shape,
                                    subtitle = i,
@@ -2758,8 +2767,8 @@ if (newStatus && msStatus) {
         # Plot violin plot
         result <- ticq::plotViolin(data = plotData %>% 
                                      dplyr::filter(.data[[sampleType]] %in% i),
-                                   x = instrument,
-                                   y = analyteRegion,
+                                   x = x,
+                                   y = y,
                                    colour = colour,
                                    shape = shape,
                                    subtitle = i,
@@ -2803,7 +2812,7 @@ if (newStatus && msStatus) {
         tmpReferenceData <- plotData %>%
           dplyr::filter(.data[[sampleType]] %in% tmpPattern)
         if (nrow(tmpReferenceData) > 1) {
-          boundaryValue <- ticq::generateStat(data = tmpReferenceData[[analyteRegion]]) %>%
+          boundaryValue <- ticq::generateStat(data = tmpReferenceData[[y]]) %>%
             dplyr::select(mean, sd, sd2) %>%
             as.list()
         } else {
@@ -2813,8 +2822,8 @@ if (newStatus && msStatus) {
         # Plot violin plot
         result <- ticq::plotViolin(data = plotData %>% 
                                      dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, i)),
-                                   x = instrument,
-                                   y = analyteRegion,
+                                   x = x,
+                                   y = y,
                                    colour = colour,
                                    shape = shape,
                                    subtitle = i,
@@ -2864,7 +2873,7 @@ if (newStatus && msStatus) {
         tmpReferenceData <- plotData %>%
           dplyr::filter(.data[[sampleType]] %in% tmpPattern)
         if (nrow(tmpReferenceData) > 1) {
-          boundaryValue <- ticq::generateStat(data = tmpReferenceData[[analyteRegion]]) %>%
+          boundaryValue <- ticq::generateStat(data = tmpReferenceData[[y]]) %>%
             dplyr::select(mean, sd, sd2) %>%
             as.list()
         } else {
@@ -2874,8 +2883,8 @@ if (newStatus && msStatus) {
         # Plot violin plot
         result <- ticq::plotViolin(data = plotData %>% 
                                      dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, i)),
-                                   x = instrument,
-                                   y = analyteRegion,
+                                   x = x,
+                                   y = y,
                                    colour = colour,
                                    shape = shape,
                                    subtitle = i,
@@ -2913,11 +2922,13 @@ if (newStatus && msStatus) {
      massCalRegion, 
      analyteRegion, 
      washRegion,
+     x,
      labelX,
      boundary,
      violinPlotToggle,
      boxPlotToggle,
      boxWidth,
+     y,
      labelY,
      pattern,
      i,
@@ -2940,7 +2951,7 @@ if (newStatus && msStatus) {
   if (ncol(analysisResult_TS) != 0) {
     print(DT::datatable(data = analysisResult_TS %>%
                           dplyr::select(all_of(colnames(analysisResult_TS)[which(colnames(analysisResult_TS) == sampleID):
-                                                                           which(colnames(analysisResult_TS) == spectrumCount)]), 
+                                                                           which(colnames(analysisResult_TS) == spectrumCount)]),
                                         prewashRegion, sampleRange) %>%
                           dplyr::filter(.data[[projectCohort]] != "Historical"),
                         filter = "top",
@@ -2976,7 +2987,7 @@ if (newStatus && msStatus) {
     print(DT::datatable(data = analysisResult_VP_massCalRegion %>%
                           dplyr::select(all_of(
                             colnames(analysisResult_VP_massCalRegion)[which(colnames(analysisResult_VP_massCalRegion) == sampleID):
-                                                                      which(colnames(analysisResult_VP_massCalRegion) == spectrumCount)]), 
+                                                                      which(colnames(analysisResult_VP_massCalRegion) == spectrumCount)]),
                             massCalRegion, sampleRange) %>%
                           dplyr::filter(.data[[projectCohort]] != "Historical"),
                         filter = "top",
@@ -3009,7 +3020,7 @@ if (newStatus && msStatus) {
     print(DT::datatable(data = analysisResult_VP_analyteRegion %>%
                           dplyr::select(all_of(
                             colnames(analysisResult_VP_analyteRegion)[which(colnames(analysisResult_VP_analyteRegion) == sampleID):
-                                                                      which(colnames(analysisResult_VP_analyteRegion) == spectrumCount)]), 
+                                                                      which(colnames(analysisResult_VP_analyteRegion) == spectrumCount)]),
                             analyteRegion, sampleRange) %>%
                           dplyr::filter(.data[[projectCohort]] != "Historical"),
                         filter = "top",
@@ -3043,23 +3054,23 @@ if (newStatus) {
   if (any(passedData[[msLevel]] == 1)) {
     msStatus <- TRUE
     
-    # Filter MS level 1 spectral data for plotting
+    # Filter data for plotting
     plotData <- passedData %>% 
       dplyr::filter(.data[[msLevel]] == 1) %>%
-      dplyr::select(all_of(c(colnames(passedData)[which(colnames(passedData) == sampleID):
-                                                  which(colnames(passedData) == spectrumCount)],
-                             retentionTime, basePeakIntensity)))
+      dplyr::select(all_of(colnames(passedData)[which(colnames(passedData) == sampleID):
+                                                which(colnames(passedData) == spectrumCount)]),
+                    retentionTime, basePeakIntensity)
     
     # If historical data exists
     if (file.exists(historicalDataPath)) {
       historicalData <- readRDS(historicalDataPath)
       
-      # Filter historical data for MS level 1 spectral data
+      # Filter historical data
       historicalData <- historicalData %>%
         dplyr::filter(.data[[msLevel]] == 1) %>%
-        dplyr::select(all_of(c(colnames(historicalData)[which(colnames(historicalData) == sampleID):
-                                                        which(colnames(historicalData) == spectrumCount)],
-                               retentionTime, basePeakIntensity)))
+        dplyr::select(all_of(colnames(historicalData)[which(colnames(historicalData) == sampleID):
+                                                      which(colnames(historicalData) == spectrumCount)]),
+                      retentionTime, basePeakIntensity)
       
       # Merge historical data into plot data
       plotData <- rbind(historicalData, plotData)
@@ -3070,6 +3081,8 @@ if (newStatus) {
     }
     
     # Set plot variables and labels
+    x <- retentionTime
+    y <- basePeakIntensity
     title <- "Base Peak Chromatogram"
     labelX <- "RT"
     labelY <- "BPI"
@@ -3110,8 +3123,8 @@ if (newStatus && msStatus) {
         # Plot chromatogram
         ticq::plotChromatogram(data = plotData %>% 
                                  dplyr::filter(.data[[sampleType]] %in% tmpPattern),
-                               x = retentionTime,
-                               y = basePeakIntensity,
+                               x = x,
+                               y = y,
                                colour = colour,
                                title = title,
                                subtitle = paste("LTR", i),
@@ -3146,8 +3159,8 @@ if (newStatus && msStatus) {
         # Plot chromatogram
         ticq::plotChromatogram(data = plotData %>% 
                                  dplyr::filter(.data[[sampleType]] %in% i),
-                               x = retentionTime,
-                               y = basePeakIntensity,
+                               x = x,
+                               y = y,
                                colour = colour,
                                title = title,
                                subtitle = i,
@@ -3179,8 +3192,8 @@ if (newStatus && msStatus) {
         # Plot chromatogram
         ticq::plotChromatogram(data = plotData %>% 
                                  dplyr::filter(.data[[sampleType]] %in% i),
-                               x = retentionTime,
-                               y = basePeakIntensity,
+                               x = x,
+                               y = y,
                                colour = colour,
                                title = title,
                                subtitle = i,
@@ -3212,8 +3225,8 @@ if (newStatus && msStatus) {
         # Plot chromatogram
         ticq::plotChromatogram(data = plotData %>% 
                                  dplyr::filter(.data[[sampleType]] %in% i),
-                               x = retentionTime,
-                               y = basePeakIntensity,
+                               x = x,
+                               y = y,
                                colour = colour,
                                title = title,
                                subtitle = i,
@@ -3245,8 +3258,8 @@ if (newStatus && msStatus) {
         # Plot chromatogram
         ticq::plotChromatogram(data = plotData %>% 
                                  dplyr::filter(.data[[sampleType]] %in% i),
-                               x = retentionTime,
-                               y = basePeakIntensity,
+                               x = x,
+                               y = y,
                                colour = colour,
                                title = title,
                                subtitle = i,
@@ -3278,8 +3291,8 @@ if (newStatus && msStatus) {
         # Plot chromatogram
         ticq::plotChromatogram(data = plotData %>% 
                                  dplyr::filter(.data[[sampleType]] %in% i),
-                               x = retentionTime,
-                               y = basePeakIntensity,
+                               x = x,
+                               y = y,
                                colour = colour,
                                title = title,
                                subtitle = i,
@@ -3311,8 +3324,8 @@ if (newStatus && msStatus) {
         # Plot chromatogram
         ticq::plotChromatogram(data = plotData %>% 
                                  dplyr::filter(.data[[sampleType]] %in% i),
-                               x = retentionTime,
-                               y = basePeakIntensity,
+                               x = x,
+                               y = y,
                                colour = colour,
                                title = title,
                                subtitle = i,
@@ -3344,8 +3357,8 @@ if (newStatus && msStatus) {
         # Plot chromatogram
         ticq::plotChromatogram(data = plotData %>% 
                                  dplyr::filter(.data[[sampleType]] %in% i),
-                               x = retentionTime,
-                               y = basePeakIntensity,
+                               x = x,
+                               y = y,
                                colour = colour,
                                title = title,
                                subtitle = i,
@@ -3393,7 +3406,7 @@ if (newStatus && msStatus) {
   }
   
   # Clean environment
-  rm(plotData, title, labelX, labelY, colour, colourLegend, pattern, i)
+  rm(plotData, x, y, title, labelX, labelY, colour, colourLegend, pattern, i)
   invisible(gc())
 }
 
@@ -3431,6 +3444,7 @@ if (newStatus) {
                                        which(colnames(passedData) == spectrumCount)]
   
   # Set plot variables and labels
+  x <- retentionTime
   caption <- "m/z"
   labelX <- "RT"
   labelY <- "EIC"
@@ -3446,7 +3460,7 @@ if (newStatus) {
   if (any(passedData[[msLevel]] == 1)) {
     msStatus <- TRUE
     
-    # Filter MS level 1 spectral data for plotting
+    # Filter data for plotting
     plotData <- passedData %>% 
       dplyr::filter(.data[[msLevel]] == 1)
     
@@ -3454,7 +3468,7 @@ if (newStatus) {
     if (file.exists(historicalDataPath)) {
       historicalData <- readRDS(historicalDataPath)
       
-      # Filter historical data for MS level 1 spectral data
+      # Filter historical data
       historicalData <- historicalData %>%
         dplyr::filter(.data[[msLevel]] == 1)
       
@@ -3502,11 +3516,14 @@ if (newStatus && msStatus) {
     
     # Filter plot data for specific chromatogram region
     plotData_filtered <- ticq::filterChromatogramRegion(data = plotData %>%
-                                                          dplyr::select(all_of(c(commonColumn, 
-                                                                                 retentionTime,
-                                                                                 targetList))),
+                                                          dplyr::select(all_of(commonColumn), 
+                                                                        retentionTime,
+                                                                        all_of(targetList)),
                                                         regionOfInterest = chromatogramRegion$massCal,
                                                         filterBy = retentionTime)
+    
+    # Set plot variables and labels
+    startIDX <- which(colnames(plotData_filtered) == targetList[1])
   } else {
     targetStatus <- FALSE
     print("Unable to generate Extracted Ion Chromatogram: No available target m/z data")
@@ -3529,8 +3546,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -3556,8 +3573,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -3583,8 +3600,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -3611,8 +3628,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -3638,8 +3655,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -3665,8 +3682,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -3693,8 +3710,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -3720,8 +3737,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -3747,8 +3764,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -3775,8 +3792,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -3802,8 +3819,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -3829,8 +3846,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -3857,8 +3874,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -3884,8 +3901,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -3911,8 +3928,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -3938,8 +3955,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -3966,8 +3983,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -3993,8 +4010,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -4020,8 +4037,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -4047,8 +4064,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -4074,8 +4091,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -4101,8 +4118,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -4128,8 +4145,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -4155,8 +4172,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -4183,8 +4200,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -4210,8 +4227,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -4238,8 +4255,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -4265,8 +4282,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -4292,8 +4309,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -4320,8 +4337,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -4347,8 +4364,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -4374,8 +4391,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -4388,7 +4405,7 @@ if (newStatus && msStatus && targetStatus) {
   }
   
   # Clean environment
-  rm(plotData_filtered, pattern)
+  rm(plotData_filtered, startIDX, pattern)
   invisible(gc())
 }
 ```
@@ -4409,11 +4426,14 @@ if (newStatus && msStatus) {
     
     # Filter plot data for specific chromatogram region
     plotData_filtered <- ticq::filterChromatogramRegion(data = plotData %>%
-                                                          dplyr::select(all_of(c(commonColumn, 
-                                                                                 retentionTime,
-                                                                                 targetList))),
+                                                          dplyr::select(all_of(commonColumn),
+                                                                        retentionTime,
+                                                                        all_of(targetList)),
                                                         regionOfInterest = chromatogramRegion$analyte,
                                                         filterBy = retentionTime)
+    
+    # Set plot variables and labels
+    startIDX <- which(colnames(plotData_filtered) == targetList[1])
   } else {
     targetStatus <- FALSE
     print("Unable to generate Extracted Ion Chromatogram: No available target m/z data")
@@ -4436,8 +4456,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -4463,8 +4483,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -4490,8 +4510,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -4518,8 +4538,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -4545,8 +4565,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -4572,8 +4592,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -4600,8 +4620,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -4627,8 +4647,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -4654,8 +4674,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -4682,8 +4702,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -4709,8 +4729,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -4736,8 +4756,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -4764,8 +4784,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -4791,8 +4811,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -4818,8 +4838,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -4845,8 +4865,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -4873,8 +4893,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -4900,8 +4920,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -4927,8 +4947,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -4954,8 +4974,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -4981,8 +5001,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -5008,8 +5028,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -5035,8 +5055,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -5062,8 +5082,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -5090,8 +5110,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -5117,8 +5137,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -5145,8 +5165,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -5172,8 +5192,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -5199,8 +5219,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -5227,8 +5247,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -5254,8 +5274,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -5281,8 +5301,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -5295,7 +5315,7 @@ if (newStatus && msStatus && targetStatus) {
   }
   
   # Clean environment
-  rm(plotData_filtered, pattern)
+  rm(plotData_filtered, startIDX, pattern)
   invisible(gc())
 }
 ```
@@ -5316,11 +5336,14 @@ if (newStatus && msStatus) {
     
     # Filter plot data for specific chromatogram region
     plotData_filtered <- ticq::filterChromatogramRegion(data = plotData %>%
-                                                          dplyr::select(all_of(c(commonColumn, 
-                                                                                 retentionTime,
-                                                                                 targetList))),
+                                                          dplyr::select(all_of(commonColumn),
+                                                                        retentionTime,
+                                                                        all_of(targetList)),
                                                         regionOfInterest = chromatogramRegion$analyte,
                                                         filterBy = retentionTime)
+    
+    # Set plot variables and labels
+    startIDX <- which(colnames(plotData_filtered) == targetList[1])
   } else {
     targetStatus <- FALSE
     print("Unable to generate Extracted Ion Chromatogram: No available target m/z data")
@@ -5343,8 +5366,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -5370,8 +5393,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -5397,8 +5420,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -5425,8 +5448,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -5452,8 +5475,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -5479,8 +5502,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -5507,8 +5530,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -5534,8 +5557,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -5561,8 +5584,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -5589,8 +5612,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -5616,8 +5639,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -5643,8 +5666,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -5671,8 +5694,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -5698,8 +5721,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -5725,8 +5748,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -5752,8 +5775,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -5780,8 +5803,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -5807,8 +5830,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -5834,8 +5857,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -5861,8 +5884,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -5888,8 +5911,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -5915,8 +5938,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -5942,8 +5965,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -5969,8 +5992,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -5997,8 +6020,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -6024,8 +6047,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -6052,8 +6075,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -6079,8 +6102,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -6106,8 +6129,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -6134,8 +6157,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -6161,8 +6184,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -6188,8 +6211,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -6202,7 +6225,7 @@ if (newStatus && msStatus && targetStatus) {
   }
   
   # Clean environment
-  rm(plotData_filtered, pattern)
+  rm(plotData_filtered, startIDX, pattern)
   invisible(gc())
 }
 
@@ -6220,7 +6243,7 @@ if (newStatus) {
   if (any(passedData[[msLevel]] == 2)) {
     msStatus <- TRUE
     
-    # Filter MS level 2 spectral data for plotting
+    # Filter data for plotting
     plotData <- passedData %>% 
       dplyr::filter(.data[[msLevel]] == 2)
     
@@ -6228,7 +6251,7 @@ if (newStatus) {
     if (file.exists(historicalDataPath)) {
       historicalData <- readRDS(historicalDataPath)
       
-      # Filter historical data for MS level 2 spectral data
+      # Filter historical data
       historicalData <- historicalData %>%
         dplyr::filter(.data[[msLevel]] == 2)
       
@@ -6276,11 +6299,14 @@ if (newStatus && msStatus) {
     
     # Filter plot data for specific chromatogram region
     plotData_filtered <- ticq::filterChromatogramRegion(data = plotData %>%
-                                                          dplyr::select(all_of(c(commonColumn, 
-                                                                                 retentionTime,
-                                                                                 targetList))),
+                                                          dplyr::select(all_of(commonColumn),
+                                                                        retentionTime,
+                                                                        all_of(targetList)),
                                                         regionOfInterest = chromatogramRegion$analyte,
                                                         filterBy = retentionTime)
+    
+    # Set plot variables and labels
+    startIDX <- which(colnames(plotData_filtered) == targetList[1])
   } else {
     targetStatus <- FALSE
     print("Unable to generate Extracted Ion Chromatogram: No available target m/z data")
@@ -6303,8 +6329,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -6330,8 +6356,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -6357,8 +6383,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -6385,8 +6411,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -6412,8 +6438,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -6439,8 +6465,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -6467,8 +6493,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -6494,8 +6520,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -6521,8 +6547,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -6549,8 +6575,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -6576,8 +6602,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -6603,8 +6629,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -6631,8 +6657,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -6658,8 +6684,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -6685,8 +6711,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -6712,8 +6738,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -6740,8 +6766,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -6767,8 +6793,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -6794,8 +6820,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -6821,8 +6847,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -6848,8 +6874,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -6875,8 +6901,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -6902,8 +6928,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -6929,8 +6955,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -6957,8 +6983,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -6984,8 +7010,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -7012,8 +7038,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -7039,8 +7065,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -7066,8 +7092,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -7094,8 +7120,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -7121,8 +7147,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -7148,8 +7174,8 @@ if (newStatus && msStatus && targetStatus) {
     # Plot chromatogram
     ticq::plotMultipleChromatogram(data = plotData_filtered %>% 
                                      dplyr::filter(.data[[sampleType]] %in% pattern),
-                                   x = retentionTime,
-                                   startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                   x = x,
+                                   startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
                                    labelX = labelX,
@@ -7162,7 +7188,7 @@ if (newStatus && msStatus && targetStatus) {
   }
   
   # Clean environment
-  rm(plotData_filtered, pattern)
+  rm(plotData_filtered, startIDX, pattern)
   invisible(gc())
 }
 
@@ -7175,7 +7201,7 @@ if (newStatus && msStatus) {
 # If there are new samples to process
 if (newStatus) {
   # Clean environment
-  rm(commonColumn, caption, labelX, labelY, nPlotCol, nPlotRow)
+  rm(commonColumn, x, caption, labelX, labelY, nPlotCol, nPlotRow)
 }
 ```
 
@@ -7184,10 +7210,144 @@ The mass calibration references, internal standards, endogenous analytes, and pr
 
 ## Time Series Analysis {.tabset}
 Time series analysis provides a temporal trendline and assesses the performance of the mass calibration references, internal standards, endogenous analytes, and product ions by their corresponding target m/z, chromatogram region, and sample type. A report is generated highlighting the target m/z that have a significant 1st and 2nd standard deviation from the average mean performance.
+```{r, echo = FALSE, warning = FALSE}
+# Check if there are new samples to process
+if (newStatus) {
+  # Set common data columns
+  commonColumn <- colnames(passedData)[which(colnames(passedData) == sampleID):
+                                       which(colnames(passedData) == spectrumCount)]
+  
+  # Set plot variables and labels
+  caption <- "m/z"
+  labelX <- "Date"
+  labelY <- "TEIC"
+  boundary <- "sd"
+  xTickToggle <- FALSE
+  nPlotCol <- 2
+  nPlotRow <- 2
+} else {
+  print("Unable to perform Time Series Analysis: No new samples to analyse")
+}
+```
 
+```{r, echo = FALSE, warning = FALSE, include = FALSE}
+# If there are new samples to process
+if (newStatus) {
+  # Check if MS level 1 spectral data is available
+  if (any(passedData[[msLevel]] == 1)) {
+    msStatus <- TRUE
+    
+    # Filter data for plotting
+    plotData <- passedData %>% 
+      dplyr::filter(.data[[msLevel]] == 1)
+    
+    # If historical data exists
+    if (file.exists(historicalDataPath)) {
+      historicalData <- readRDS(historicalDataPath)
+      
+      # Filter historical data
+      historicalData <- historicalData %>%
+        dplyr::filter(.data[[msLevel]] == 1)
+      
+      # Merge historical data into plot data
+      plotData <- rbind(historicalData, plotData)
+      
+      # Clean environment
+      rm(historicalData)
+      invisible(gc())
+    }
+    
+    # Set plot variables and labels
+      # Dynamically set colour grouping variable and label
+      if (length(unique(plotData[[projectCohort]])) > 1) {
+        colour <- projectCohort
+        colourLegend <- "Project"
+      } else {
+        colour <- plate
+        colourLegend <- "Plate"
+      }
+    
+    # Extract and append intensity (EIC) of each target m/z stored in spectra into their own respective columns
+    plotData <- ticq::extractEIC(data = plotData,
+                                 intensityArray = intensityArray,
+                                 targetList = as.character(sort(unique(targetMZ$mzValue))))
+  } else {
+    msStatus <- FALSE
+  }
+}
+```
 
+### Mass Calibration References {.tabset}
+```{r, echo = FALSE, warning = FALSE}
+# Check if there are new samples to process and MS level 1 spectral data is available
+if (newStatus && msStatus) {
+  # Filter and sort unique target m/z values
+  targetList <- targetMZ %>%
+    dplyr::filter(analyteType == "Mass Calibration"
+                  & msLevel == 1)
+  targetList <- as.character(sort(unique(targetList$mzValue)))
+  
+  # Check target status (based on availability of target list)
+  if (length(targetList) > 0) {
+    targetStatus <- TRUE
+    
+    # Filter plot data for specific chromatogram region
+    plotData_filtered <- ticq::filterChromatogramRegion(data = plotData %>%
+                                                          dplyr::select(all_of(commonColumn),
+                                                                        retentionTime,
+                                                                        all_of(targetList)),
+                                                        regionOfInterest = chromatogramRegion$massCal,
+                                                        filterBy = retentionTime)
+    
+    plotData_filtered <- ticq::sumEIC(data = plotData_filtered,
+                                      commonColumn = commonColumn,
+                                      spectrumCount = spectrumCount,
+                                      startIDX = which(colnames(plotData_filtered) == targetList[1]))
+    
+    # Data frame to store analysis result
+    analysisResult_TS_massCalibration <- data.frame()
+  } else {
+    targetStatus <- FALSE
+    print("Unable to generate Extracted Ion Chromatogram: No available target m/z data")
+  }
+} else if (newStatus && !msStatus) {
+  print("Unable to generate Extracted Ion Chromatogram: No available MS level 1 spectral data")
+}
+```
 
-
-
-
+#### LTR {.tabset}
+##### LTR Plasma
+```{r, echo = FALSE, warning = FALSE, warning = FALSE}
+# If there is new samples to process and MS1 data and target m/z data is available
+if (newStatus && msStatus && targetStatus) {
+  # Set patterns to check
+  pattern <- c("sLTR Plasma", "LTR Plasma")
+  
+  # If pattern exist in sample type list
+  if (any(pattern %in% sampleTypeList)) {
+    # Plot time series
+    result <- ticq::plotMultipleTimeSeries(data = plotData_filtered %>%
+                                             dplyr::filter(.data[[sampleType]] %in% pattern),
+                                           commonColumn = commonColumn,
+                                           x = date,
+                                           startIDX = which(colnames(plotData_filtered) == targetList[1]),
+                                           colour = colour,
+                                           shape = shape,
+                                           caption = caption,
+                                           labelX = labelX,
+                                           labelY = labelY,
+                                           colourLegend = colourLegend,
+                                           shapeLegend = shapeLegend,
+                                           boundary = boundary,
+                                           xTickToggle = xTickToggle,
+                                           nPlotCol = nPlotCol,
+                                           nPlotRow = nPlotRow)
+    
+    # Append result to overall 
+    analysisResult_TS_massCalibration <- rbind(analysisResult_TS_massCalibration, result) 
+  } else { 
+    print("No available data") 
+  }
+}
+```
 

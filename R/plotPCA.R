@@ -1,11 +1,11 @@
 #' plotPCA
-#' 
+#'
 #' Perform Principle Component Analysis (PCA) and plot all associated plots (scree plot, scores plot, loadings plot and biplot).
-#' 
+#'
 #' @import ggplot2
 #' @import HotellingEllipse
 #' @import ggforce
-#' 
+#'
 #' @export
 #' @param data Data frame that contains columns representing data to perform PCA on. Should be equal sized and not contain NA values: data frame
 #' @param startIDX Index of the first data column to perform PCA on: double
@@ -18,14 +18,14 @@
 #' @param subtitle Plot subtitle (Default: NULL): NULL or character
 #' @param colourLegend Legend label for colour grouping (Default: Value used for colour): NULL or character
 #' @param shapeLegend Legend label for shape grouping (Default: Value used for shape): NULL or character
-#' @param screePlotToggle Toggle printing of scree plot (Default: TRUE, Options: TRUE or FALSE): boolean 
-#' @param scoresPlotToggle Toggle printing of scores plot (Default: TRUE, Options: TRUE or FALSE): boolean 
-#' @param loadingsPlotToggle Toggle printing of loadings plot (Default: TRUE, Options: TRUE or FALSE): boolean 
-#' @param biPlotToggle Toggle printing of biplot (Default: TRUE, Options: TRUE or FALSE): boolean 
+#' @param screePlotToggle Toggle printing of scree plot (Default: TRUE, Options: TRUE or FALSE): boolean
+#' @param scoresPlotToggle Toggle printing of scores plot (Default: TRUE, Options: TRUE or FALSE): boolean
+#' @param loadingsPlotToggle Toggle printing of loadings plot (Default: TRUE, Options: TRUE or FALSE): boolean
+#' @param biPlotToggle Toggle printing of biplot (Default: TRUE, Options: TRUE or FALSE): boolean
 plotPCA <- function(data,
                     startIDX,
                     endIDX = NULL,
-                    scale = TRUE, 
+                    scale = TRUE,
                     confidence = 95,
                     distribution = NULL,
                     colour = NULL,
@@ -62,21 +62,16 @@ plotPCA <- function(data,
     if (threshold > 1) {
       # Plot scree plot
       screePlot <- ggplot2::ggplot(data = variance,
-                                   aes(x = principalComponent, 
-                                       y = varianceProportion,
-                                       group = 1)) + 
+                                   aes(x = principalComponent, y = varianceProportion, group = 1)) + 
         ggplot2::geom_col(fill = "orange") +
         ggplot2::geom_point() +
-        ggplot2::geom_line(aes(y = varianceProportion, 
-                               colour = "Proportion of Variance")) +
-        ggplot2::geom_line(aes(y = cumulativeProportion, 
-                               colour = "Cumulative Proportion"),
+        ggplot2::geom_line(aes(y = varianceProportion, colour = "Proportion of Variance")) +
+        ggplot2::geom_line(aes(y = cumulativeProportion, colour = "Cumulative Proportion"),
                            linetype = "dashed") +
-        ggplot2::geom_vline(aes(xintercept = threshold, 
-                                colour = "Threshold"),
+        ggplot2::geom_vline(aes(xintercept = threshold, colour = "Threshold"),
                             linetype = "dotted") +
         ggplot2::geom_text(aes(label = paste0(round(varianceProportion, 2), "%")),
-                           vjust = -0.5, 
+                           vjust = -0.5,
                            size = 3) +
         ggplot2::theme(panel.background = element_blank(),
                        axis.line = element_line(colour = "black"),
@@ -105,15 +100,10 @@ plotPCA <- function(data,
         for (i in 1:(threshold - 1)) {
           for (j in (i+1):threshold) {
             # Generate Hotelling Ellipse
-            hotelling <- HotellingEllipse::ellipseParam(data = scores,
-                                                        k = 2,
-                                                        pcx = i,
-                                                        pcy = j)
+            hotelling <- HotellingEllipse::ellipseParam(data = scores, pcx = i, pcy = j)
             
             # Plot scores
-            scoresPlot <- ggplot2::ggplot(data = scores,
-                                          aes(x = .data[[paste0("PC", i)]], 
-                                              y = .data[[paste0("PC", j)]])) +
+            scoresPlot <- ggplot2::ggplot(data = scores, aes(x = .data[[paste0("PC", i)]], y = .data[[paste0("PC", j)]])) +
               ggplot2::geom_point(aes(colour = if (!is.null(colour)) data[[colour]] else NULL,
                                       shape = if (!is.null(shape)) data[[shape]] else NULL,
                                       group = if (!is.null(colour)) ifelse(data[[colour]] == "Historical", 1, 2) else NULL),
@@ -126,18 +116,10 @@ plotPCA <- function(data,
                                   linetype = "solid",
                                   colour = "grey",
                                   linewidth = 0.2) +
-              ggforce::geom_ellipse(aes(x0 = 0,
-                                        y0 = 0,
-                                        a = hotelling$Ellipse$a.95pct,
-                                        b = hotelling$Ellipse$b.95pct,
-                                        angle = 0),
+              ggforce::geom_ellipse(aes(x0 = 0, y0 = 0, a = hotelling$Ellipse$a.95pct, b = hotelling$Ellipse$b.95pct, angle = 0),
                                     linetype = "dashed",
                                     colour = "blue") +
-              ggforce::geom_ellipse(aes(x0 = 0,
-                                        y0 = 0,
-                                        a = hotelling$Ellipse$a.99pct,
-                                        b = hotelling$Ellipse$b.99pct,
-                                        angle = 0),
+              ggforce::geom_ellipse(aes(x0 = 0, y0 = 0, a = hotelling$Ellipse$a.99pct, b = hotelling$Ellipse$b.99pct, angle = 0),
                                     linetype = "dashed",
                                     colour = "red") +
               ggplot2::theme(panel.background = element_blank(),
@@ -173,9 +155,7 @@ plotPCA <- function(data,
               }
             
             # Plot loadings
-            loadingsPlot <- ggplot2::ggplot(data = loading,
-                                            aes(x = .data[[paste0("PC", i)]], 
-                                                y = .data[[paste0("PC", j)]])) +
+            loadingsPlot <- ggplot2::ggplot(data = loading, aes(x = .data[[paste0("PC", i)]], y = .data[[paste0("PC", j)]])) +
               ggplot2::geom_point(aes(colour = row.names(loading))) +
               ggplot2::theme(panel.background = element_blank(),
                              axis.line = element_line(colour = "black"),
@@ -195,15 +175,11 @@ plotPCA <- function(data,
             # Plot biplot
             biplot <- scoresPlot +
               ggplot2::geom_segment(data = loading,
-                                    aes(x = 0, y = 0, 
-                                        xend = .data[[paste0("PC", i)]], 
-                                        yend = .data[[paste0("PC", j)]]),
+                                    aes(x = 0, y = 0, xend = .data[[paste0("PC", i)]], yend = .data[[paste0("PC", j)]]),
                                     arrow = arrow(length = unit(0.25, "cm")),
                                     color = "red") +
               ggplot2::geom_text(data = loading,
-                                 aes(x = .data[[paste0("PC", i)]], 
-                                     y = .data[[paste0("PC", j)]], 
-                                     label = row.names(loading))) + 
+                                 aes(x = .data[[paste0("PC", i)]], y = .data[[paste0("PC", j)]], label = row.names(loading))) + 
               ggplot2::labs(title = "PCA Biplot")
               
               # Print biplot
@@ -213,20 +189,12 @@ plotPCA <- function(data,
           }
         }
       },
-      warning = function(w) {
-        print(paste0("Unable to plot PCA results - ", w))
-      },
-      error = function(e) {
-        print(paste0("Unable to plot PCA results - ", e))
-      })
+      warning = function(w) print(paste0("Unable to plot PCA results - ", w)),
+      error = function(e) print(paste0("Unable to plot PCA results - ", e)))
     } else {
       print(paste("Unable to plot PCA results - Only PC1 satisfies the threshold limit"))
     }
   },
-  warning = function(w) {
-    print(paste0("Unable to perform Principal Component Analysis - ", w))
-  },
-  error = function(e) {
-    print(paste0("Unable to perform Principal Component Analysis - ", e))
-  })
+  warning = function(w) print(paste0("Unable to perform Principal Component Analysis - ", w)),
+  error = function(e) print(paste0("Unable to perform Principal Component Analysis - ", e)))
 }

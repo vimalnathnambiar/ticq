@@ -1,8 +1,8 @@
 #' generateStat
-#' 
-#' Generate statistical information based on data. 
-#' 
-#' Statistical information includes: 
+#'
+#' Generate statistical information based on data.
+#'
+#' Statistical information includes:
 #' - Sample size (n)
 #' - Minimum (min)
 #' - Mean (mean)
@@ -19,14 +19,14 @@
 #' - Margin error (me) - 95% and 99%
 #' - Confidence interval (CI) - 95% and 99% (Lower and upper)
 #' - Confidence quantile range (CQ) - 95% and 99% (Lower and upper)
-#' 
+#'
 #' @export
 #' @param data Continuous data series of numerical values without NA (At least 2 data points): numerical vector
 #' @returns Data frame containing all associated statistical information
-#' 
+#'
 #' @examples
 #' stat <- ticq::generateStat(data = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
-generateStat <- function(data){
+generateStat <- function(data) {
   # Sample size
   n <- length(data)
   
@@ -75,22 +75,22 @@ generateStat <- function(data){
     if (n < 30) {
       # Calculate t-critical score (uses probability area and sample size -1)
       # Multiply t-critical score with the standard error to obtain margin error
-      # 95%
-      tCritical95 <- abs(qt(probArea95, (n - 1)))
-      me95 <- tCritical95 * se
-      
-      # 99%
-      tCritical99 <- abs(qt(probArea99, (n - 1)))
-      me99 <- tCritical99 * se
+        # 95%
+        tCritical95 <- abs(qt(probArea95, (n - 1)))
+        me95 <- tCritical95 * se
+        
+        # 99%
+        tCritical99 <- abs(qt(probArea99, (n - 1)))
+        me99 <- tCritical99 * se
     } else {
       # Use z-score
-      # 95%
-      zScore95 <- 1.960
-      me95 <- zScore95 * se
-      
-      # 99%
-      zScore99 <- 2.576
-      me99 <- zScore99 * se
+        # 95%
+        zScore95 <- 1.960
+        me95 <- zScore95 * se
+        
+        # 99%
+        zScore99 <- 2.576
+        me99 <- zScore99 * se
     }
   
   # Confidence Interval

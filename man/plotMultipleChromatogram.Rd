@@ -12,7 +12,7 @@ plotMultipleChromatogram(
   colour = NULL,
   caption = NULL,
   labelX = x,
-  labelY = y,
+  labelY = NULL,
   colourLegend = colour,
   nPlotCol = 1,
   nPlotRow = 1
@@ -33,7 +33,7 @@ plotMultipleChromatogram(
 
 \item{labelX}{x-axis label (Default: the name of the column used for the x-axis): NULL or character}
 
-\item{labelY}{y-axis label (Default: the name of the column used for the y-axis): NULL or character}
+\item{labelY}{y-axis label (Default: NULL): NULL or character}
 
 \item{colourLegend}{Legend label for colour grouping (Default: Value used for colour): NULL or character}
 

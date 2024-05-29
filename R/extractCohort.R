@@ -1,15 +1,15 @@
 #' extractCohort
-#' 
+#'
 #' Extract cohort name.
-#' 
+#'
 #' Only applicable to data acquired at the Australian National Phenome Centre (ANPC).
-#' 
+#'
 #' @import dplyr
-#' 
+#'
 #' @export
 #' @param input Input to extract cohort name: character
 #' @returns Cohort name
-#' 
+#'
 #' @examples
 #' cohort <- ticq::extractCohort(input = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29.json")
 extractCohort <- function(input) {

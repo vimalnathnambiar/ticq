@@ -12,8 +12,6 @@ extractEIC(data, intensityArray, targetList)
 \item{intensityArray}{Name of the column that represents intensity array: character}
 
 \item{targetList}{Unique target m/z value that reflect the intensity value in the array: character vector}
-
-\item{commonColumn}{Column names that are common across all samples: character vector}
 }
 \value{
 Data frame with the extracted intensity of each target m/z (EIC) in its own individual column appended

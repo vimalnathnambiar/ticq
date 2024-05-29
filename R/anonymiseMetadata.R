@@ -1,17 +1,17 @@
 #' anonymiseMetadata
-#' 
+#'
 #' Anonymise sample metadata.
-#' 
-#' Only applicable to data acquired at the Australian National Phenome Centre (ANPC). 
+#'
+#' Only applicable to data acquired at the Australian National Phenome Centre (ANPC).
 #' Information anonymised includes sample ID, project name, cohort name, method name, instrument name, and plate number.
-#' 
+#'
 #' @import dplyr
-#' 
+#'
 #' @export
 #' @param data Data frame that contains spectral information of samples: data frame
 #' @param commonColumn Column names that are common across all samples: character vector
 #' @returns Data frame containing spectral information of anonymised samples
-#' 
+#'
 #' @examples
 #' data <- data.frame(sampleID = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29",
 #'                    project = "COVID-19",
@@ -20,22 +20,23 @@
 #'                    method = "MS-AA-POS",
 #'                    instrument = "PAI05",
 #'                    plate = 88)
-#' anonymiseMetadata <- ticq::anonymiseMetadata(data = data, 
+#' anonymiseMetadata <- ticq::anonymiseMetadata(data = data,
 #'                                              sampleID = "sampleID",
-#'                                              project = "project", 
-#'                                              cohort = "cohort", 
-#'                                              projectCohort = "projectCohort", 
-#'                                              method = "method", 
+#'                                              project = "project",
+#'                                              cohort = "cohort",
+#'                                              projectCohort = "projectCohort",
+#'                                              method = "method",
 #'                                              instrument = "instrument",
 #'                                              plate = "plate")
-anonymiseMetadata <- function(data, 
-                              sampleID, 
-                              project, 
-                              cohort, 
-                              projectCohort, 
-                              method, 
-                              instrument, 
-                              plate) {
+anonymiseMetadata <- function(data,
+                              sampleID,
+                              project,
+                              cohort,
+                              projectCohort,
+                              method,
+                              instrument,
+                              plate)
+{
   anonymisedData <- data %>%
     dplyr::mutate(
       !!sampleID := paste0("sample", match(.data[[sampleID]], unique(.data[[sampleID]]))),
@@ -153,7 +154,8 @@ anonymiseMetadata <- function(data,
         .data[[instrument]] == "PLIP01" ~ "I23",
         .data[[instrument]] == "RLIP02" ~ "I24"
       ),
-      !!plate := ifelse(is.na(.data[[plate]]), "0", .data[[plate]]))
+      !!plate := ifelse(is.na(.data[[plate]]), "0", .data[[plate]])
+    )
   
   return(anonymisedData)
 }

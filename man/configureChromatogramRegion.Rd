@@ -34,7 +34,7 @@ Configure chromatogram regions of interest based on specific time points.
 }
 \examples{
 # Example 1: Using default values for analyteStart, analyteEnd and washEnd
-chromatogramRegion <- ticq::configureChromatogramRegion(massCalStart = 0, massCalEnd = 0.3, 
+chromatogramRegion <- ticq::configureChromatogramRegion(massCalStart = 0, massCalEnd = 0.3,
                                                         washStart = 5)
 
 # Example 2: Define values for analyteStart, analyteEnd and washEnd

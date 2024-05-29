@@ -1,10 +1,10 @@
 #' plotViolin
-#' 
+#'
 #' Plot violin plots and perform boundary analysis (if specified).
-#' 
+#'
 #' @import ggplot2
 #' @import dplyr
-#' 
+#'
 #' @export
 #' @param data Data frame that contains plot data: data frame
 #' @param x Name of the column that represents the continuous data series for x-axis: character
@@ -21,41 +21,40 @@
 #' @param shapeLegend Legend label for shape grouping (Default: Value used for shape)
 #' @param boundary Boundary analysis to perform based on a +/- value from 0 (value) or 100 (percentage), or up to 2 standard deviation (sd) from average mean (Default: NULL, Options: "value", "percentage", "sd"): NULL or character
 #' @param boundaryValue Value used for boundary analysis. For "sd" boundary analysis, use list(mean = meanValue, sd = sdValue, sd2 = sd2Value) (Default: 0): double or list
-#' @param violinPlotToggle Toggle printing of violin plot (Default: TRUE, Options: TRUE or FALSE): boolean 
+#' @param violinPlotToggle Toggle printing of violin plot (Default: TRUE, Options: TRUE or FALSE): boolean
 #' @param tailTrimToggle Toggle to trim the tails of the violin plot. Applicable only if violinPlotToggle is set to TRUE (Default: FALSE, Options: TRUE or FALSE): boolean
-#' @param boxPlotToggle Toggle printing of box plot (Default: TRUE, Options: TRUE or FALSE): boolean 
+#' @param boxPlotToggle Toggle printing of box plot (Default: TRUE, Options: TRUE or FALSE): boolean
 #' @param boxWidth Width of box plot. Applicable if boxPlotToggle is set to TRUE (Default: 1): double
 #' @returns Data frame containing the boundary analysis result (if specified)
-plotViolin <- function(data, 
-                       x, 
-                       y, 
+plotViolin <- function(data,
+                       x,
+                       y,
                        colour = NULL,
                        shape = NULL,
                        outlierShape = NA,
-                       title = "Violin Plot", 
-                       subtitle = NULL, 
-                       caption = NULL, 
-                       labelX = x, 
+                       title = "Violin Plot",
+                       subtitle = NULL,
+                       caption = NULL,
+                       labelX = x,
                        labelY = y,
-                       colourLegend = colour, 
+                       colourLegend = colour,
                        shapeLegend = shape,
-                       boundary = NULL, 
+                       boundary = NULL,
                        boundaryValue = 0,
                        violinPlotToggle = TRUE,
                        tailTrimToggle = FALSE,
                        boxPlotToggle = TRUE,
                        boxWidth = 1) {
-  tryCatch({    
+  tryCatch({
     # Plot violin plot
-    violinPlot <- ggplot2::ggplot(data = data,
-                                  aes(x = .data[[x]], y = .data[[y]]))
+    violinPlot <- ggplot2::ggplot(data = data, aes(x = .data[[x]], y = .data[[y]]))
     
       # Display box or violin or both
         # Violin plot
-        if (violinPlotToggle) {
-          violinPlot <- violinPlot + 
-            ggplot2::geom_violin(trim = tailTrimToggle)
-        }
+      if (violinPlotToggle) {
+        violinPlot <- violinPlot +
+          ggplot2::geom_violin(trim = tailTrimToggle)
+      }
       
         # Box plot
         if (boxPlotToggle) {
@@ -93,7 +92,7 @@ plotViolin <- function(data,
         lowerBound <- 0 - boundaryValue
         upperBound <- 0 + boundaryValue
         
-        violinPlot <- violinPlot + 
+        violinPlot <- violinPlot +
           ggplot2::geom_hline(yintercept = 0,
                               linetype = "dashed",
                               colour = "grey") +
@@ -123,7 +122,7 @@ plotViolin <- function(data,
         lowerBound <- 100 - boundaryValue
         upperBound <- 100 + boundaryValue
         
-        violinPlot <- violinPlot + 
+        violinPlot <- violinPlot +
           ggplot2::geom_hline(yintercept = 100,
                               linetype = "dashed",
                               colour = "grey") +
@@ -215,20 +214,14 @@ plotViolin <- function(data,
     }
     
     print(violinPlot)
-    
-    # If boundary analysis generated results
-    if (!is.null(result)) {
-      return(result)
-    }
+    return(result)
   }, 
   warning = function(w) {
     print(paste0("Unable to perform Violin Plot Analysis - ", w))
-    result <- NULL
-    return(result)
+    return(NULL)
   },
   error = function(e) {
     print(paste0("Unable to perform Violin Plot Analysis - ", e))
-    result <- NULL
-    return(result)
+    return(NULL)
   })
 }

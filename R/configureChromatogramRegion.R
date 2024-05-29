@@ -1,7 +1,7 @@
 #' configureChromatogramRegion
-#' 
+#'
 #' Configure chromatogram regions of interest based on specific time points.
-#' 
+#'
 #' @export
 #' @param massCalStart Fixed time point when the MS instrument starts its mass calibration cycle (Default: 0): double
 #' @param massCalEnd Fixed time point that the MS instrument ends its mass calibration cycle: double
@@ -10,21 +10,21 @@
 #' @param washStart Fixed time point that the MS instrument starts its wash cycle: double
 #' @param washEnd Fixed time point that the MS instrument ends its wash cycle (Default: NULL): NULL or double
 #' @returns List containing the time points representing the different chromatogram regions of interest
-#' 
+#'
 #' @examples
 #' # Example 1: Using default values for analyteStart, analyteEnd and washEnd
-#' chromatogramRegion <- ticq::configureChromatogramRegion(massCalStart = 0, massCalEnd = 0.3, 
+#' chromatogramRegion <- ticq::configureChromatogramRegion(massCalStart = 0, massCalEnd = 0.3,
 #'                                                         washStart = 5)
 #'
 #' # Example 2: Define values for analyteStart, analyteEnd and washEnd
 #' chromatogramRegion <- ticq::configureChromatogramRegion(massCalStart = 0, massCalEnd = 0.3,
 #'                                                         analyteStart = 2, analyteEnd = 4
 #'                                                         washStart = 5, washEnd = 6)
-configureChromatogramRegion <- function(massCalStart = 0, 
-                                        massCalEnd, 
-                                        analyteStart = massCalEnd, 
-                                        analyteEnd = washStart, 
-                                        washStart, 
+configureChromatogramRegion <- function(massCalStart = 0,
+                                        massCalEnd,
+                                        analyteStart = massCalEnd,
+                                        analyteEnd = washStart,
+                                        washStart,
                                         washEnd = NULL) {
   return(list(prewash = list(start = 0, end = washStart),
               massCal = list(start = massCalStart, end = massCalEnd),
