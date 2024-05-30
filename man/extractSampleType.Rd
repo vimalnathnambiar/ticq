@@ -4,12 +4,12 @@
 \alias{extractSampleType}
 \title{extractSampleType}
 \usage{
-extractSampleType(input, matrix)
+extractSampleType(input, matrix = NA_character_)
 }
 \arguments{
-\item{input}{Input to extract sample type: character}
+\item{input}{ANPC sample file name or path: character}
 
-\item{matrix}{Associated sample matrix type: character}
+\item{matrix}{Associated matrix type: character}
 }
 \value{
 Sample type

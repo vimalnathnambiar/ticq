@@ -7,15 +7,16 @@
 #' @import dplyr
 #'
 #' @export
-#' @param input Input to extract sample type: character
-#' @param matrix Associated sample matrix type: character
+#' @param input ANPC sample file name or path: character
+#' @param matrix Associated matrix type: character
 #' @returns Sample type
 #'
 #' @examples
 #' sampleType <- ticq::extractSampleType(input = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29.json",
 #'                                       matrix = "Serum")
 #' print(sampleType)
-extractSampleType <- function(input, matrix) {
+extractSampleType <- function(input, matrix = NA_character_) {
+  # Sample type patterns
   sampleType <- dplyr::case_when(
     grepl("DLTR|dLTR|dltr", input) ~ ifelse(is.na(matrix), NA_character_, paste("dLTR", matrix)),
     grepl("SLTR|sLTR|sltr", input) ~ ifelse(is.na(matrix), NA_character_, paste("sLTR", matrix)),

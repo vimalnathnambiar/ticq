@@ -1,18 +1,18 @@
-#' retrieveFileList
+#' retrieveFilename
 #'
-#' Filter and retrieve file list of a specified extension type stored within an input path.
+#' Filter and retrieve names of files of a specific extension type stored within an input path.
 #'
 #' @export
-#' @param input Input path containing a list of files to retrieve: character
+#' @param input Input path containing files of interest: character
 #' @param fileExtension File extension to filter for (Default: NULL): NULL or character
-#' @returns List of files stored within the input path that matches the file extension specified: character vector
-retrieveFileList <- function(input, fileExtension = NULL) {
-  # Check if input specified exists (either as a directory or a file)
+#' @returns File names matching the file extension specified: character vector
+retrieveFilename <- function(input, fileExtension = NULL) {
+  # Check if input exists (either as a directory or a file)
   if (dir.exists(input) || file.exists(input)) {
     # Extract file information
     fileInfo <- file.info(input)
     
-    # Check if input is a directory or a file, and retrieve file list
+    # Retrieve file list (either from a directory or a file)
     if (fileInfo$isdir) {
       # Check if file extension is specified
       if (!is.null(fileExtension)) {

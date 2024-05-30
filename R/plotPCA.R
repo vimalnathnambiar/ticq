@@ -7,21 +7,21 @@
 #' @import ggforce
 #'
 #' @export
-#' @param data Data frame that contains columns representing data to perform PCA on. Should be equal sized and not contain NA values: data frame
+#' @param data A data frame containing equal sized data to perform PCA (Must not contain NA values): data frame
 #' @param startIDX Index of the first data column to perform PCA on: double
 #' @param endIDX Index of the last data column data to perform PCA on (Default: NULL): NULL or double
-#' @param scale Scaling status for the PCA (Default: TRUE, Options: TRUE or FALSE): boolean
+#' @param scale PCA scaling (Default: TRUE, Options: TRUE or FALSE): boolean
 #' @param confidence Data confidence % (Default: 95): double
-#' @param distribution Data distribution. Distribution boundary is drawn on scores plot and biplot (Default: NULL, Options: "normal" or "t"): NULL or character
-#' @param colour Name of the column used for colour grouping (Default: NULL): NULL or character
-#' @param shape Name of the column used for shape grouping (Default: NULL): NULL or character
+#' @param distribution Data distribution to be drawn on scores plot and biplot (Default: NULL, Options: "normal" or "t"): NULL or character
+#' @param colour Column name representing data to be used for colour grouping (Default: NULL): NULL or character
+#' @param shape Column name representing data to be used for shape grouping (Default: NULL): NULL or character
 #' @param subtitle Plot subtitle (Default: NULL): NULL or character
-#' @param colourLegend Legend label for colour grouping (Default: Value used for colour): NULL or character
-#' @param shapeLegend Legend label for shape grouping (Default: Value used for shape): NULL or character
-#' @param screePlotToggle Toggle printing of scree plot (Default: TRUE, Options: TRUE or FALSE): boolean
-#' @param scoresPlotToggle Toggle printing of scores plot (Default: TRUE, Options: TRUE or FALSE): boolean
-#' @param loadingsPlotToggle Toggle printing of loadings plot (Default: TRUE, Options: TRUE or FALSE): boolean
-#' @param biPlotToggle Toggle printing of biplot (Default: TRUE, Options: TRUE or FALSE): boolean
+#' @param colourLabel Colour grouping label (Default: Value used for colour): NULL or character
+#' @param shapeLabel Shape grouping label (Default: Value used for shape): NULL or character
+#' @param screePlotToggle Toggle to display scree plot (Default: TRUE, Options: TRUE or FALSE): boolean
+#' @param scoresPlotToggle Toggle to display scores plot (Default: TRUE, Options: TRUE or FALSE): boolean
+#' @param loadingsPlotToggle Toggle to display loadings plot (Default: TRUE, Options: TRUE or FALSE): boolean
+#' @param biPlotToggle Toggle to display biplot (Default: TRUE, Options: TRUE or FALSE): boolean
 plotPCA <- function(data,
                     startIDX,
                     endIDX = NULL,
@@ -31,14 +31,14 @@ plotPCA <- function(data,
                     colour = NULL,
                     shape = NULL,
                     subtitle = NULL,
-                    colourLegend = colour,
-                    shapeLegend = shape,
+                    colourLabel = colour,
+                    shapeLabel = shape,
                     screePlotToggle = TRUE,
                     scoresPlotToggle = TRUE,
                     loadingsPlotToggle = TRUE,
                     biPlotToggle = TRUE) {
   tryCatch({
-    # Check and ensure no NA values in data frame
+    # Check and ensure no NA values in data
     if (is.null(endIDX)) {
       tmp <- data[, startIDX:ncol(data)]
     } else {
@@ -58,11 +58,10 @@ plotPCA <- function(data,
     # Threshold limit based on variance and data confidence %
     threshold <- which(variance$cumulativeProportion >= confidence)[1]
     
-    # Check if threshold is more than 1
+    # Check PC threshold status
     if (threshold > 1) {
       # Plot scree plot
-      screePlot <- ggplot2::ggplot(data = variance,
-                                   aes(x = principalComponent, y = varianceProportion, group = 1)) + 
+      screePlot <- ggplot2::ggplot(data = variance, aes(x = principalComponent, y = varianceProportion, group = 1)) + 
         ggplot2::geom_col(fill = "orange") +
         ggplot2::geom_point() +
         ggplot2::geom_line(aes(y = varianceProportion, colour = "Proportion of Variance")) +
@@ -78,15 +77,13 @@ plotPCA <- function(data,
                        legend.title = element_text(size = 8),
                        legend.text = element_text(size = 8)) +
         ggplot2::scale_colour_manual(values = c("red", "darkgreen", "blue"),
-                                     labels = c("Cumulative Proportion",
-                                                "Proportion of Variance", 
-                                                "Threshold (>=95%)")) +
+                                     labels = c("Cumulative Proportion", "Proportion of Variance", "Threshold (>=95%)")) +
         ggplot2::labs(title = "Scree Plot",
                       subtitle = subtitle,
                       x = "Principal Components",
                       y = "Proportion of Variance (%)")
       
-        # Print scree plot
+        # Display scree plot
         if (screePlotToggle == TRUE) {
           print(screePlot)
         }
@@ -100,7 +97,10 @@ plotPCA <- function(data,
         for (i in 1:(threshold - 1)) {
           for (j in (i+1):threshold) {
             # Generate Hotelling Ellipse
-            hotelling <- HotellingEllipse::ellipseParam(data = scores, pcx = i, pcy = j)
+            hotelling <- HotellingEllipse::ellipseParam(data = scores,
+                                                        k = 2,
+                                                        pcx = i,
+                                                        pcy = j)
             
             # Plot scores
             scoresPlot <- ggplot2::ggplot(data = scores, aes(x = .data[[paste0("PC", i)]], y = .data[[paste0("PC", j)]])) +
@@ -130,11 +130,11 @@ plotPCA <- function(data,
                             subtitle = subtitle,
                             x = paste0("PC", i, " [", round(pca$importance[2, i] * 100, 2), "%]"),
                             y = paste0("PC", j, " [", round(pca$importance[2, j] * 100, 2), "%]"),
-                            colour = colourLegend,
-                            shape = shapeLegend,
+                            colour = colourLabel,
+                            shape = shapeLabel,
                             caption = paste0("Hotelling T² Ellipse (Blue: 95% Confidence; Red: 99% Confidence)"))
               
-              # Add distribution boundary at a specific confidence
+              # Display data distribution at a specific confidence
               if (!is.null(distribution)) {
                 if (distribution == "normal") {
                   scoresPlot <- scoresPlot +
@@ -149,7 +149,7 @@ plotPCA <- function(data,
                 }
               }
               
-              # Print scores plot
+              # Display scores plot
               if (scoresPlotToggle == TRUE) {
                 print(scoresPlot)
               }
@@ -167,7 +167,7 @@ plotPCA <- function(data,
                             y = paste0("PC", j, " [", round(pca$importance[2, j] * 100, 2), "%]"),
                             colour = "Variables")
             
-              # Print loadings plot
+              # Display loadings plot
               if (loadingsPlotToggle == TRUE) {
                 print(loadingsPlot)
               }
@@ -182,17 +182,17 @@ plotPCA <- function(data,
                                  aes(x = .data[[paste0("PC", i)]], y = .data[[paste0("PC", j)]], label = row.names(loading))) + 
               ggplot2::labs(title = "PCA Biplot")
               
-              # Print biplot
+              # Display biplot
               if (biPlotToggle == TRUE) {
                 print(biplot)
               }
           }
         }
       },
-      warning = function(w) print(paste0("Unable to plot PCA results - ", w)),
-      error = function(e) print(paste0("Unable to plot PCA results - ", e)))
+      warning = function(w) print(paste0("Unable to generate PCA results - ", w)),
+      error = function(e) print(paste0("Unable to generate PCA results - ", e)))
     } else {
-      print(paste("Unable to plot PCA results - Only PC1 satisfies the threshold limit"))
+      print(paste("Unable to generate PCA results - Only PC1 satisfies the threshold limit"))
     }
   },
   warning = function(w) print(paste0("Unable to perform Principal Component Analysis - ", w)),

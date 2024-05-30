@@ -16,19 +16,30 @@ anonymiseMetadata(
 )
 }
 \arguments{
-\item{data}{Data frame that contains spectral information of samples: data frame}
+\item{data}{A data frame containing spectral data: data frame}
 
-\item{commonColumn}{Column names that are common across all samples: character vector}
+\item{sampleID}{Sample ID column name: character}
+
+\item{project}{Project column name: character}
+
+\item{cohort}{Cohort column name: character}
+
+\item{projectCohort}{Combined project and cohort variable column name: character}
+
+\item{method}{Method column name: character}
+
+\item{instrument}{Instrument column name: character}
+
+\item{plate}{Plate number column name: character}
 }
 \value{
-Data frame containing spectral information of anonymised samples
+A data frame with anonymised sample metadata containing spectral data
 }
 \description{
-Anonymise sample metadata.
+Anonymise sample metadata including sample ID, project name, cohort name, method name, instrument name, and plate number.
 }
 \details{
 Only applicable to data acquired at the Australian National Phenome Centre (ANPC).
-Information anonymised includes sample ID, project name, cohort name, method name, instrument name, and plate number.
 }
 \examples{
 data <- data.frame(sampleID = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29",

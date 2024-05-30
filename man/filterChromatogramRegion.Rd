@@ -4,18 +4,18 @@
 \alias{filterChromatogramRegion}
 \title{filterChromatogramRegion}
 \usage{
-filterChromatogramRegion(data, regionOfInterest = NULL, filterBy)
+filterChromatogramRegion(data, regionOfInterest = NULL, retentionTime)
 }
 \arguments{
-\item{data}{Data frame that contains spectral information of samples: data frame}
+\item{data}{A data frame containing spectral data: data frame}
 
-\item{regionOfInterest}{List that represents the start and end point of a chromatogram region (Default: NULL): NULL or list}
+\item{regionOfInterest}{A list representing the start and end time points of a chromatogram region (Default: NULL): NULL or list}
 
-\item{filterBy}{Name of the column that represents the retention time to be filtered: character}
+\item{retentionTime}{Retention time column name: character}
 }
 \value{
-A data frame containing the spliced chromatogram region of interest
+A data frame containing spectral data that falls within the retention time of the chromatogram region of interest
 }
 \description{
-Filter for a chromatogram region of interest.
+Filter for retention time of a chromatogram region of interest.
 }

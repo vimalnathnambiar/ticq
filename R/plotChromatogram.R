@@ -5,17 +5,17 @@
 #' @import ggplot2
 #'
 #' @export
-#' @param data Data frame that contains plot data: data frame
-#' @param x Name of the column that represents the continuous data series for the x-axis: character
-#' @param y Name of the column that represents the continuous data series for the y-axis: character
-#' @param colour Name of the column used for colour grouping (Default: NULL): NULL or character
-#' @param title Plot title (Default: "Chromatogram"): character
+#' @param data A data frame containing plot data: data frame
+#' @param x Column name representing the continuous data series to be used for x-axis: character
+#' @param y Column name representing the continuous data series to be used for y-axis: character
+#' @param colour Column name representing data to be used for colour grouping (Default: NULL): NULL or character
+#' @param title Plot title (Default: "Chromatogram"): NULL or character
 #' @param subtitle Plot subtitle (Default: NULL): NULL or character
 #' @param caption Plot caption (Default: NULL): NULL or character
-#' @param labelX x-axis label (Default: Value used for x): NULL or character
-#' @param labelY y-axis label (Default:Value used for y): NULL or character
-#' @param colourLegend Legend label for colour grouping (Default: Value used for colour): NULL or character
-#' @param chromatogramRegion List that represents the different chromatogram regions of interest (Default: NULL): NULL or list
+#' @param xLabel x-axis label (Default: Column name used for x): NULL or character
+#' @param yLabel y-axis label (Default:Column name used for y): NULL or character
+#' @param colourLabel Colour grouping label (Default: Value used for colour): NULL or character
+#' @param chromatogramRegion A list that represents the different chromatogram regions of interest to be plotted (Default: NULL): NULL or list
 plotChromatogram <- function(data,
                              x,
                              y,
@@ -23,9 +23,9 @@ plotChromatogram <- function(data,
                              title = "Chromatogram",
                              subtitle = NULL,
                              caption = NULL,
-                             labelX = x,
-                             labelY = y,
-                             colourLegend = colour,
+                             xLabel = x,
+                             yLabel = y,
+                             colourLabel = colour,
                              chromatogramRegion = NULL) {
   tryCatch({
     # Plot chromatogram
@@ -40,9 +40,9 @@ plotChromatogram <- function(data,
       ggplot2::labs(title = title,
                     subtitle = subtitle,
                     caption = caption,
-                    x = labelX,
-                    y = labelY,
-                    colour = colourLegend)
+                    x = xLabel,
+                    y = yLabel,
+                    colour = colourLabel)
     
     # Display chromatogram regions of interest
     if (!is.null(chromatogramRegion)) {

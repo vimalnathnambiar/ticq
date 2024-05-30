@@ -9,25 +9,25 @@ spliceChromatogramRegion(
   commonColumn,
   spectrumCount,
   chromatogramRegion = NULL,
-  filterBy,
+  retentionTime,
   sumBy
 )
 }
 \arguments{
-\item{data}{Data frame that contains spectral information of samples: data frame}
+\item{data}{A data frame containing spectral data: data frame}
 
-\item{commonColumn}{Column names that are common across all samples: character vector}
+\item{commonColumn}{Column names of data common for each unique sample: character vector}
 
-\item{spectrumCount}{Name of the column that represents spectrum count: character}
+\item{spectrumCount}{Spectrum count column name: character}
 
-\item{chromatogramRegion}{List that represents the different chromatogram regions of interest (Default: NULL): NULL or list}
+\item{chromatogramRegion}{A list containing the start and end time points of the different chromatogram regions of interest (prewash, maass calibration, analyte and wash) (Default: NULL): NULL or list}
 
-\item{filterBy}{Name of the column that represents the retention time to be filtered: character}
+\item{retentionTime}{Retention time column name: character}
 
-\item{sumBy}{Name of the column that represents the data to be summed for each chromatogram region: character}
+\item{sumBy}{Column name of the data to be summed: character}
 }
 \value{
-Data frame containing the sum values of the spliced chromatogram regions
+A data frame containing the summed values for each chromatogram regions of interest
 }
 \description{
 Splice chromatogram regions and sum values of a specific data column together.

@@ -7,7 +7,7 @@
 extractInstrument(input)
 }
 \arguments{
-\item{input}{Input to extract instrument name: character}
+\item{input}{ANPC sample file name or path: character}
 }
 \value{
 Instrument name

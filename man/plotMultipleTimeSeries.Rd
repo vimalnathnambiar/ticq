@@ -13,10 +13,10 @@ plotMultipleTimeSeries(
   colour = NULL,
   shape = NULL,
   caption = NULL,
-  labelX = x,
-  labelY = NULL,
-  colourLegend = colour,
-  shapeLegend = shape,
+  xLabel = x,
+  yLabel = NULL,
+  colourLabel = colour,
+  shapeLabel = shape,
   boundary = NULL,
   boundaryValue = 0,
   xTickToggle = TRUE,
@@ -25,43 +25,54 @@ plotMultipleTimeSeries(
 )
 }
 \arguments{
-\item{data}{Data frame that contains plot data: data frame}
+\item{data}{A data frame containing plot data: data frame}
 
-\item{commonColumn}{Column names that are common across all samples: character vector}
+\item{commonColumn}{Column names of data common for each unique sample: character vector}
 
-\item{x}{Name of the column that represents the continuous data series for x-axis: character}
+\item{x}{Column name representing the continuous data series to be used for x-axis: character}
 
-\item{startIDX}{Index of the first data column that contains continuous data series for the y-axis: double}
+\item{startIDX}{Index of the first data column containing continuous data series for the y-axis: double}
 
-\item{endIDX}{Index of the last data column data that contains continuous data series for the y-axis (Default: NULL): NULL or double}
+\item{endIDX}{Index of the last data column data containing continuous data series for the y-axis (Default: NULL): NULL or double}
 
-\item{colour}{Name of the column used for colour grouping (Default: NULL): NULL or character}
+\item{colour}{Column name representing data to be used for colour grouping (Default: NULL): NULL or character}
 
-\item{shape}{Name of the column used for shape grouping (Default: NULL): NULL or character}
+\item{shape}{Column name representing data to be used for shape grouping (Default: NULL): NULL or character}
 
 \item{caption}{Plot caption (Default: NULL): NULL or character}
 
-\item{labelX}{x-axis label (Default: Value used for x): NULL or character}
+\item{xLabel}{x-axis label (Default: Value used for x): NULL or character}
 
-\item{labelY}{y-axis label (Default: NULL): NULL or character}
+\item{yLabel}{y-axis label (Default: NULL): NULL or character}
 
-\item{colourLegend}{Legend label for colour grouping (Default: Value used for colour): NULL or character}
+\item{colourLabel}{Colour grouping label (Default: Value used for colour): NULL or character}
 
-\item{shapeLegend}{Legend label for shape grouping (Default: Value used for shape)}
+\item{shapeLabel}{Shape grouping label (Default: Value used for shape)}
 
-\item{boundary}{Boundary analysis to perform based on a +/- value from 0 (value) or 100 (percentage), or up to 2 standard deviation (sd) from average mean (Default: NULL, Options: "value", "percentage", "sd"): NULL or character}
+\item{boundary}{Boundary analysis to perform (Default: NULL, Options: "value", "percentage", "sd"): NULL or character.}
 
-\item{boundaryValue}{Value used for boundary analysis. To specify values for "sd" boundary analysis, use list(mean = meanValue, sd = sdValue, sd2 = sd2Value) (Default: 0): double or list}
+\item{boundaryValue}{Value used for boundary analysis. (Default: 0): double or list}
 
-\item{xTickToggle}{Toggle ticks on x-axis (Default: TRUE, Options: TRUE or FALSE): boolean}
+\item{xTickToggle}{Toggle to display ticks on x-axis (Default: TRUE, Options: TRUE or FALSE): boolean}
 
-\item{nPlotCol}{Number of plots in a single columns (Default: 1): double}
+\item{nPlotCol}{Number of plots to be plotted in a single column (Default: 1): double}
 
-\item{nPlotRow}{Number of plot in a single row (Default: 1): double}
+\item{nPlotRow}{Number of plots to be plotted in a single row (Default: 1): double}
 }
 \value{
-Data frame containing the boundary analysis result (if specified)
+A data frame containing the result of the boundary analysis performed (if specified)
 }
 \description{
 Plot multiple time series data and perform boundary analysis (if specified).
+}
+\details{
+Boundary analysis that can be performed:
+\itemize{
+\item value: Evaluates data by +/- value from 0
+\item percentage: Evaluates data +/- value from 100
+\item sd: Evaluates data using 2 standard deviations from average mean of the data or using defined mean and standard deviation values
+}
+
+To defined mean and standard deviation values to be used for "sd" boundary analysis, use
+list(mean = meanValue, sd = firstValueSD, sd2 = secondValueSD)
 }

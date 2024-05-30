@@ -14,23 +14,23 @@ configureChromatogramRegion(
 )
 }
 \arguments{
-\item{massCalStart}{Fixed time point when the MS instrument starts its mass calibration cycle (Default: 0): double}
+\item{massCalStart}{Start of mass calibration cycle (Default: 0): double}
 
-\item{massCalEnd}{Fixed time point that the MS instrument ends its mass calibration cycle: double}
+\item{massCalEnd}{End of mass calibration cycle: double}
 
-\item{analyteStart}{Fixed time point when the MS instrument starts its cycle to scan for targeted features (Default: End of mass calibration cycle): double}
+\item{analyteStart}{Start of feature detection cycle (Default: End of mass calibration cycle): double}
 
-\item{analyteEnd}{Fixed time point when the MS instrument ends its cycle to scan for targeted features (Default: Start of wash cycle): double}
+\item{analyteEnd}{End of feature detection cycle (Default: Start of wash cycle): double}
 
-\item{washStart}{Fixed time point that the MS instrument starts its wash cycle: double}
+\item{washStart}{Start of wash cycle: double}
 
-\item{washEnd}{Fixed time point that the MS instrument ends its wash cycle (Default: NULL): NULL or double}
+\item{washEnd}{End of wash cycle (Default: NULL): NULL or double}
 }
 \value{
-List containing the time points representing the different chromatogram regions of interest
+A list containing the start and end time points of the different chromatogram regions of interest (prewash, mass calibration, analyte, and wash)
 }
 \description{
-Configure chromatogram regions of interest based on specific time points.
+Configure the start and end time points of the different chromatogram regions of interest: prewash, mass calibration, analyte and wash.
 }
 \examples{
 # Example 1: Using default values for analyteStart, analyteEnd and washEnd
@@ -38,7 +38,7 @@ chromatogramRegion <- ticq::configureChromatogramRegion(massCalStart = 0, massCa
                                                         washStart = 5)
 print(chromatogramRegion)
 
-# Example 2: Define values for analyteStart, analyteEnd and washEnd
+# Example 2: Defining values for analyteStart, analyteEnd and washEnd
 chromatogramRegion <- ticq::configureChromatogramRegion(massCalStart = 0, massCalEnd = 0.3,
                                                         analyteStart = 2, analyteEnd = 4
                                                         washStart = 5, washEnd = 6)

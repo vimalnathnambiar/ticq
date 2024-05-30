@@ -7,7 +7,7 @@
 extractProject(input)
 }
 \arguments{
-\item{input}{Input to extract project name: character}
+\item{input}{ANPC sample file name or path: character}
 }
 \value{
 Project name

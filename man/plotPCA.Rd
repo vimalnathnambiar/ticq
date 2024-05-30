@@ -14,8 +14,8 @@ plotPCA(
   colour = NULL,
   shape = NULL,
   subtitle = NULL,
-  colourLegend = colour,
-  shapeLegend = shape,
+  colourLabel = colour,
+  shapeLabel = shape,
   screePlotToggle = TRUE,
   scoresPlotToggle = TRUE,
   loadingsPlotToggle = TRUE,
@@ -23,35 +23,35 @@ plotPCA(
 )
 }
 \arguments{
-\item{data}{Data frame that contains columns representing data to perform PCA on. Should be equal sized and not contain NA values: data frame}
+\item{data}{A data frame containing equal sized data to perform PCA (Must not contain NA values): data frame}
 
 \item{startIDX}{Index of the first data column to perform PCA on: double}
 
 \item{endIDX}{Index of the last data column data to perform PCA on (Default: NULL): NULL or double}
 
-\item{scale}{Scaling status for the PCA (Default: TRUE, Options: TRUE or FALSE): boolean}
+\item{scale}{PCA scaling (Default: TRUE, Options: TRUE or FALSE): boolean}
 
 \item{confidence}{Data confidence \% (Default: 95): double}
 
-\item{distribution}{Data distribution. Distribution boundary is drawn on scores plot and biplot (Default: NULL, Options: "normal" or "t"): NULL or character}
+\item{distribution}{Data distribution to be drawn on scores plot and biplot (Default: NULL, Options: "normal" or "t"): NULL or character}
 
-\item{colour}{Name of the column used for colour grouping (Default: NULL): NULL or character}
+\item{colour}{Column name representing data to be used for colour grouping (Default: NULL): NULL or character}
 
-\item{shape}{Name of the column used for shape grouping (Default: NULL): NULL or character}
+\item{shape}{Column name representing data to be used for shape grouping (Default: NULL): NULL or character}
 
 \item{subtitle}{Plot subtitle (Default: NULL): NULL or character}
 
-\item{colourLegend}{Legend label for colour grouping (Default: Value used for colour): NULL or character}
+\item{colourLabel}{Colour grouping label (Default: Value used for colour): NULL or character}
 
-\item{shapeLegend}{Legend label for shape grouping (Default: Value used for shape): NULL or character}
+\item{shapeLabel}{Shape grouping label (Default: Value used for shape): NULL or character}
 
-\item{screePlotToggle}{Toggle printing of scree plot (Default: TRUE, Options: TRUE or FALSE): boolean}
+\item{screePlotToggle}{Toggle to display scree plot (Default: TRUE, Options: TRUE or FALSE): boolean}
 
-\item{scoresPlotToggle}{Toggle printing of scores plot (Default: TRUE, Options: TRUE or FALSE): boolean}
+\item{scoresPlotToggle}{Toggle to display scores plot (Default: TRUE, Options: TRUE or FALSE): boolean}
 
-\item{loadingsPlotToggle}{Toggle printing of loadings plot (Default: TRUE, Options: TRUE or FALSE): boolean}
+\item{loadingsPlotToggle}{Toggle to display loadings plot (Default: TRUE, Options: TRUE or FALSE): boolean}
 
-\item{biPlotToggle}{Toggle printing of biplot (Default: TRUE, Options: TRUE or FALSE): boolean}
+\item{biPlotToggle}{Toggle to display biplot (Default: TRUE, Options: TRUE or FALSE): boolean}
 }
 \description{
 Perform Principle Component Analysis (PCA) and plot all associated plots (scree plot, scores plot, loadings plot and biplot).

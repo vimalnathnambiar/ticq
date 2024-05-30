@@ -12,34 +12,34 @@ plotChromatogram(
   title = "Chromatogram",
   subtitle = NULL,
   caption = NULL,
-  labelX = x,
-  labelY = y,
-  colourLegend = colour,
+  xLabel = x,
+  yLabel = y,
+  colourLabel = colour,
   chromatogramRegion = NULL
 )
 }
 \arguments{
-\item{data}{Data frame that contains plot data: data frame}
+\item{data}{A data frame containing plot data: data frame}
 
-\item{x}{Name of the column that represents the continuous data series for the x-axis: character}
+\item{x}{Column name representing the continuous data series to be used for x-axis: character}
 
-\item{y}{Name of the column that represents the continuous data series for the y-axis: character}
+\item{y}{Column name representing the continuous data series to be used for y-axis: character}
 
-\item{colour}{Name of the column used for colour grouping (Default: NULL): NULL or character}
+\item{colour}{Column name representing data to be used for colour grouping (Default: NULL): NULL or character}
 
-\item{title}{Plot title (Default: "Chromatogram"): character}
+\item{title}{Plot title (Default: "Chromatogram"): NULL or character}
 
 \item{subtitle}{Plot subtitle (Default: NULL): NULL or character}
 
 \item{caption}{Plot caption (Default: NULL): NULL or character}
 
-\item{labelX}{x-axis label (Default: Value used for x): NULL or character}
+\item{xLabel}{x-axis label (Default: Column name used for x): NULL or character}
 
-\item{labelY}{y-axis label (Default:Value used for y): NULL or character}
+\item{yLabel}{y-axis label (Default:Column name used for y): NULL or character}
 
-\item{colourLegend}{Legend label for colour grouping (Default: Value used for colour): NULL or character}
+\item{colourLabel}{Colour grouping label (Default: Value used for colour): NULL or character}
 
-\item{chromatogramRegion}{List that represents the different chromatogram regions of interest (Default: NULL): NULL or list}
+\item{chromatogramRegion}{A list that represents the different chromatogram regions of interest to be plotted (Default: NULL): NULL or list}
 }
 \description{
 Plot chromatogram data.

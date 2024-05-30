@@ -7,13 +7,14 @@
 #' @import dplyr
 #'
 #' @export
-#' @param input Input to extract cohort name: character
+#' @param input ANPC sample file name or path: character
 #' @returns Cohort name
 #'
 #' @examples
 #' cohort <- ticq::extractCohort(input = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29.json")
 #' print(cohort)
 extractCohort <- function(input) {
+  # Cohort name patterns
   cohort <- dplyr::case_when(
     grepl("System_Suitability|System|SS", input) ~ "System Suitability",
     grepl("cambridge_FollowUp_Part2|cambridgeFollowUpPart2", input) ~ "Cambridge Follow Up Part 2",

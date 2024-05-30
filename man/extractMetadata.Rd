@@ -7,7 +7,7 @@
 extractMetadata(input)
 }
 \arguments{
-\item{input}{Input to extract metadata: character}
+\item{input}{ANPC sample file name or path: character}
 }
 \value{
 List containing the metadata associated to the data

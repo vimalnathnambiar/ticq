@@ -5,15 +5,15 @@
 #' @import dplyr
 #'
 #' @export
-#' @param data Data frame that contains spectral information of samples: data frame
-#' @param intensityArray Name of the column that represents intensity array: character
-#' @param targetList Unique target m/z value that reflect the intensity value in the array: character vector
-#' @returns Data frame with the extracted intensity of each target m/z (EIC) in its own individual column appended
+#' @param data A data frame containing spectral data: data frame
+#' @param intensityArray Intensity array column name: character
+#' @param targetList A list of unique target m/z mirroring the values stored within the intensity array: character vector
+#' @returns A data frame with appended columns representing the extracted intensity of each target m/z (EIC)
 extractEIC <- function(data, intensityArray, targetList) {
   # Extract intensity of each target m/z into a matrix
   tmp <- do.call(cbind, data[[intensityArray]])
   
-  # Transpose matrix and convert into data frame
+  # Transpose and convert matrix into data frame
   tmp <- as.data.frame(t(tmp))
   
   # Rename columns

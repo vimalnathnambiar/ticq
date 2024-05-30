@@ -7,16 +7,13 @@
 generateStat(data)
 }
 \arguments{
-\item{data}{Continuous data series of numerical values without NA (At least 2 data points): numerical vector}
+\item{data}{A continuous data series of numerical values (Requires a minimum of 2 data points and must not contain NA values): numerical vector}
 }
 \value{
-Data frame containing all associated statistical information
+A data frame containing all generated statistics
 }
 \description{
-Generate statistical information based on data.
-}
-\details{
-Statistical information includes:
+Generate statistical information including:
 \itemize{
 \item Sample size (n)
 \item Minimum (min)

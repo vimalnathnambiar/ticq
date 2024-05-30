@@ -7,13 +7,14 @@
 #' @import dplyr
 #'
 #' @export
-#' @param input Input to extract project name: character
+#' @param input ANPC sample file name or path: character
 #' @returns Project name
 #'
 #' @examples
 #' project <- ticq::extractProject(input = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29.json")
 #' print(project)
 extractProject <- function(input) {
+  # Project name patterns
   project <- dplyr::case_when(
     grepl("covid19|covid|COV", input) ~ "COVID-19",
     grepl("barwon|barwin20|BARWIN|BAR", input) ~ "Barwon",

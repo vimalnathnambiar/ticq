@@ -7,13 +7,14 @@
 #' @import dplyr
 #'
 #' @export
-#' @param input Input to extract matrix type: character
+#' @param input ANPC sample file name or path: character
 #' @returns Matrix type
 #'
 #' @examples
 #' matrix <- ticq::extractMatrix(input = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29.json")
 #' print(matrix)
 extractMatrix <- function(input) {
+  # Matrix type patterns
   matrix <- dplyr::case_when(
     grepl("PLASMA|PLA", input) ~ "Plasma",
     grepl("SERUM|SER", input) ~ "Serum",

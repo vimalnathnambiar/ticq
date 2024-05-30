@@ -7,16 +7,16 @@
 checkUndefinedSampleType(data, commonColumn, sampleType, spectrumCount)
 }
 \arguments{
-\item{data}{Data frame that contains spectral information of samples: data frame}
+\item{data}{A data frame containing spectral data: data frame}
 
-\item{commonColumn}{Column names that are common across all samples: character vector}
+\item{commonColumn}{Column names of data common for each unique sample: character vector}
 
-\item{sampleType}{Name of the column that represents sample type: character}
+\item{sampleType}{Sample type column name: character}
 
-\item{spectrumCount}{Name of the column that represents spectrum count: character}
+\item{spectrumCount}{Spectrum count column name: character}
 }
 \value{
-List containing two data frames (passed and failed data)
+A list containing two data frames (passed and failed data)
 }
 \description{
 Check and filter for samples that have an undefined sample type.

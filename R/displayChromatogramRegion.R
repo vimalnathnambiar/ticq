@@ -1,18 +1,18 @@
 #' displayChromatogramRegion
 #'
-#' Add vertical lines to represent the different regions of the chromatogram.
+#' Add vertical lines to display the start and end time points of a chromatogram region.
 #'
 #' This function is not exported as it is only used by:
 #' ticq::plotChromatogram()
 #'
 #' @import ggplot2
 #'
-#' @param plot ggplot object that represents a chromatogram: ggplot
-#' @param maxX Maximum value of the x-axis: double
-#' @param maxY Maximum value of the y-axis: double
+#' @param plot A ggplot object representing a chromatogram: ggplot
+#' @param maxX x-axis maximum value: double
+#' @param maxY y-axis maximum value: double
 #' @param chromatogramRegion Chromatogram region to be displayed: list
 #' @param label Chromatogram region label: character
-#' @returns ggplot object with the added vertical lines displaying the chromatogram region start and end points
+#' @returns A ggplot object with the added vertical lines displaying the chromatogram region start and end time points
 displayChromatogramRegion <- function(plot,
                                       maxX,
                                       maxY,
@@ -24,7 +24,7 @@ displayChromatogramRegion <- function(plot,
     chromatogramRegion$end <- maxX
   }
   
-  # Add vertical lines for the chromatogram region start and end points
+  # Add vertical lines and annotate the chromatogram region
   plot <- plot +
     ggplot2::geom_vline(xintercept = chromatogramRegion$start,
                         linetype = "dashed",

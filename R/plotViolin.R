@@ -2,30 +2,38 @@
 #'
 #' Plot violin plots and perform boundary analysis (if specified).
 #'
+#' Boundary analysis that can be performed:
+#' - value: Evaluates data by +/- value from 0
+#' - percentage: Evaluates data +/- value from 100
+#' - sd: Evaluates data using 2 standard deviations from average mean of the data or using defined mean and standard deviation values
+#'
+#' To defined mean and standard deviation values to be used for "sd" boundary analysis, use
+#' list(mean = meanValue, sd = firstValueSD, sd2 = secondValueSD)
+#'
 #' @import ggplot2
 #' @import dplyr
 #'
 #' @export
-#' @param data Data frame that contains plot data: data frame
-#' @param x Name of the column that represents the continuous data series for x-axis: character
-#' @param y Name of the column that represents the continuous data series for y-axis: character
-#' @param colour Name of the column used for colour grouping (Default: NULL): NULL or character
-#' @param shape Name of the column used for shape grouping (Default: NULL): NULL or character
-#' @param outlierShape Shape used to identify outliers ((Default: NA): NA or double)
-#' @param title Plot title (Default: "Time Series"): character
+#' @param data A data frame containing plot data: data frame
+#' @param x Column name representing the continuous data series to be used for x-axis: character
+#' @param y Column name representing the continuous data series to be used for y-axis: character
+#' @param colour Column name representing data to be used for colour grouping (Default: NULL): NULL or character
+#' @param shape Column name representing data to be used for shape grouping (Default: NULL): NULL or character
+#' @param outlierShape Shape style to be used to identify outliers (Default: NA): NA or double
+#' @param title Plot title (Default: "Violin Plot"): NULL or character
 #' @param subtitle Plot subtitle (Default: NULL): NULL or character
 #' @param caption Plot caption (Default: NULL): NULL or character
-#' @param labelX x-axis label (Default: Value used for x): NULL or character
-#' @param labelY y-axis label (Default: Value used for y): NULL or character
-#' @param colourLegend Legend label for colour grouping (Default: Value used for colour): NULL or character
-#' @param shapeLegend Legend label for shape grouping (Default: Value used for shape)
-#' @param boundary Boundary analysis to perform based on a +/- value from 0 (value) or 100 (percentage), or up to 2 standard deviation (sd) from average mean (Default: NULL, Options: "value", "percentage", "sd"): NULL or character
-#' @param boundaryValue Value used for boundary analysis. For "sd" boundary analysis, use list(mean = meanValue, sd = sdValue, sd2 = sd2Value) (Default: 0): double or list
-#' @param violinPlotToggle Toggle printing of violin plot (Default: TRUE, Options: TRUE or FALSE): boolean
+#' @param xLabel x-axis label (Default: Value used for x): NULL or character
+#' @param yLabel y-axis label (Default: Value used for y): NULL or character
+#' @param colourLabel Colour grouping label (Default: Value used for colour): NULL or character
+#' @param shapeLabel Shape grouping label (Default: Value used for shape)
+#' @param boundary Boundary analysis to perform (Default: NULL, Options: "value", "percentage", "sd"): NULL or character.
+#' @param boundaryValue Value used for boundary analysis. (Default: 0): double or list
+#' @param violinPlotToggle Toggle to display violin plot (Default: TRUE, Options: TRUE or FALSE): boolean
 #' @param tailTrimToggle Toggle to trim the tails of the violin plot. Applicable only if violinPlotToggle is set to TRUE (Default: FALSE, Options: TRUE or FALSE): boolean
-#' @param boxPlotToggle Toggle printing of box plot (Default: TRUE, Options: TRUE or FALSE): boolean
-#' @param boxWidth Width of box plot. Applicable if boxPlotToggle is set to TRUE (Default: 1): double
-#' @returns Data frame containing the boundary analysis result (if specified)
+#' @param boxPlotToggle Toggle to display box plot (Default: TRUE, Options: TRUE or FALSE): boolean
+#' @param boxWidth Box plot width. Applicable only if boxPlotToggle is set to TRUE (Default: 1): double
+#' @returns A data frame containing the result of the boundary analysis performed (if specified)
 plotViolin <- function(data,
                        x,
                        y,
@@ -35,10 +43,10 @@ plotViolin <- function(data,
                        title = "Violin Plot",
                        subtitle = NULL,
                        caption = NULL,
-                       labelX = x,
-                       labelY = y,
-                       colourLegend = colour,
-                       shapeLegend = shape,
+                       xLabel = x,
+                       yLabel = y,
+                       colourLabel = colour,
+                       shapeLabel = shape,
                        boundary = NULL,
                        boundaryValue = 0,
                        violinPlotToggle = TRUE,
@@ -49,12 +57,12 @@ plotViolin <- function(data,
     # Plot violin plot
     violinPlot <- ggplot2::ggplot(data = data, aes(x = .data[[x]], y = .data[[y]]))
     
-      # Display box or violin or both
+      # Display box plot or violin plot or both
         # Violin plot
-      if (violinPlotToggle) {
-        violinPlot <- violinPlot +
-          ggplot2::geom_violin(trim = tailTrimToggle)
-      }
+        if (violinPlotToggle) {
+          violinPlot <- violinPlot +
+            ggplot2::geom_violin(trim = tailTrimToggle)
+        }
       
         # Box plot
         if (boxPlotToggle) {
@@ -78,15 +86,15 @@ plotViolin <- function(data,
         ggplot2::labs(title = title,
                       subtitle = subtitle,
                       caption = caption,
-                      x = labelX,
-                      y = labelY,
-                      colour = colourLegend,
-                      shape = shapeLegend)
+                      x = xLabel,
+                      y = yLabel,
+                      colour = colourLabel,
+                      shape = shapeLabel)
     
     # Add and perform boundary analysis
     result <- NULL
     if (!is.null(boundary)) {
-      # Check the type of boundary to draw (value, percentage or sd)
+      # Check boundary type
       if (boundary == "value") {
         # Add boundaries
         lowerBound <- 0 - boundaryValue
@@ -148,7 +156,7 @@ plotViolin <- function(data,
         
         result <- rbind(low, normal, high)
       } else if (boundary == "sd") {
-        # Check if there are more than 1 data point or if boundaryValue (list containing mean and necessary standard deviation values) is provided
+        # Check if there are more than 1 data point or if boundary value is defined as a list
         if (nrow(data) > 1 || is.list(boundaryValue)) {
           # Get mean and standard deviation values
           if (is.list(boundaryValue)) {

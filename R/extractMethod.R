@@ -7,13 +7,14 @@
 #' @import dplyr
 #'
 #' @export
-#' @param input Input to extract method name: character
+#' @param input ANPC sample file name or path: character
 #' @returns Method name
 #'
 #' @examples
 #' method <- ticq::extractMethod(input = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29.json")
 #' print(method)
 extractMethod <- function(input) {
+  # Method name patterns
   method <- dplyr::case_when(
     grepl("MS-AA-POS|MS-AApos|MS-AA|MS_AA|AAA|AA", input) ~ "MS-AA-POS",
     grepl("MS-AI-HILPOS|MS-HIL-POS|MS-HILpos", input) ~ "MS-HIL-POS",

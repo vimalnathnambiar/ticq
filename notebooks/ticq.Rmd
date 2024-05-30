@@ -113,7 +113,7 @@ if (!is.null(targetMZ)) {
 Input specified is validated for the presence of JSON file(s) to be extracted and assessed.
 ```{r, echo = FALSE, warning = FALSE}
 # Retrieve file list and display number of JSON files to process
-inputFiles <- ticq::retrieveFileList(input = input, fileExtension = "JSON")
+inputFiles <- ticq::retrieveFilename(input = input, fileExtension = "JSON")
 print(paste("Number of JSON files to process:", length(inputFiles)))
 
 # Check new sample status
@@ -214,8 +214,8 @@ if (newStatus) {
   # Check for undefined sample type
   result <- ticq::checkUndefinedSampleType(data = passedData,
                                            commonColumn = colnames(passedData)[which(colnames(passedData) == sampleID):
-                                                                               which(colnames(passedData) == spectrumCount)], 
-                                           sampleType = sampleType, 
+                                                                               which(colnames(passedData) == spectrumCount)],
+                                           sampleType = sampleType,
                                            spectrumCount = spectrumCount)
   
   # Check new sample status
@@ -259,10 +259,10 @@ if (newStatus) {
   
   # Check spectrum count if comparison with historical data or more than 1 new sample is performed
   if (length(unique(passedData[[sampleID]])) > 1) {
-    result <- ticq::checkSpectrumCount(data = passedData, 
+    result <- ticq::checkSpectrumCount(data = passedData,
                                        commonColumn = colnames(passedData)[which(colnames(passedData) == sampleID):
-                                                                           which(colnames(passedData) == spectrumCount)], 
-                                       sampleID = sampleID, 
+                                                                           which(colnames(passedData) == spectrumCount)],
+                                       sampleID = sampleID,
                                        spectrumCount = spectrumCount,
                                        threshold = 20)
   } else {
@@ -357,18 +357,18 @@ if (newStatus) {
     x <- retentionTime
     y <- totalIonCurrent
     title <- "Total Ion Chromatogram"
-    labelX <- "RT"
-    labelY <- "TIC"
+    xLabel <- "RT"
+    yLabel <- "TIC"
     shape <- sampleType
-    shapeLegend <- "Sample Type"
+    shapeLabel <- "Sample Type"
     
       # Dynamically set colour grouping variable and label
       if (length(unique(plotData[[projectCohort]])) > 1) {
         colour <- projectCohort
-        colourLegend <- "Project"
+        colourLabel <- "Project"
       } else {
         colour <- plate
-        colourLegend <- "Plate"
+        colourLabel <- "Plate"
       }
   } else {
     msStatus <- FALSE
@@ -403,9 +403,9 @@ if (newStatus && msStatus) {
                                colour = colour,
                                title = title,
                                subtitle = paste("LTR", i),
-                               labelX = labelX,
-                               labelY = labelY,
-                               colourLegend = colourLegend,
+                               xLabel = xLabel,
+                               yLabel = yLabel,
+                               colourLabel = colourLabel,
                                chromatogramRegion = chromatogramRegion)
       }
       
@@ -439,9 +439,9 @@ if (newStatus && msStatus) {
                                colour = colour,
                                title = title,
                                subtitle = i,
-                               labelX = labelX,
-                               labelY = labelY,
-                               colourLegend = colourLegend,
+                               xLabel = xLabel,
+                               yLabel = yLabel,
+                               colourLabel = colourLabel,
                                chromatogramRegion = chromatogramRegion)
       }
     }
@@ -472,9 +472,9 @@ if (newStatus && msStatus) {
                                colour = colour,
                                title = title,
                                subtitle = i,
-                               labelX = labelX,
-                               labelY = labelY,
-                               colourLegend = colourLegend,
+                               xLabel = xLabel,
+                               yLabel = yLabel,
+                               colourLabel = colourLabel,
                                chromatogramRegion = chromatogramRegion)
       }
     }
@@ -505,9 +505,9 @@ if (newStatus && msStatus) {
                                colour = colour,
                                title = title,
                                subtitle = i,
-                               labelX = labelX,
-                               labelY = labelY,
-                               colourLegend = colourLegend,
+                               xLabel = xLabel,
+                               yLabel = yLabel,
+                               colourLabel = colourLabel,
                                chromatogramRegion = chromatogramRegion)
       }
     }
@@ -538,9 +538,9 @@ if (newStatus && msStatus) {
                                colour = colour,
                                title = title,
                                subtitle = i,
-                               labelX = labelX,
-                               labelY = labelY,
-                               colourLegend = colourLegend,
+                               xLabel = xLabel,
+                               yLabel = yLabel,
+                               colourLabel = colourLabel,
                                chromatogramRegion = chromatogramRegion)
       }
     }
@@ -571,9 +571,9 @@ if (newStatus && msStatus) {
                                colour = colour,
                                title = title,
                                subtitle = i,
-                               labelX = labelX,
-                               labelY = labelY,
-                               colourLegend = colourLegend,
+                               xLabel = xLabel,
+                               yLabel = yLabel,
+                               colourLabel = colourLabel,
                                chromatogramRegion = chromatogramRegion)
       }
     }
@@ -604,9 +604,9 @@ if (newStatus && msStatus) {
                                colour = colour,
                                title = title,
                                subtitle = i,
-                               labelX = labelX,
-                               labelY = labelY,
-                               colourLegend = colourLegend,
+                               xLabel = xLabel,
+                               yLabel = yLabel,
+                               colourLabel = colourLabel,
                                chromatogramRegion = chromatogramRegion)
       }
     }
@@ -637,9 +637,9 @@ if (newStatus && msStatus) {
                                colour = colour,
                                title = title,
                                subtitle = i,
-                               labelX = labelX,
-                               labelY = labelY,
-                               colourLegend = colourLegend,
+                               xLabel = xLabel,
+                               yLabel = yLabel,
+                               colourLabel = colourLabel,
                                chromatogramRegion = chromatogramRegion)
       }
     }
@@ -670,9 +670,9 @@ if (newStatus && msStatus) {
                                colour = colour,
                                title = title,
                                subtitle = i,
-                               labelX = labelX,
-                               labelY = labelY,
-                               colourLegend = colourLegend,
+                               xLabel = xLabel,
+                               yLabel = yLabel,
+                               colourLabel = colourLabel,
                                chromatogramRegion = chromatogramRegion)
       }
     }
@@ -681,7 +681,7 @@ if (newStatus && msStatus) {
   }
   
   # Clean environment
-  rm(x, y, title, labelX, labelY, pattern, i)
+  rm(x, y, title, xLabel, yLabel, pattern, i)
 }
 ```
 
@@ -696,7 +696,7 @@ if (newStatus && msStatus) {
                                                                                which(colnames(plotData) == spectrumCount)],
                                              spectrumCount = spectrumCount,
                                              chromatogramRegion = chromatogramRegion,
-                                             filterBy = retentionTime,
+                                             retentionTime = retentionTime,
                                              sumBy = totalIonCurrent)
   
   # Set column names of the spliced chromatogram regions
@@ -743,8 +743,8 @@ if (newStatus && msStatus) {
                   colour = colour,
                   shape = shape,
                   subtitle = "LTR Plasma",
-                  colourLegend = colourLegend,
-                  shapeLegend = shapeLegend,
+                  colourLabel = colourLabel,
+                  shapeLabel = shapeLabel,
                   screePlotToggle = screePlotToggle,
                   scoresPlotToggle = scoresPlotToggle,
                   loadingsPlotToggle = loadingsPlotToggle,
@@ -771,8 +771,8 @@ if (newStatus && msStatus) {
                   colour = colour,
                   shape = shape,
                   subtitle = "LTR Serum",
-                  colourLegend = colourLegend,
-                  shapeLegend = shapeLegend,
+                  colourLabel = colourLabel,
+                  shapeLabel = shapeLabel,
                   screePlotToggle = screePlotToggle,
                   scoresPlotToggle = scoresPlotToggle,
                   loadingsPlotToggle = loadingsPlotToggle,
@@ -799,8 +799,8 @@ if (newStatus && msStatus) {
                   colour = colour,
                   shape = shape,
                   subtitle = "LTR Urine",
-                  colourLegend = colourLegend,
-                  shapeLegend = shapeLegend,
+                  colourLabel = colourLabel,
+                  shapeLabel = shapeLabel,
                   screePlotToggle = screePlotToggle,
                   scoresPlotToggle = scoresPlotToggle,
                   loadingsPlotToggle = loadingsPlotToggle,
@@ -828,8 +828,8 @@ if (newStatus && msStatus) {
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
-                  colourLegend = colourLegend,
-                  shapeLegend = shapeLegend,
+                  colourLabel = colourLabel,
+                  shapeLabel = shapeLabel,
                   screePlotToggle = screePlotToggle,
                   scoresPlotToggle = scoresPlotToggle,
                   loadingsPlotToggle = loadingsPlotToggle,
@@ -856,8 +856,8 @@ if (newStatus && msStatus) {
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
-                  colourLegend = colourLegend,
-                  shapeLegend = shapeLegend,
+                  colourLabel = colourLabel,
+                  shapeLabel = shapeLabel,
                   screePlotToggle = screePlotToggle,
                   scoresPlotToggle = scoresPlotToggle,
                   loadingsPlotToggle = loadingsPlotToggle,
@@ -884,8 +884,8 @@ if (newStatus && msStatus) {
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
-                  colourLegend = colourLegend,
-                  shapeLegend = shapeLegend,
+                  colourLabel = colourLabel,
+                  shapeLabel = shapeLabel,
                   screePlotToggle = screePlotToggle,
                   scoresPlotToggle = scoresPlotToggle,
                   loadingsPlotToggle = loadingsPlotToggle,
@@ -913,8 +913,8 @@ if (newStatus && msStatus) {
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
-                  colourLegend = colourLegend,
-                  shapeLegend = shapeLegend,
+                  colourLabel = colourLabel,
+                  shapeLabel = shapeLabel,
                   screePlotToggle = screePlotToggle,
                   scoresPlotToggle = scoresPlotToggle,
                   loadingsPlotToggle = loadingsPlotToggle,
@@ -941,8 +941,8 @@ if (newStatus && msStatus) {
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
-                  colourLegend = colourLegend,
-                  shapeLegend = shapeLegend,
+                  colourLabel = colourLabel,
+                  shapeLabel = shapeLabel,
                   screePlotToggle = screePlotToggle,
                   scoresPlotToggle = scoresPlotToggle,
                   loadingsPlotToggle = loadingsPlotToggle,
@@ -969,8 +969,8 @@ if (newStatus && msStatus) {
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
-                  colourLegend = colourLegend,
-                  shapeLegend = shapeLegend,
+                  colourLabel = colourLabel,
+                  shapeLabel = shapeLabel,
                   screePlotToggle = screePlotToggle,
                   scoresPlotToggle = scoresPlotToggle,
                   loadingsPlotToggle = loadingsPlotToggle,
@@ -998,8 +998,8 @@ if (newStatus && msStatus) {
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
-                  colourLegend = colourLegend,
-                  shapeLegend = shapeLegend,
+                  colourLabel = colourLabel,
+                  shapeLabel = shapeLabel,
                   screePlotToggle = screePlotToggle,
                   scoresPlotToggle = scoresPlotToggle,
                   loadingsPlotToggle = loadingsPlotToggle,
@@ -1026,8 +1026,8 @@ if (newStatus && msStatus) {
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
-                  colourLegend = colourLegend,
-                  shapeLegend = shapeLegend,
+                  colourLabel = colourLabel,
+                  shapeLabel = shapeLabel,
                   screePlotToggle = screePlotToggle,
                   scoresPlotToggle = scoresPlotToggle,
                   loadingsPlotToggle = loadingsPlotToggle,
@@ -1054,8 +1054,8 @@ if (newStatus && msStatus) {
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
-                  colourLegend = colourLegend,
-                  shapeLegend = shapeLegend,
+                  colourLabel = colourLabel,
+                  shapeLabel = shapeLabel,
                   screePlotToggle = screePlotToggle,
                   scoresPlotToggle = scoresPlotToggle,
                   loadingsPlotToggle = loadingsPlotToggle,
@@ -1083,8 +1083,8 @@ if (newStatus && msStatus) {
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
-                  colourLegend = colourLegend,
-                  shapeLegend = shapeLegend,
+                  colourLabel = colourLabel,
+                  shapeLabel = shapeLabel,
                   screePlotToggle = screePlotToggle,
                   scoresPlotToggle = scoresPlotToggle,
                   loadingsPlotToggle = loadingsPlotToggle,
@@ -1111,8 +1111,8 @@ if (newStatus && msStatus) {
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
-                  colourLegend = colourLegend,
-                  shapeLegend = shapeLegend,
+                  colourLabel = colourLabel,
+                  shapeLabel = shapeLabel,
                   screePlotToggle = screePlotToggle,
                   scoresPlotToggle = scoresPlotToggle,
                   loadingsPlotToggle = loadingsPlotToggle,
@@ -1139,8 +1139,8 @@ if (newStatus && msStatus) {
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
-                  colourLegend = colourLegend,
-                  shapeLegend = shapeLegend,
+                  colourLabel = colourLabel,
+                  shapeLabel = shapeLabel,
                   screePlotToggle = screePlotToggle,
                   scoresPlotToggle = scoresPlotToggle,
                   loadingsPlotToggle = loadingsPlotToggle,
@@ -1167,8 +1167,8 @@ if (newStatus && msStatus) {
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
-                  colourLegend = colourLegend,
-                  shapeLegend = shapeLegend,
+                  colourLabel = colourLabel,
+                  shapeLabel = shapeLabel,
                   screePlotToggle = screePlotToggle,
                   scoresPlotToggle = scoresPlotToggle,
                   loadingsPlotToggle = loadingsPlotToggle,
@@ -1196,8 +1196,8 @@ if (newStatus && msStatus) {
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
-                  colourLegend = colourLegend,
-                  shapeLegend = shapeLegend,
+                  colourLabel = colourLabel,
+                  shapeLabel = shapeLabel,
                   screePlotToggle = screePlotToggle,
                   scoresPlotToggle = scoresPlotToggle,
                   loadingsPlotToggle = loadingsPlotToggle,
@@ -1224,8 +1224,8 @@ if (newStatus && msStatus) {
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
-                  colourLegend = colourLegend,
-                  shapeLegend = shapeLegend,
+                  colourLabel = colourLabel,
+                  shapeLabel = shapeLabel,
                   screePlotToggle = screePlotToggle,
                   scoresPlotToggle = scoresPlotToggle,
                   loadingsPlotToggle = loadingsPlotToggle,
@@ -1252,8 +1252,8 @@ if (newStatus && msStatus) {
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
-                  colourLegend = colourLegend,
-                  shapeLegend = shapeLegend,
+                  colourLabel = colourLabel,
+                  shapeLabel = shapeLabel,
                   screePlotToggle = screePlotToggle,
                   scoresPlotToggle = scoresPlotToggle,
                   loadingsPlotToggle = loadingsPlotToggle,
@@ -1280,8 +1280,8 @@ if (newStatus && msStatus) {
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
-                  colourLegend = colourLegend,
-                  shapeLegend = shapeLegend,
+                  colourLabel = colourLabel,
+                  shapeLabel = shapeLabel,
                   screePlotToggle = screePlotToggle,
                   scoresPlotToggle = scoresPlotToggle,
                   loadingsPlotToggle = loadingsPlotToggle,
@@ -1308,8 +1308,8 @@ if (newStatus && msStatus) {
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
-                  colourLegend = colourLegend,
-                  shapeLegend = shapeLegend,
+                  colourLabel = colourLabel,
+                  shapeLabel = shapeLabel,
                   screePlotToggle = screePlotToggle,
                   scoresPlotToggle = scoresPlotToggle,
                   loadingsPlotToggle = loadingsPlotToggle,
@@ -1336,8 +1336,8 @@ if (newStatus && msStatus) {
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
-                  colourLegend = colourLegend,
-                  shapeLegend = shapeLegend,
+                  colourLabel = colourLabel,
+                  shapeLabel = shapeLabel,
                   screePlotToggle = screePlotToggle,
                   scoresPlotToggle = scoresPlotToggle,
                   loadingsPlotToggle = loadingsPlotToggle,
@@ -1364,8 +1364,8 @@ if (newStatus && msStatus) {
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
-                  colourLegend = colourLegend,
-                  shapeLegend = shapeLegend,
+                  colourLabel = colourLabel,
+                  shapeLabel = shapeLabel,
                   screePlotToggle = screePlotToggle,
                   scoresPlotToggle = scoresPlotToggle,
                   loadingsPlotToggle = loadingsPlotToggle,
@@ -1392,8 +1392,8 @@ if (newStatus && msStatus) {
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
-                  colourLegend = colourLegend,
-                  shapeLegend = shapeLegend,
+                  colourLabel = colourLabel,
+                  shapeLabel = shapeLabel,
                   screePlotToggle = screePlotToggle,
                   scoresPlotToggle = scoresPlotToggle,
                   loadingsPlotToggle = loadingsPlotToggle,
@@ -1421,8 +1421,8 @@ if (newStatus && msStatus) {
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
-                  colourLegend = colourLegend,
-                  shapeLegend = shapeLegend,
+                  colourLabel = colourLabel,
+                  shapeLabel = shapeLabel,
                   screePlotToggle = screePlotToggle,
                   scoresPlotToggle = scoresPlotToggle,
                   loadingsPlotToggle = loadingsPlotToggle,
@@ -1449,8 +1449,8 @@ if (newStatus && msStatus) {
                   colour = colour,
                   shape = shape,
                   subtitle = pattern,
-                  colourLegend = colourLegend,
-                  shapeLegend = shapeLegend,
+                  colourLabel = colourLabel,
+                  shapeLabel = shapeLabel,
                   screePlotToggle = screePlotToggle,
                   scoresPlotToggle = scoresPlotToggle,
                   loadingsPlotToggle = loadingsPlotToggle,
@@ -1478,8 +1478,8 @@ if (newStatus && msStatus) {
                   colour = colour,
                   shape = shape,
                   subtitle = "Sample Plasma",
-                  colourLegend = colourLegend,
-                  shapeLegend = shapeLegend,
+                  colourLabel = colourLabel,
+                  shapeLabel = shapeLabel,
                   screePlotToggle = screePlotToggle,
                   scoresPlotToggle = scoresPlotToggle,
                   loadingsPlotToggle = loadingsPlotToggle,
@@ -1506,8 +1506,8 @@ if (newStatus && msStatus) {
                   colour = colour,
                   shape = shape,
                   subtitle = "Sample Serum",
-                  colourLegend = colourLegend,
-                  shapeLegend = shapeLegend,
+                  colourLabel = colourLabel,
+                  shapeLabel = shapeLabel,
                   screePlotToggle = screePlotToggle,
                   scoresPlotToggle = scoresPlotToggle,
                   loadingsPlotToggle = loadingsPlotToggle,
@@ -1534,8 +1534,8 @@ if (newStatus && msStatus) {
                   colour = colour,
                   shape = shape,
                   subtitle = "Sample Urine",
-                  colourLegend = colourLegend,
-                  shapeLegend = shapeLegend,
+                  colourLabel = colourLabel,
+                  shapeLabel = shapeLabel,
                   screePlotToggle = screePlotToggle,
                   scoresPlotToggle = scoresPlotToggle,
                   loadingsPlotToggle = loadingsPlotToggle,
@@ -1563,8 +1563,8 @@ if (newStatus && msStatus) {
                   colour = colour,
                   shape = shape,
                   subtitle = "dSample Plasma",
-                  colourLegend = colourLegend,
-                  shapeLegend = shapeLegend,
+                  colourLabel = colourLabel,
+                  shapeLabel = shapeLabel,
                   screePlotToggle = screePlotToggle,
                   scoresPlotToggle = scoresPlotToggle,
                   loadingsPlotToggle = loadingsPlotToggle,
@@ -1591,8 +1591,8 @@ if (newStatus && msStatus) {
                   colour = colour,
                   shape = shape,
                   subtitle = "dSample Serum",
-                  colourLegend = colourLegend,
-                  shapeLegend = shapeLegend,
+                  colourLabel = colourLabel,
+                  shapeLabel = shapeLabel,
                   screePlotToggle = screePlotToggle,
                   scoresPlotToggle = scoresPlotToggle,
                   loadingsPlotToggle = loadingsPlotToggle,
@@ -1619,8 +1619,8 @@ if (newStatus && msStatus) {
                   colour = colour,
                   shape = shape,
                   subtitle = "dSample Plasma",
-                  colourLegend = colourLegend,
-                  shapeLegend = shapeLegend,
+                  colourLabel = colourLabel,
+                  shapeLabel = shapeLabel,
                   screePlotToggle = screePlotToggle,
                   scoresPlotToggle = scoresPlotToggle,
                   loadingsPlotToggle = loadingsPlotToggle,
@@ -1642,8 +1642,8 @@ if (newStatus && msStatus) {
   # Set plot variables and labels
   x <- date
   y <- prewashRegion
-  labelX <- "Date"
-  labelY <- "Prewash Region (TIC)"
+  xLabel <- "Date"
+  yLabel <- "Prewash Region (TIC)"
   boundary <- "sd"
   xTickToggle <- FALSE
   
@@ -1680,10 +1680,10 @@ if (newStatus && msStatus) {
                                        colour = colour,
                                        shape = shape,
                                        subtitle = paste("LTR", i),
-                                       labelX = labelX,
-                                       labelY = labelY,
-                                       colourLegend = colourLegend,
-                                       shapeLegend = shapeLegend,
+                                       xLabel = xLabel,
+                                       yLabel = yLabel,
+                                       colourLabel = colourLabel,
+                                       shapeLabel = shapeLabel,
                                        boundary = boundary,
                                        xTickToggle = xTickToggle)
 
@@ -1721,10 +1721,10 @@ if (newStatus && msStatus) {
                                        colour = colour,
                                        shape = shape,
                                        subtitle = i,
-                                       labelX = labelX,
-                                       labelY = labelY,
-                                       colourLegend = colourLegend,
-                                       shapeLegend = shapeLegend,
+                                       xLabel = xLabel,
+                                       yLabel = yLabel,
+                                       colourLabel = colourLabel,
+                                       shapeLabel = shapeLabel,
                                        boundary = boundary,
                                        xTickToggle = xTickToggle)
         
@@ -1759,10 +1759,10 @@ if (newStatus && msStatus) {
                                        colour = colour,
                                        shape = shape,
                                        subtitle = i,
-                                       labelX = labelX,
-                                       labelY = labelY,
-                                       colourLegend = colourLegend,
-                                       shapeLegend = shapeLegend,
+                                       xLabel = xLabel,
+                                       yLabel = yLabel,
+                                       colourLabel = colourLabel,
+                                       shapeLabel = shapeLabel,
                                        boundary = boundary,
                                        xTickToggle = xTickToggle)
         
@@ -1797,10 +1797,10 @@ if (newStatus && msStatus) {
                                        colour = colour,
                                        shape = shape,
                                        subtitle = i,
-                                       labelX = labelX,
-                                       labelY = labelY,
-                                       colourLegend = colourLegend,
-                                       shapeLegend = shapeLegend,
+                                       xLabel = xLabel,
+                                       yLabel = yLabel,
+                                       colourLabel = colourLabel,
+                                       shapeLabel = shapeLabel,
                                        boundary = boundary,
                                        xTickToggle = xTickToggle)
         
@@ -1835,10 +1835,10 @@ if (newStatus && msStatus) {
                                        colour = colour,
                                        shape = shape,
                                        subtitle = i,
-                                       labelX = labelX,
-                                       labelY = labelY,
-                                       colourLegend = colourLegend,
-                                       shapeLegend = shapeLegend,
+                                       xLabel = xLabel,
+                                       yLabel = yLabel,
+                                       colourLabel = colourLabel,
+                                       shapeLabel = shapeLabel,
                                        boundary = boundary,
                                        xTickToggle = xTickToggle)
         
@@ -1873,10 +1873,10 @@ if (newStatus && msStatus) {
                                        colour = colour,
                                        shape = shape,
                                        subtitle = i,
-                                       labelX = labelX,
-                                       labelY = labelY,
-                                       colourLegend = colourLegend,
-                                       shapeLegend = shapeLegend,
+                                       xLabel = xLabel,
+                                       yLabel = yLabel,
+                                       colourLabel = colourLabel,
+                                       shapeLabel = shapeLabel,
                                        boundary = boundary,
                                        xTickToggle = xTickToggle)
         
@@ -1911,10 +1911,10 @@ if (newStatus && msStatus) {
                                        colour = colour,
                                        shape = shape,
                                        subtitle = i,
-                                       labelX = labelX,
-                                       labelY = labelY,
-                                       colourLegend = colourLegend,
-                                       shapeLegend = shapeLegend,
+                                       xLabel = xLabel,
+                                       yLabel = yLabel,
+                                       colourLabel = colourLabel,
+                                       shapeLabel = shapeLabel,
                                        boundary = boundary,
                                        xTickToggle = xTickToggle)
         
@@ -1964,10 +1964,10 @@ if (newStatus && msStatus) {
                                        colour = colour,
                                        shape = shape,
                                        subtitle = i,
-                                       labelX = labelX,
-                                       labelY = labelY,
-                                       colourLegend = colourLegend,
-                                       shapeLegend = shapeLegend,
+                                       xLabel = xLabel,
+                                       yLabel = yLabel,
+                                       colourLabel = colourLabel,
+                                       shapeLabel = shapeLabel,
                                        boundary = boundary,
                                        boundaryValue = boundaryValue,
                                        xTickToggle = xTickToggle) %>%
@@ -2023,10 +2023,10 @@ if (newStatus && msStatus) {
                                        colour = colour,
                                        shape = shape,
                                        subtitle = i,
-                                       labelX = labelX,
-                                       labelY = labelY,
-                                       colourLegend = colourLegend,
-                                       shapeLegend = shapeLegend,
+                                       xLabel = xLabel,
+                                       yLabel = yLabel,
+                                       colourLabel = colourLabel,
+                                       shapeLabel = shapeLabel,
                                        boundary = boundary,
                                        boundaryValue = boundaryValue,
                                        xTickToggle = xTickToggle) %>%
@@ -2045,7 +2045,7 @@ if (newStatus && msStatus) {
   }
   
   # Clean environment
-  rm(x, y, labelX, labelY, boundary, xTickToggle, pattern, i, result)
+  rm(x, y, xLabel, yLabel, boundary, xTickToggle, pattern, i, result)
   invisible(gc())
 }
 ```
@@ -2057,7 +2057,7 @@ Violin plot analysis focuses on the two distinct chromatogram regions that made 
 if (newStatus && msStatus) {
   # Set plot variables and labels
   x <- instrument
-  labelX <- "Instrument"
+  xLabel <- "Instrument"
   boundary <- "sd"
   violinPlotToggle <- TRUE
   boxPlotToggle <- TRUE
@@ -2076,7 +2076,7 @@ Violin plot analysis of the mass calibration region assesses the performance of 
 if (newStatus && msStatus) {
   # Set plot variables and labels
   y <- massCalRegion
-  labelY <- "Mass Calibration Region (TIC)"
+  yLabel <- "Mass Calibration Region (TIC)"
   
   # Data frame to store analysis result
   analysisResult_VP_massCalRegion <- data.frame()
@@ -2107,10 +2107,10 @@ if (newStatus && msStatus) {
                                    colour = colour,
                                    shape = shape,
                                    subtitle = paste("LTR", i),
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
-                                   shapeLegend = shapeLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
+                                   shapeLabel = shapeLabel,
                                    boundary = boundary,
                                    violinPlotToggle = violinPlotToggle,
                                    boxPlotToggle = boxPlotToggle,
@@ -2150,10 +2150,10 @@ if (newStatus && msStatus) {
                                    colour = colour,
                                    shape = shape,
                                    subtitle = i,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
-                                   shapeLegend = shapeLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
+                                   shapeLabel = shapeLabel,
                                    boundary = boundary,
                                    violinPlotToggle = violinPlotToggle,
                                    boxPlotToggle = boxPlotToggle,
@@ -2190,10 +2190,10 @@ if (newStatus && msStatus) {
                                    colour = colour,
                                    shape = shape,
                                    subtitle = i,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
-                                   shapeLegend = shapeLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
+                                   shapeLabel = shapeLabel,
                                    boundary = boundary,
                                    violinPlotToggle = violinPlotToggle,
                                    boxPlotToggle = boxPlotToggle,
@@ -2230,10 +2230,10 @@ if (newStatus && msStatus) {
                                    colour = colour,
                                    shape = shape,
                                    subtitle = i,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
-                                   shapeLegend = shapeLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
+                                   shapeLabel = shapeLabel,
                                    boundary = boundary,
                                    violinPlotToggle = violinPlotToggle,
                                    boxPlotToggle = boxPlotToggle,
@@ -2270,10 +2270,10 @@ if (newStatus && msStatus) {
                                    colour = colour,
                                    shape = shape,
                                    subtitle = i,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
-                                   shapeLegend = shapeLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
+                                   shapeLabel = shapeLabel,
                                    boundary = boundary,
                                    violinPlotToggle = violinPlotToggle,
                                    boxPlotToggle = boxPlotToggle,
@@ -2310,10 +2310,10 @@ if (newStatus && msStatus) {
                                    colour = colour,
                                    shape = shape,
                                    subtitle = i,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
-                                   shapeLegend = shapeLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
+                                   shapeLabel = shapeLabel,
                                    boundary = boundary,
                                    violinPlotToggle = violinPlotToggle,
                                    boxPlotToggle = boxPlotToggle,
@@ -2350,10 +2350,10 @@ if (newStatus && msStatus) {
                                    colour = colour,
                                    shape = shape,
                                    subtitle = i,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
-                                   shapeLegend = shapeLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
+                                   shapeLabel = shapeLabel,
                                    boundary = boundary,
                                    violinPlotToggle = violinPlotToggle,
                                    boxPlotToggle = boxPlotToggle,
@@ -2405,10 +2405,10 @@ if (newStatus && msStatus) {
                                    colour = colour,
                                    shape = shape,
                                    subtitle = i,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
-                                   shapeLegend = shapeLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
+                                   shapeLabel = shapeLabel,
                                    boundary = boundary,
                                    boundaryValue = boundaryValue,
                                    violinPlotToggle = violinPlotToggle,
@@ -2466,10 +2466,10 @@ if (newStatus && msStatus) {
                                    colour = colour,
                                    shape = shape,
                                    subtitle = i,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
-                                   shapeLegend = shapeLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
+                                   shapeLabel = shapeLabel,
                                    boundary = boundary,
                                    boundaryValue = boundaryValue,
                                    violinPlotToggle = violinPlotToggle,
@@ -2498,7 +2498,7 @@ Violin plot analysis of the mass calibration region assesses the combined perfor
 if (newStatus && msStatus) {
   # Set plot variables and labels
   y <- analyteRegion
-  labelY <- "Analyte Region (TIC)"
+  yLabel <- "Analyte Region (TIC)"
   
   # Data frame to store analysis result
   analysisResult_VP_analyteRegion <- data.frame()
@@ -2529,10 +2529,10 @@ if (newStatus && msStatus) {
                                    colour = colour,
                                    shape = shape,
                                    subtitle = paste("LTR", i),
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
-                                   shapeLegend = shapeLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
+                                   shapeLabel = shapeLabel,
                                    boundary = boundary,
                                    violinPlotToggle = violinPlotToggle,
                                    boxPlotToggle = boxPlotToggle,
@@ -2572,10 +2572,10 @@ if (newStatus && msStatus) {
                                    colour = colour,
                                    shape = shape,
                                    subtitle = i,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
-                                   shapeLegend = shapeLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
+                                   shapeLabel = shapeLabel,
                                    boundary = boundary,
                                    violinPlotToggle = violinPlotToggle,
                                    boxPlotToggle = boxPlotToggle,
@@ -2612,10 +2612,10 @@ if (newStatus && msStatus) {
                                    colour = colour,
                                    shape = shape,
                                    subtitle = i,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
-                                   shapeLegend = shapeLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
+                                   shapeLabel = shapeLabel,
                                    boundary = boundary,
                                    violinPlotToggle = violinPlotToggle,
                                    boxPlotToggle = boxPlotToggle,
@@ -2652,10 +2652,10 @@ if (newStatus && msStatus) {
                                    colour = colour,
                                    shape = shape,
                                    subtitle = i,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
-                                   shapeLegend = shapeLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
+                                   shapeLabel = shapeLabel,
                                    boundary = boundary,
                                    violinPlotToggle = violinPlotToggle,
                                    boxPlotToggle = boxPlotToggle,
@@ -2692,10 +2692,10 @@ if (newStatus && msStatus) {
                                    colour = colour,
                                    shape = shape,
                                    subtitle = i,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
-                                   shapeLegend = shapeLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
+                                   shapeLabel = shapeLabel,
                                    boundary = boundary,
                                    violinPlotToggle = violinPlotToggle,
                                    boxPlotToggle = boxPlotToggle,
@@ -2732,10 +2732,10 @@ if (newStatus && msStatus) {
                                    colour = colour,
                                    shape = shape,
                                    subtitle = i,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
-                                   shapeLegend = shapeLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
+                                   shapeLabel = shapeLabel,
                                    boundary = boundary,
                                    violinPlotToggle = violinPlotToggle,
                                    boxPlotToggle = boxPlotToggle,
@@ -2772,10 +2772,10 @@ if (newStatus && msStatus) {
                                    colour = colour,
                                    shape = shape,
                                    subtitle = i,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
-                                   shapeLegend = shapeLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
+                                   shapeLabel = shapeLabel,
                                    boundary = boundary,
                                    violinPlotToggle = violinPlotToggle,
                                    boxPlotToggle = boxPlotToggle,
@@ -2827,10 +2827,10 @@ if (newStatus && msStatus) {
                                    colour = colour,
                                    shape = shape,
                                    subtitle = i,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
-                                   shapeLegend = shapeLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
+                                   shapeLabel = shapeLabel,
                                    boundary = boundary,
                                    boundaryValue = boundaryValue,
                                    violinPlotToggle = violinPlotToggle,
@@ -2888,10 +2888,10 @@ if (newStatus && msStatus) {
                                    colour = colour,
                                    shape = shape,
                                    subtitle = i,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
-                                   shapeLegend = shapeLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
+                                   shapeLabel = shapeLabel,
                                    boundary = boundary,
                                    boundaryValue = boundaryValue,
                                    violinPlotToggle = violinPlotToggle,
@@ -2913,9 +2913,9 @@ if (newStatus && msStatus) {
   
   # Clean environment
   rm(shape,
-     shapeLegend,
+     shapeLabel,
      colour,
-     colourLegend,
+     colourLabel,
      plotData, 
      overallRegion, 
      prewashRegion, 
@@ -2923,13 +2923,13 @@ if (newStatus && msStatus) {
      analyteRegion, 
      washRegion,
      x,
-     labelX,
+     xLabel,
      boundary,
      violinPlotToggle,
      boxPlotToggle,
      boxWidth,
      y,
-     labelY,
+     yLabel,
      pattern,
      i,
      result)
@@ -3084,16 +3084,16 @@ if (newStatus) {
     x <- retentionTime
     y <- basePeakIntensity
     title <- "Base Peak Chromatogram"
-    labelX <- "RT"
-    labelY <- "BPI"
+    xLabel <- "RT"
+    yLabel <- "BPI"
     
       # Dynamically set colour grouping variable and label
       if (length(unique(plotData[[projectCohort]])) > 1) {
         colour <- projectCohort
-        colourLegend <- "Project"
+        colourLabel <- "Project"
       } else {
         colour <- plate
-        colourLegend <- "Plate"
+        colourLabel <- "Plate"
       }
   } else {
     msStatus <- FALSE
@@ -3128,9 +3128,9 @@ if (newStatus && msStatus) {
                                colour = colour,
                                title = title,
                                subtitle = paste("LTR", i),
-                               labelX = labelX,
-                               labelY = labelY,
-                               colourLegend = colourLegend,
+                               xLabel = xLabel,
+                               yLabel = yLabel,
+                               colourLabel = colourLabel,
                                chromatogramRegion = chromatogramRegion)
       }
       
@@ -3164,9 +3164,9 @@ if (newStatus && msStatus) {
                                colour = colour,
                                title = title,
                                subtitle = i,
-                               labelX = labelX,
-                               labelY = labelY,
-                               colourLegend = colourLegend,
+                               xLabel = xLabel,
+                               yLabel = yLabel,
+                               colourLabel = colourLabel,
                                chromatogramRegion = chromatogramRegion)
       }
     }
@@ -3197,9 +3197,9 @@ if (newStatus && msStatus) {
                                colour = colour,
                                title = title,
                                subtitle = i,
-                               labelX = labelX,
-                               labelY = labelY,
-                               colourLegend = colourLegend,
+                               xLabel = xLabel,
+                               yLabel = yLabel,
+                               colourLabel = colourLabel,
                                chromatogramRegion = chromatogramRegion)
       }
     }
@@ -3230,9 +3230,9 @@ if (newStatus && msStatus) {
                                colour = colour,
                                title = title,
                                subtitle = i,
-                               labelX = labelX,
-                               labelY = labelY,
-                               colourLegend = colourLegend,
+                               xLabel = xLabel,
+                               yLabel = yLabel,
+                               colourLabel = colourLabel,
                                chromatogramRegion = chromatogramRegion)
       }
     }
@@ -3263,9 +3263,9 @@ if (newStatus && msStatus) {
                                colour = colour,
                                title = title,
                                subtitle = i,
-                               labelX = labelX,
-                               labelY = labelY,
-                               colourLegend = colourLegend,
+                               xLabel = xLabel,
+                               yLabel = yLabel,
+                               colourLabel = colourLabel,
                                chromatogramRegion = chromatogramRegion)
       }
     }
@@ -3296,9 +3296,9 @@ if (newStatus && msStatus) {
                                colour = colour,
                                title = title,
                                subtitle = i,
-                               labelX = labelX,
-                               labelY = labelY,
-                               colourLegend = colourLegend,
+                               xLabel = xLabel,
+                               yLabel = yLabel,
+                               colourLabel = colourLabel,
                                chromatogramRegion = chromatogramRegion)
       }
     }
@@ -3329,9 +3329,9 @@ if (newStatus && msStatus) {
                                colour = colour,
                                title = title,
                                subtitle = i,
-                               labelX = labelX,
-                               labelY = labelY,
-                               colourLegend = colourLegend,
+                               xLabel = xLabel,
+                               yLabel = yLabel,
+                               colourLabel = colourLabel,
                                chromatogramRegion = chromatogramRegion)
       }
     }
@@ -3362,9 +3362,9 @@ if (newStatus && msStatus) {
                                colour = colour,
                                title = title,
                                subtitle = i,
-                               labelX = labelX,
-                               labelY = labelY,
-                               colourLegend = colourLegend,
+                               xLabel = xLabel,
+                               yLabel = yLabel,
+                               colourLabel = colourLabel,
                                chromatogramRegion = chromatogramRegion)
       }
     }
@@ -3395,9 +3395,9 @@ if (newStatus && msStatus) {
                                colour = colour,
                                title = title,
                                subtitle = i,
-                               labelX = labelX,
-                               labelY = labelY,
-                               colourLegend = colourLegend,
+                               xLabel = xLabel,
+                               yLabel = yLabel,
+                               colourLabel = colourLabel,
                                chromatogramRegion = chromatogramRegion)
       }
     }
@@ -3406,7 +3406,7 @@ if (newStatus && msStatus) {
   }
   
   # Clean environment
-  rm(plotData, x, y, title, labelX, labelY, colour, colourLegend, pattern, i)
+  rm(plotData, x, y, title, xLabel, yLabel, colour, colourLabel, pattern, i)
   invisible(gc())
 }
 
@@ -3446,8 +3446,8 @@ if (newStatus) {
   # Set plot variables and labels
   x <- retentionTime
   caption <- "m/z"
-  labelX <- "RT"
-  labelY <- "EIC"
+  xLabel <- "RT"
+  yLabel <- "EIC"
   nPlotCol <- 2
   nPlotRow <- 2
 }
@@ -3484,10 +3484,10 @@ if (newStatus) {
       # Dynamically set colour grouping variable and label
       if (length(unique(plotData[[projectCohort]])) > 1) {
         colour <- projectCohort
-        colourLegend <- "Project"
+        colourLabel <- "Project"
       } else {
         colour <- plate
-        colourLegend <- "Plate"
+        colourLabel <- "Plate"
       }
     
     # Extract and append intensity (EIC) of each target m/z stored in spectra into their own respective columns
@@ -3520,7 +3520,7 @@ if (newStatus && msStatus) {
                                                                         retentionTime,
                                                                         all_of(targetList)),
                                                         regionOfInterest = chromatogramRegion$massCal,
-                                                        filterBy = retentionTime)
+                                                        retentionTime = retentionTime)
     
     # Set plot variables and labels
     startIDX <- which(colnames(plotData_filtered) == targetList[1])
@@ -3550,9 +3550,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -3577,9 +3577,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -3604,9 +3604,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -3632,9 +3632,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -3659,9 +3659,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -3686,9 +3686,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -3714,9 +3714,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -3741,9 +3741,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -3768,9 +3768,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -3796,9 +3796,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -3823,9 +3823,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -3850,9 +3850,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -3878,9 +3878,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -3905,9 +3905,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -3932,9 +3932,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -3959,9 +3959,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -3987,9 +3987,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -4014,9 +4014,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -4041,9 +4041,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -4068,9 +4068,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -4095,9 +4095,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -4122,9 +4122,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -4149,9 +4149,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -4176,9 +4176,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -4204,9 +4204,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -4231,9 +4231,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -4259,9 +4259,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -4286,9 +4286,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -4313,9 +4313,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -4341,9 +4341,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -4368,9 +4368,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -4395,9 +4395,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -4430,7 +4430,7 @@ if (newStatus && msStatus) {
                                                                         retentionTime,
                                                                         all_of(targetList)),
                                                         regionOfInterest = chromatogramRegion$analyte,
-                                                        filterBy = retentionTime)
+                                                        retentionTime = retentionTime)
     
     # Set plot variables and labels
     startIDX <- which(colnames(plotData_filtered) == targetList[1])
@@ -4460,9 +4460,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -4487,9 +4487,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -4514,9 +4514,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -4542,9 +4542,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -4569,9 +4569,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -4596,9 +4596,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -4624,9 +4624,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -4651,9 +4651,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -4678,9 +4678,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -4706,9 +4706,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -4733,9 +4733,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -4760,9 +4760,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -4788,9 +4788,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -4815,9 +4815,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -4842,9 +4842,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -4869,9 +4869,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -4897,9 +4897,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -4924,9 +4924,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -4951,9 +4951,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -4978,9 +4978,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -5005,9 +5005,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -5032,9 +5032,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -5059,9 +5059,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -5086,9 +5086,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -5114,9 +5114,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -5141,9 +5141,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -5169,9 +5169,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -5196,9 +5196,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -5223,9 +5223,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -5251,9 +5251,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -5278,9 +5278,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -5305,9 +5305,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -5340,7 +5340,7 @@ if (newStatus && msStatus) {
                                                                         retentionTime,
                                                                         all_of(targetList)),
                                                         regionOfInterest = chromatogramRegion$analyte,
-                                                        filterBy = retentionTime)
+                                                        retentionTime = retentionTime)
     
     # Set plot variables and labels
     startIDX <- which(colnames(plotData_filtered) == targetList[1])
@@ -5370,9 +5370,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -5397,9 +5397,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -5424,9 +5424,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -5452,9 +5452,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -5479,9 +5479,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -5506,9 +5506,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -5534,9 +5534,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -5561,9 +5561,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -5588,9 +5588,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -5616,9 +5616,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -5643,9 +5643,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -5670,9 +5670,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -5698,9 +5698,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -5725,9 +5725,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -5752,9 +5752,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -5779,9 +5779,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -5807,9 +5807,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -5834,9 +5834,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -5861,9 +5861,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -5888,9 +5888,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -5915,9 +5915,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -5942,9 +5942,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -5969,9 +5969,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -5996,9 +5996,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -6024,9 +6024,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -6051,9 +6051,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -6079,9 +6079,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -6106,9 +6106,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -6133,9 +6133,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -6161,9 +6161,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -6188,9 +6188,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -6215,9 +6215,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -6232,7 +6232,7 @@ if (newStatus && msStatus && targetStatus) {
 # If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
   # Clean environment
-  rm(msStatus, plotData, colour, colourLegend, targetList, targetStatus)
+  rm(msStatus, plotData, colour, colourLabel, targetList, targetStatus)
 }
 ```
 
@@ -6267,10 +6267,10 @@ if (newStatus) {
       # Dynamically set colour grouping variable and label
       if (length(unique(plotData[[projectCohort]])) > 1) {
         colour <- projectCohort
-        colourLegend <- "Project"
+        colourLabel <- "Project"
       } else {
         colour <- plate
-        colourLegend <- "Plate"
+        colourLabel <- "Plate"
       }
     
     # Extract and append intensity (EIC) of each target m/z stored in spectra into their own respective columns
@@ -6303,7 +6303,7 @@ if (newStatus && msStatus) {
                                                                         retentionTime,
                                                                         all_of(targetList)),
                                                         regionOfInterest = chromatogramRegion$analyte,
-                                                        filterBy = retentionTime)
+                                                        retentionTime = retentionTime)
     
     # Set plot variables and labels
     startIDX <- which(colnames(plotData_filtered) == targetList[1])
@@ -6333,9 +6333,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -6360,9 +6360,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -6387,9 +6387,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -6415,9 +6415,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -6442,9 +6442,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -6469,9 +6469,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -6497,9 +6497,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -6524,9 +6524,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -6551,9 +6551,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -6579,9 +6579,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -6606,9 +6606,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -6633,9 +6633,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -6661,9 +6661,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -6688,9 +6688,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -6715,9 +6715,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -6742,9 +6742,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -6770,9 +6770,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -6797,9 +6797,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -6824,9 +6824,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -6851,9 +6851,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -6878,9 +6878,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -6905,9 +6905,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -6932,9 +6932,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -6959,9 +6959,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -6987,9 +6987,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -7014,9 +7014,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -7042,9 +7042,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -7069,9 +7069,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -7096,9 +7096,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -7124,9 +7124,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -7151,9 +7151,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -7178,9 +7178,9 @@ if (newStatus && msStatus && targetStatus) {
                                    startIDX = startIDX,
                                    colour = colour,
                                    caption = caption,
-                                   labelX = labelX,
-                                   labelY = labelY,
-                                   colourLegend = colourLegend,
+                                   xLabel = xLabel,
+                                   yLabel = yLabel,
+                                   colourLabel = colourLabel,
                                    nPlotCol = nPlotCol,
                                    nPlotRow = nPlotRow)
   } else {
@@ -7195,13 +7195,13 @@ if (newStatus && msStatus && targetStatus) {
 # If there are new samples to process and MS level 1 spectral data is available
 if (newStatus && msStatus) {
   # Clean environment
-  rm(msStatus, plotData, colour, colourLegend, targetList, targetStatus)
+  rm(msStatus, plotData, colour, colourLabel, targetList, targetStatus)
 }
 
 # If there are new samples to process
 if (newStatus) {
   # Clean environment
-  rm(commonColumn, x, caption, labelX, labelY, nPlotCol, nPlotRow)
+  rm(commonColumn, x, caption, xLabel, yLabel, nPlotCol, nPlotRow)
 }
 ```
 
@@ -7219,8 +7219,8 @@ if (newStatus) {
   
   # Set plot variables and labels
   caption <- "m/z"
-  labelX <- "Date"
-  labelY <- "TEIC"
+  xLabel <- "Date"
+  yLabel <- "TEIC"
   boundary <- "sd"
   xTickToggle <- FALSE
   nPlotCol <- 2
@@ -7261,10 +7261,10 @@ if (newStatus) {
       # Dynamically set colour grouping variable and label
       if (length(unique(plotData[[projectCohort]])) > 1) {
         colour <- projectCohort
-        colourLegend <- "Project"
+        colourLabel <- "Project"
       } else {
         colour <- plate
-        colourLegend <- "Plate"
+        colourLabel <- "Plate"
       }
     
     # Extract and append intensity (EIC) of each target m/z stored in spectra into their own respective columns
@@ -7297,7 +7297,7 @@ if (newStatus && msStatus) {
                                                                         retentionTime,
                                                                         all_of(targetList)),
                                                         regionOfInterest = chromatogramRegion$massCal,
-                                                        filterBy = retentionTime)
+                                                        retentionTime = retentionTime)
     
     plotData_filtered <- ticq::sumEIC(data = plotData_filtered,
                                       commonColumn = commonColumn,
@@ -7334,10 +7334,10 @@ if (newStatus && msStatus && targetStatus) {
                                            colour = colour,
                                            shape = shape,
                                            caption = caption,
-                                           labelX = labelX,
-                                           labelY = labelY,
-                                           colourLegend = colourLegend,
-                                           shapeLegend = shapeLegend,
+                                           xLabel = xLabel,
+                                           yLabel = yLabel,
+                                           colourLabel = colourLabel,
+                                           shapeLabel = shapeLabel,
                                            boundary = boundary,
                                            xTickToggle = xTickToggle,
                                            nPlotCol = nPlotCol,

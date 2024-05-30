@@ -7,7 +7,7 @@
 extractCohort(input)
 }
 \arguments{
-\item{input}{Input to extract cohort name: character}
+\item{input}{ANPC sample file name or path: character}
 }
 \value{
 Cohort name

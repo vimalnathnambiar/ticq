@@ -7,13 +7,14 @@
 #' @import dplyr
 #'
 #' @export
-#' @param input Input to extract instrument name: character
+#' @param input ANPC sample file name or path: character
 #' @returns Instrument name
 #'
 #' @examples
 #' instrument <- ticq::extractInstrument(input = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29.json")
 #' print(instrument)
 extractInstrument <- function(input) {
+  # Instrument name patterns
   instrument <- dplyr::case_when(
     grepl("PAI01|PAI-01", input) ~ "PAI01",
     grepl("PAI02|PAI-02", input) ~ "PAI02",

@@ -6,27 +6,26 @@
 #' @import ggpubr
 #'
 #' @export
-#' @param data Data frame that contains plot data: data frame
-#' @param x Name of the column that represents the continuous data series for the x-axis: character
-#' @param startIDX Index of the first data column that contains continuous data series for the y-axis: double
-#' @param endIDX Index of the last data column data that contains continuous data series for the y-axis (Default: NULL): NULL or double
-#' @param colour Name of the column used for colour grouping (Default: NULL): NULL or character
-#' @param caption Plot caption. This will append a caption value to the column name used for the y-axis (Default: Column name used for y-axis): NULL or character
-#' @param labelX x-axis label (Default: the name of the column used for the x-axis): NULL or character
-#' @param labelY y-axis label (Default: NULL): NULL or character
-#' @param colourLegend Legend label for colour grouping (Default: Value used for colour): NULL or character
-#' @param nPlotCol Number of plots in a single columns (Default: 1): double
-#' @param nPlotRow Number of plot in a single row (Default: 1): double
-#' @returns Print multiple chromatogram plot
+#' @param data A data frame containing plot data: data frame
+#' @param x Column name representing the continuous data series to be used for x-axis: character
+#' @param startIDX Index of the first data column containing continuous data series for the y-axis: double
+#' @param endIDX Index of the last data column data containing continuous data series for the y-axis (Default: NULL): NULL or double
+#' @param colour Column name representing data to be used for colour grouping (Default: NULL): NULL or character
+#' @param caption Plot caption. This will append a caption value to the column name used for the y-axis (Default: Column name used for y): NULL or character
+#' @param xLabel x-axis label (Default: Column name used for x): NULL or character
+#' @param yLabel y-axis label (Default: NULL): NULL or character
+#' @param colourLabel Colour grouping label (Default: Value used for colour): NULL or character
+#' @param nPlotCol Number of plots to be plotted in a single column (Default: 1): double
+#' @param nPlotRow Number of plot to be plotted in a single row (Default: 1): double
 plotMultipleChromatogram <- function(data,
                                      x,
                                      startIDX,
                                      endIDX = NULL,
                                      colour = NULL,
                                      caption = NULL,
-                                     labelX = x,
-                                     labelY = NULL,
-                                     colourLegend = colour,
+                                     xLabel = x,
+                                     yLabel = NULL,
+                                     colourLabel = colour,
                                      nPlotCol = 1,
                                      nPlotRow = 1) {
   tryCatch({
@@ -36,14 +35,14 @@ plotMultipleChromatogram <- function(data,
     nPlotData <- nPlotCol * nPlotRow
     
     
-      # If index of last column is NULL
+      # If index of last data column to plot is NULL
       if (is.null(endIDX)) {
         endIDX <- ncol(data)
       }
     
-    # Loop through y-axis data columns for plotting
+    # Loop through data columns for plotting y-axis
     for (i in startIDX:endIDX) {
-      # y-axis column name
+      # y-axis data column name
       y <- colnames(data)[i]
       
       # Plot chromatogram
@@ -56,22 +55,23 @@ plotMultipleChromatogram <- function(data,
                        legend.title = element_text(size = 6),
                        legend.text = element_text(size = 6)) + 
         ggplot2::labs(caption = if (is.null(caption)) y else paste(y, caption),
-                      x = labelX,
-                      y = labelY,
-                      colour = colourLegend)
+                      x = xLabel,
+                      y = yLabel,
+                      colour = colourLabel)
       
       # Add plot to plotList
       plotList[[y]] <- chromatogram
       
-      # Display plots
+      # Display plots in specified columns and rows
       if (length(plotList) %% nPlotData == 0 || i == endIDX) {
         plotGrid <- ggpubr::ggarrange(plotlist = plotList,
-                                      ncol = nPlotCol, nrow = nPlotRow,
+                                      ncol = nPlotCol, 
+                                      nrow = nPlotRow,
                                       common.legend = TRUE,
                                       legend = ifelse(isFirstPlot, "top", "none"))
         print(plotGrid)
         
-        # Reset list and change isFirstPlot status
+        # Reset
         plotList <- list()
         isFirstPlot <- FALSE
       }

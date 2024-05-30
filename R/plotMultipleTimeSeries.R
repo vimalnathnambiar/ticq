@@ -2,28 +2,36 @@
 #'
 #' Plot multiple time series data and perform boundary analysis (if specified).
 #'
+#' Boundary analysis that can be performed:
+#' - value: Evaluates data by +/- value from 0
+#' - percentage: Evaluates data +/- value from 100
+#' - sd: Evaluates data using 2 standard deviations from average mean of the data or using defined mean and standard deviation values
+#'
+#' To defined mean and standard deviation values to be used for "sd" boundary analysis, use
+#' list(mean = meanValue, sd = firstValueSD, sd2 = secondValueSD)
+#'
 #' @import ggplot2
 #' @import dplyr
 #'
 #' @export
-#' @param data Data frame that contains plot data: data frame
-#' @param commonColumn Column names that are common across all samples: character vector
-#' @param x Name of the column that represents the continuous data series for x-axis: character
-#' @param startIDX Index of the first data column that contains continuous data series for the y-axis: double
-#' @param endIDX Index of the last data column data that contains continuous data series for the y-axis (Default: NULL): NULL or double
-#' @param colour Name of the column used for colour grouping (Default: NULL): NULL or character
-#' @param shape Name of the column used for shape grouping (Default: NULL): NULL or character
+#' @param data A data frame containing plot data: data frame
+#' @param commonColumn Column names of data common for each unique sample: character vector
+#' @param x Column name representing the continuous data series to be used for x-axis: character
+#' @param startIDX Index of the first data column containing continuous data series for the y-axis: double
+#' @param endIDX Index of the last data column data containing continuous data series for the y-axis (Default: NULL): NULL or double
+#' @param colour Column name representing data to be used for colour grouping (Default: NULL): NULL or character
+#' @param shape Column name representing data to be used for shape grouping (Default: NULL): NULL or character
 #' @param caption Plot caption (Default: NULL): NULL or character
-#' @param labelX x-axis label (Default: Value used for x): NULL or character
-#' @param labelY y-axis label (Default: NULL): NULL or character
-#' @param colourLegend Legend label for colour grouping (Default: Value used for colour): NULL or character
-#' @param shapeLegend Legend label for shape grouping (Default: Value used for shape)
-#' @param boundary Boundary analysis to perform based on a +/- value from 0 (value) or 100 (percentage), or up to 2 standard deviation (sd) from average mean (Default: NULL, Options: "value", "percentage", "sd"): NULL or character
-#' @param boundaryValue Value used for boundary analysis. To specify values for "sd" boundary analysis, use list(mean = meanValue, sd = sdValue, sd2 = sd2Value) (Default: 0): double or list
-#' @param xTickToggle Toggle ticks on x-axis (Default: TRUE, Options: TRUE or FALSE): boolean
-#' @param nPlotCol Number of plots in a single columns (Default: 1): double
-#' @param nPlotRow Number of plot in a single row (Default: 1): double
-#' @returns Data frame containing the boundary analysis result (if specified)
+#' @param xLabel x-axis label (Default: Value used for x): NULL or character
+#' @param yLabel y-axis label (Default: NULL): NULL or character
+#' @param colourLabel Colour grouping label (Default: Value used for colour): NULL or character
+#' @param shapeLabel Shape grouping label (Default: Value used for shape)
+#' @param boundary Boundary analysis to perform (Default: NULL, Options: "value", "percentage", "sd"): NULL or character.
+#' @param boundaryValue Value used for boundary analysis. (Default: 0): double or list
+#' @param xTickToggle Toggle to display ticks on x-axis (Default: TRUE, Options: TRUE or FALSE): boolean
+#' @param nPlotCol Number of plots to be plotted in a single column (Default: 1): double
+#' @param nPlotRow Number of plots to be plotted in a single row (Default: 1): double
+#' @returns A data frame containing the result of the boundary analysis performed (if specified)
 plotMultipleTimeSeries <- function(data,
                                    commonColumn,
                                    x,
@@ -32,10 +40,10 @@ plotMultipleTimeSeries <- function(data,
                                    colour = NULL,
                                    shape = NULL,
                                    caption = NULL,
-                                   labelX = x,
-                                   labelY = NULL,
-                                   colourLegend = colour,
-                                   shapeLegend = shape,
+                                   xLabel = x,
+                                   yLabel = NULL,
+                                   colourLabel = colour,
+                                   shapeLabel = shape,
                                    boundary = NULL,
                                    boundaryValue = 0,
                                    xTickToggle = TRUE,
@@ -47,12 +55,12 @@ plotMultipleTimeSeries <- function(data,
     isFirstPlot <- TRUE
     nPlotData <- nPlotCol * nPlotRow
     
-      # If index of last column is NULL
+    # If index of last data column to plot is NULL
       if (is.null(endIDX)) {
         endIDX <- ncol(data)
       }
     
-      # Base data frame
+      # Base data frame for boundary analysis if specified
       if (!is.null(boundary)) {
         result <- data %>%
           dplyr::select(all_of(commonColumn))
@@ -60,9 +68,9 @@ plotMultipleTimeSeries <- function(data,
         result <- NULL
       }
       
-    # Loop through y-axis data columns for plotting
+    # Loop through data columns for plotting y-axis
     for (i in startIDX:endIDX) {
-      # y-axis column name
+      # y-axis data column name
       y <- colnames(data)[i]
       
       # Plot time series
@@ -76,12 +84,12 @@ plotMultipleTimeSeries <- function(data,
                        legend.title = element_text(size = 8),
                        legend.text = element_text(size = 8)) + 
         ggplot2::labs(caption = if (is.null(caption)) y else paste(y, caption),
-                      x = labelX,
-                      y = labelY,
-                      colour = colourLegend,
-                      shape = shapeLegend)
+                      x = xLabel,
+                      y = yLabel,
+                      colour = colourLabel,
+                      shape = shapeLabel)
       
-        # Remove xTick
+        # Display ticks on x-axis
         if (!xTickToggle) {
           timeSeries <- timeSeries +
             ggplot2::theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
@@ -89,7 +97,7 @@ plotMultipleTimeSeries <- function(data,
       
       # Add and perform boundary analysis
       if (!is.null(boundary)) {
-        # Check the type of boundary to draw (value, percentage or sd)
+        # Check boundary type
         if (boundary == "value") {
           # Add boundaries
           lowerBound <- 0 - boundaryValue
@@ -159,7 +167,7 @@ plotMultipleTimeSeries <- function(data,
           result <- dplyr::left_join(result, rbind(low, normal, high), by = commonColumn) %>%
             dplyr::rename(!!y := sampleRange)
         } else if (boundary == "sd") {
-          # Check if there are more than 1 data point or if boundaryValue (list containing mean and necessary standard deviation values) is provided
+          # Check if there are more than 1 data point or if boundary value is defined as a list
           if (nrow(data) > 1 || is.list(boundaryValue)) {
             # Get mean and standard deviation values
             if (is.list(boundaryValue)) {
@@ -228,9 +236,7 @@ plotMultipleTimeSeries <- function(data,
               dplyr::mutate(sampleRange = "Normal") %>%
               dplyr::select(all_of(commonColumn), sampleRange)
             
-            result <- dplyr::left_join(result,
-                                       normal,
-                                       by = commonColumn) %>%
+            result <- dplyr::left_join(result, normal, by = commonColumn) %>%
               dplyr::rename(!!y := sampleRange)
           }
         } else {
@@ -244,12 +250,13 @@ plotMultipleTimeSeries <- function(data,
       # Display plots
       if (length(plotList) %% nPlotData == 0 || i == endIDX) {
         plotGrid <- ggpubr::ggarrange(plotlist = plotList,
-                                      ncol = nPlotCol, nrow = nPlotRow,
+                                      ncol = nPlotCol, 
+                                      nrow = nPlotRow,
                                       common.legend = TRUE,
                                       legend = ifelse(isFirstPlot, "top", "none"))
         print(plotGrid)
         
-        # Reset list and change isFirstPlot status
+        # Reset
         plotList <- list()
         isFirstPlot <- FALSE
       }

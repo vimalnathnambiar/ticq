@@ -7,7 +7,7 @@
 extractMatrix(input)
 }
 \arguments{
-\item{input}{Input to extract matrix type: character}
+\item{input}{ANPC sample file name or path: character}
 }
 \value{
 Matrix type

@@ -7,14 +7,14 @@
 sumDataColumn(data, commonColumn, sumBy)
 }
 \arguments{
-\item{data}{Data frame that contains spectral information of samples: data frame}
+\item{data}{A data frame containing spectral data: data frame}
 
-\item{commonColumn}{Column names that are common across all samples: character vector}
+\item{commonColumn}{Column names of data common for each unique sample: character vector}
 
-\item{sumBy}{Name of the column that represents the data to be summed: character}
+\item{sumBy}{Column name of the data to be summed: character}
 }
 \value{
-Data frame grouped by common columns and the sum value of the column specified
+A data frame grouped by common columns and the sum value of the data column specified
 }
 \description{
 Sum values of a data column by grouping using its common columns.

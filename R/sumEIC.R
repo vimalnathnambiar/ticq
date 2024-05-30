@@ -1,44 +1,44 @@
 #' sumEIC
 #'
-#' Sum EIC values by grouping using its common columns.
+#' Sum EIC values of multiple data columns by grouping using its common columns.
 #'
 #' @import dplyr
 #'
 #' @export
-#' @param data Data frame that contains spectral information of samples: data frame
-#' @param commonColumn Column names that are common across all samples: character vector
-#' @param spectrumCount Name of the column that represents spectrum count: character
-#' @param startIDX Index of the first column to sum: double
-#' @param endIDX Index of the last column to sum: double
-#' @returns A data frame grouped by common columns and the summed EIC values for each column specified
+#' @param data A data frame containing spectral data: data frame
+#' @param commonColumn Column names of data common for each unique sample: character vector
+#' @param spectrumCount Spectrum count column name: character
+#' @param startIDX Index of the first data column to summed: double
+#' @param endIDX Index of the last data column to summed: double
+#' @returns A data frame grouped by common columns and the summed values of each column specified
 sumEIC <- function(data,
                    commonColumn,
                    spectrumCount,
                    startIDX,
                    endIDX = NULL) {
-  # Base data frame
-  result <- ticq::countSpectrum(data = data,
-                                commonColumn = commonColumn,
-                                spectrumCount = spectrumCount)
+  # Base data frame to append summed data to
+  sumData <- ticq::countSpectrum(data = data,
+                                 commonColumn = commonColumn,
+                                 spectrumCount = spectrumCount)
   
-  # If index of last column is NULL
+  # If index of last data column is NULL
   if (is.null(endIDX)) {
     endIDX <- ncol(data)
   }
   
-  # Loop through target m/z columns
+  # Loop through data columns
   for (i in startIDX:endIDX) {
     # Column name to be summed
     y <- colnames(data)[i]
     
-    # Group data by common columns, and sum the TEIC
+    # Group data by common columns, and sum values
     tmp <- data %>%
       dplyr::group_by(across(all_of(commonColumn))) %>%
       dplyr::summarise(!!spectrumCount := n(), !!y := sum(.data[[y]]), .groups = "keep")
     
     # Append summed data column to base data frame
-    result <- dplyr::left_join(result, tmp, by = commonColumn)
+    sumData <- dplyr::left_join(sumData, tmp, by = commonColumn)
   }
   
-  return(result)
+  return(sumData)
 }

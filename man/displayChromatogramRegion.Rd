@@ -7,21 +7,21 @@
 displayChromatogramRegion(plot, maxX, maxY, chromatogramRegion, label)
 }
 \arguments{
-\item{plot}{ggplot object that represents a chromatogram: ggplot}
+\item{plot}{A ggplot object representing a chromatogram: ggplot}
 
-\item{maxX}{Maximum value of the x-axis: double}
+\item{maxX}{x-axis maximum value: double}
 
-\item{maxY}{Maximum value of the y-axis: double}
+\item{maxY}{y-axis maximum value: double}
 
 \item{chromatogramRegion}{Chromatogram region to be displayed: list}
 
 \item{label}{Chromatogram region label: character}
 }
 \value{
-ggplot object with the added vertical lines displaying the chromatogram region start and end points
+A ggplot object with the added vertical lines displaying the chromatogram region start and end time points
 }
 \description{
-Add vertical lines to represent the different regions of the chromatogram.
+Add vertical lines to display the start and end time points of a chromatogram region.
 }
 \details{
 This function is not exported as it is only used by:

@@ -7,14 +7,14 @@
 extractEIC(data, intensityArray, targetList)
 }
 \arguments{
-\item{data}{Data frame that contains spectral information of samples: data frame}
+\item{data}{A data frame containing spectral data: data frame}
 
-\item{intensityArray}{Name of the column that represents intensity array: character}
+\item{intensityArray}{Intensity array column name: character}
 
-\item{targetList}{Unique target m/z value that reflect the intensity value in the array: character vector}
+\item{targetList}{A list of unique target m/z mirroring the values stored within the intensity array: character vector}
 }
 \value{
-Data frame with the extracted intensity of each target m/z (EIC) in its own individual column appended
+A data frame with appended columns representing the extracted intensity of each target m/z (EIC)
 }
 \description{
 Extract the intensity of each target m/z (Extracted Ion Current, EIC) stored within the spectra.

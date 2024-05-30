@@ -11,38 +11,35 @@ plotMultipleChromatogram(
   endIDX = NULL,
   colour = NULL,
   caption = NULL,
-  labelX = x,
-  labelY = NULL,
-  colourLegend = colour,
+  xLabel = x,
+  yLabel = NULL,
+  colourLabel = colour,
   nPlotCol = 1,
   nPlotRow = 1
 )
 }
 \arguments{
-\item{data}{Data frame that contains plot data: data frame}
+\item{data}{A data frame containing plot data: data frame}
 
-\item{x}{Name of the column that represents the continuous data series for the x-axis: character}
+\item{x}{Column name representing the continuous data series to be used for x-axis: character}
 
-\item{startIDX}{Index of the first data column that contains continuous data series for the y-axis: double}
+\item{startIDX}{Index of the first data column containing continuous data series for the y-axis: double}
 
-\item{endIDX}{Index of the last data column data that contains continuous data series for the y-axis (Default: NULL): NULL or double}
+\item{endIDX}{Index of the last data column data containing continuous data series for the y-axis (Default: NULL): NULL or double}
 
-\item{colour}{Name of the column used for colour grouping (Default: NULL): NULL or character}
+\item{colour}{Column name representing data to be used for colour grouping (Default: NULL): NULL or character}
 
-\item{caption}{Plot caption. This will append a caption value to the column name used for the y-axis (Default: Column name used for y-axis): NULL or character}
+\item{caption}{Plot caption. This will append a caption value to the column name used for the y-axis (Default: Column name used for y): NULL or character}
 
-\item{labelX}{x-axis label (Default: the name of the column used for the x-axis): NULL or character}
+\item{xLabel}{x-axis label (Default: Column name used for x): NULL or character}
 
-\item{labelY}{y-axis label (Default: NULL): NULL or character}
+\item{yLabel}{y-axis label (Default: NULL): NULL or character}
 
-\item{colourLegend}{Legend label for colour grouping (Default: Value used for colour): NULL or character}
+\item{colourLabel}{Colour grouping label (Default: Value used for colour): NULL or character}
 
-\item{nPlotCol}{Number of plots in a single columns (Default: 1): double}
+\item{nPlotCol}{Number of plots to be plotted in a single column (Default: 1): double}
 
-\item{nPlotRow}{Number of plot in a single row (Default: 1): double}
-}
-\value{
-Print multiple chromatogram plot
+\item{nPlotRow}{Number of plot to be plotted in a single row (Default: 1): double}
 }
 \description{
 Plot multiple chromatogram data in specified number of rows and columns based on the same x-axis but different y-axis.

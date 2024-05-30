@@ -3,20 +3,20 @@
 #' Splice chromatogram regions and sum values of a specific data column together.
 #'
 #' @export
-#' @param data Data frame that contains spectral information of samples: data frame
-#' @param commonColumn Column names that are common across all samples: character vector
-#' @param spectrumCount Name of the column that represents spectrum count: character
-#' @param chromatogramRegion List that represents the different chromatogram regions of interest (Default: NULL): NULL or list
-#' @param filterBy Name of the column that represents the retention time to be filtered: character
-#' @param sumBy Name of the column that represents the data to be summed for each chromatogram region: character
-#' @returns Data frame containing the sum values of the spliced chromatogram regions
+#' @param data A data frame containing spectral data: data frame
+#' @param commonColumn Column names of data common for each unique sample: character vector
+#' @param spectrumCount Spectrum count column name: character
+#' @param chromatogramRegion A list containing the start and end time points of the different chromatogram regions of interest (prewash, maass calibration, analyte and wash) (Default: NULL): NULL or list
+#' @param retentionTime Retention time column name: character
+#' @param sumBy Column name of the data to be summed: character
+#' @returns A data frame containing the summed values for each chromatogram regions of interest
 spliceChromatogramRegion <- function(data,
                                      commonColumn,
                                      spectrumCount,
                                      chromatogramRegion = NULL,
-                                     filterBy,
+                                     retentionTime,
                                      sumBy) {
-  # Data frame with common columns to append spliced chromatogram region data
+  # Base data frame to append spliced chromatogram region data
   splicedData <- ticq::countSpectrum(data = data,
                                      commonColumn = commonColumn,
                                      spectrumCount = spectrumCount)
@@ -32,7 +32,7 @@ spliceChromatogramRegion <- function(data,
     # Prewash region
     tmp <- ticq::filterChromatogramRegion(data = data,
                                           regionOfInterest = chromatogramRegion$prewash,
-                                          filterBy = filterBy)
+                                          retentionTime = retentionTime)
     tmp <- ticq::sumDataColumn(data = tmp,
                                commonColumn = commonColumn,
                                sumBy = sumBy)
@@ -41,7 +41,7 @@ spliceChromatogramRegion <- function(data,
     # Mass calibration region
     tmp <- ticq::filterChromatogramRegion(data = data,
                                           regionOfInterest = chromatogramRegion$massCal,
-                                          filterBy = filterBy)
+                                          retentionTime = retentionTime)
     tmp <- ticq::sumDataColumn(data = tmp,
                                commonColumn = commonColumn,
                                sumBy = sumBy)
@@ -50,7 +50,7 @@ spliceChromatogramRegion <- function(data,
     # Analyte region
     tmp <- ticq::filterChromatogramRegion(data = data,
                                           regionOfInterest = chromatogramRegion$analyte,
-                                          filterBy = filterBy)
+                                          retentionTime = retentionTime)
     tmp <- ticq::sumDataColumn(data = tmp,
                                commonColumn = commonColumn,
                                sumBy = sumBy)
@@ -59,7 +59,7 @@ spliceChromatogramRegion <- function(data,
     # Wash region
     tmp <- ticq::filterChromatogramRegion(data = data,
                                           regionOfInterest = chromatogramRegion$wash,
-                                          filterBy = filterBy)
+                                          retentionTime = retentionTime)
     tmp <- ticq::sumDataColumn(data = tmp,
                                commonColumn = commonColumn,
                                sumBy = sumBy)

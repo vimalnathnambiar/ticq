@@ -7,7 +7,7 @@
 extractMethod(input)
 }
 \arguments{
-\item{input}{Input to extract method name: character}
+\item{input}{ANPC sample file name or path: character}
 }
 \value{
 Method name

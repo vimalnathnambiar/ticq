@@ -1,8 +1,6 @@
 #' generateStat
 #'
-#' Generate statistical information based on data.
-#'
-#' Statistical information includes:
+#' Generate statistical information including: 
 #' - Sample size (n)
 #' - Minimum (min)
 #' - Mean (mean)
@@ -21,14 +19,14 @@
 #' - Confidence quantile range (CQ) - 95% and 99% (Lower and upper)
 #'
 #' @export
-#' @param data Continuous data series of numerical values without NA (At least 2 data points): numerical vector
-#' @returns Data frame containing all associated statistical information
+#' @param data A continuous data series of numerical values (Requires a minimum of 2 data points and must not contain NA values): numerical vector
+#' @returns A data frame containing all generated statistics
 #'
 #' @examples
 #' stat <- ticq::generateStat(data = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
 #' print(stat)
 generateStat <- function(data) {
-  # Sample size
+  # Sample size (n)
   n <- length(data)
   
   # Min, Mean, Max
@@ -41,7 +39,7 @@ generateStat <- function(data) {
   median <- quantile(data, 0.5)
   Q3 <- quantile(data, 0.75)
   
-  # Inter-quantile Ranges
+  # Inter-quantile Ranges (IQR)
   IQR <- Q3 - Q1
   
     # Inner Fences
@@ -52,7 +50,7 @@ generateStat <- function(data) {
     lowerOuterFence <- Q1 - (3 * IQR)
     upperOuterFence <- Q3 - (3 * IQR)
   
-  # Standard Deviations
+  # Standard Deviations (1st and 2nd)
   sd <- sd(data)
   sd2 <- sd(2 * data)
   
@@ -74,8 +72,7 @@ generateStat <- function(data) {
   
     # Check sample size and calculate margin error
     if (n < 30) {
-      # Calculate t-critical score (uses probability area and sample size -1)
-      # Multiply t-critical score with the standard error to obtain margin error
+      # Use t-critical score
         # 95%
         tCritical95 <- abs(qt(probArea95, (n - 1)))
         me95 <- tCritical95 * se

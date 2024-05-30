@@ -1,16 +1,21 @@
 #' anonymiseMetadata
 #'
-#' Anonymise sample metadata.
+#' Anonymise sample metadata including sample ID, project name, cohort name, method name, instrument name, and plate number.
 #'
 #' Only applicable to data acquired at the Australian National Phenome Centre (ANPC).
-#' Information anonymised includes sample ID, project name, cohort name, method name, instrument name, and plate number.
 #'
 #' @import dplyr
 #'
 #' @export
-#' @param data Data frame that contains spectral information of samples: data frame
-#' @param commonColumn Column names that are common across all samples: character vector
-#' @returns Data frame containing spectral information of anonymised samples
+#' @param data A data frame containing spectral data: data frame
+#' @param sampleID Sample ID column name: character
+#' @param project Project column name: character
+#' @param cohort Cohort column name: character
+#' @param projectCohort Combined project and cohort variable column name: character
+#' @param method Method column name: character
+#' @param instrument Instrument column name: character
+#' @param plate Plate number column name: character
+#' @returns A data frame with anonymised sample metadata containing spectral data
 #'
 #' @examples
 #' data <- data.frame(sampleID = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29",
@@ -36,9 +41,9 @@ anonymiseMetadata <- function(data,
                               projectCohort,
                               method,
                               instrument,
-                              plate)
-{
-  anonymisedData <- data %>%
+                              plate) {
+  # Anonymise (and replace NA) values of sample metadata
+  anonymisedData <- data %>% 
     dplyr::mutate(
       !!sampleID := paste0("sample", match(.data[[sampleID]], unique(.data[[sampleID]]))),
       !!project := case_when(
