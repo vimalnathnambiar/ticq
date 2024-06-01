@@ -17,7 +17,7 @@ sumEIC <- function(data,
                    startIDX,
                    endIDX = NULL) {
   # Base data frame to append summed data to
-  sumData <- ticq::countSpectrum(data = data,
+  summarisedData <- ticq::countSpectrum(data = data,
                                  commonColumn = commonColumn,
                                  spectrumCount = spectrumCount)
   
@@ -37,8 +37,8 @@ sumEIC <- function(data,
       dplyr::summarise(!!spectrumCount := n(), !!y := sum(.data[[y]]), .groups = "keep")
     
     # Append summed data column to base data frame
-    sumData <- dplyr::left_join(sumData, tmp, by = commonColumn)
+    summarisedData <- dplyr::left_join(summarisedData, tmp, by = commonColumn)
   }
   
-  return(sumData)
+  return(summarisedData)
 }

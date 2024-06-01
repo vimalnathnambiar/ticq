@@ -1,4 +1,4 @@
-#' anonymiseMetadata
+#' Anonymise Metadata
 #'
 #' Anonymise sample metadata including sample ID, project name, cohort name, method name, instrument name, and plate number.
 #'
@@ -42,7 +42,7 @@ anonymiseMetadata <- function(data,
                               method,
                               instrument,
                               plate) {
-  # Anonymise (and replace NA) values of sample metadata
+  # Anonymise (and replace NA) metadata values
   anonymisedData <- data %>% 
     dplyr::mutate(
       !!sampleID := paste0("sample", match(.data[[sampleID]], unique(.data[[sampleID]]))),

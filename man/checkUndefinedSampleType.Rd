@@ -2,7 +2,7 @@
 % Please edit documentation in R/checkUndefinedSampleType.R
 \name{checkUndefinedSampleType}
 \alias{checkUndefinedSampleType}
-\title{checkUndefinedSampleType}
+\title{Check Undefined Sample Type}
 \usage{
 checkUndefinedSampleType(data, commonColumn, sampleType, spectrumCount)
 }

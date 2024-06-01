@@ -2,7 +2,7 @@
 % Please edit documentation in R/extractCohort.R
 \name{extractCohort}
 \alias{extractCohort}
-\title{extractCohort}
+\title{Extract Cohort}
 \usage{
 extractCohort(input)
 }

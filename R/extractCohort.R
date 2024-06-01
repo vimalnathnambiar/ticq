@@ -1,4 +1,4 @@
-#' extractCohort
+#' Extract Cohort
 #'
 #' Extract cohort name.
 #'

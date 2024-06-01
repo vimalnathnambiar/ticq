@@ -1,10 +1,10 @@
-#' extractTargetMZ
+#' Extract Target m/z
 #'
 #' Extract target m/z data from a target file (published to web URL or local TSV document) or an in-house method library used at the Australian National Phenome Centre (ANPC).
 #' 
-#' Specify either a target file OR an in-house method library. If both is specified, only target file is checked for.
+#' Define either a target file OR an in-house method library. If both is defined, only target file is checked for.
 #' 
-#' If using a target file, please ensure it follows a specified layout.
+#' When defining a target file, please ensure it follows a specified layout.
 #'
 #' @import httr
 #' @import readr
@@ -13,16 +13,16 @@
 #' @param targetFile Published to web or local TSV document containing target m/z data (Default: NULL, Options: Published to web URL or local file path): NULL or character
 #' @param anpcMethodLibrary ANPC in-house method library (Default: NULL, Options: "MS-AA-POS", "MS-HIL-POS", "MS-HIL-NEG", "MS-RP-POS" or "MS-RP-NEG"): NULL or character
 #' @param roundDecimal Number of decimal places for precision value rounding (Default: NULL): NULL or double
-#' @returns A data frame containing the target m/z data
+#' @returns A data frame containing target m/z data
 #'
 #' @examples
-#' # Example 1: Specifying a target file with no rounding of precision values
+#' # Example 1: Defining a target file with no rounding of precision values
 #' targetMZ <- ticq::extractTargetMZ(targetFile = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSeo31hlruA3QuwoESz5IDJ9Nu6ndSAgLTRn3uc45rOPO4BlksfHzh9xtNB22Oes9JOxhEbI4NK-zxl/pub?gid=0&single=true&output=tsv",
 #'                                   anpcMethodLibrary = NULL,
 #'                                   roundDecimal = NULL)
 #' print(targetMZ)
 #'
-#' # Example 2: Specifying an in-house method library with rounding of precision values to 4 decimal places
+#' # Example 2: Defining an in-house method library with rounding of precision values to 4 decimal places
 #' targetMZ <- ticq::extractTargetMZ(targetFile = NULL,
 #'                                   anpcMethodLibrary = "MS-AA-POS",
 #'                                   roundDecimal = 4)
@@ -33,7 +33,7 @@ extractTargetMZ <- function(targetFile = NULL,
   # Defaults
   targetMZ <- NULL
   
-  # Check if either target file or ANPC in-house method library is specified
+  # Check if either a target file or an ANPC in-house method library is defined
   if (!is.null(targetFile)) {
     # Check for published to web URL or local file path
     if (grepl("^(?:http|https)://[^ \"]+&output=tsv$", targetFile, ignore.case = TRUE)) {
@@ -62,7 +62,7 @@ extractTargetMZ <- function(targetFile = NULL,
                     "MS-RP-POS" = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSeo31hlruA3QuwoESz5IDJ9Nu6ndSAgLTRn3uc45rOPO4BlksfHzh9xtNB22Oes9JOxhEbI4NK-zxl/pub?gid=1641228752&single=true&output=tsv",
                     "MS-RP-NEG" = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSeo31hlruA3QuwoESz5IDJ9Nu6ndSAgLTRn3uc45rOPO4BlksfHzh9xtNB22Oes9JOxhEbI4NK-zxl/pub?gid=311622861&single=true&output=tsv")
     
-    # Check if ANPC in-house method library is specified
+    # Check if a valid ANPC in-house method library is defined
     if (anpcMethodLibrary %in% names(urlList)) {
       # Perform HTTP request
       response <- tryCatch(httr::GET(urlList[[anpcMethodLibrary]]),
@@ -79,7 +79,7 @@ extractTargetMZ <- function(targetFile = NULL,
     }
   }
   
-  # Check target m/z data for required header columns
+  # Check target m/z data for required headers
   if (!is.null(targetMZ) &&
       !all(c("analyteName",
              "analyteType",
@@ -91,10 +91,13 @@ extractTargetMZ <- function(targetFile = NULL,
     targetMZ <- NULL
   }
   
-  # Round target m/z data precision values if specified
+  # Round precision values in target m/z data if defined
   if (!is.null(targetMZ) && !is.null(roundDecimal)) {
     # m/z value
     targetMZ$mzValue <- round(targetMZ$mzValue, digits = roundDecimal)
+    
+    # Retention time
+    targetMZ$retentionTime <- round(targetMZ$retentionTime, digits = roundDecimal)
   }
   
   return(targetMZ)

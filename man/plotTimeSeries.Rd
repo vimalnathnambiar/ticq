@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotTimeSeries.R
 \name{plotTimeSeries}
 \alias{plotTimeSeries}
-\title{plotTimeSeries}
+\title{Plot Time Series}
 \usage{
 plotTimeSeries(
   data,
@@ -54,10 +54,10 @@ plotTimeSeries(
 \item{xTickToggle}{Toggle to display ticks on x-axis (Default: TRUE, Options: TRUE or FALSE): boolean}
 }
 \value{
-A data frame containing the result of the boundary analysis performed (if specified)
+A data frame containing the result of the boundary analysis performed
 }
 \description{
-Plot time series data and perform boundary analysis (if specified).
+Plot time series data (and perform boundary analysis if defined).
 }
 \details{
 Boundary analysis that can be performed:
@@ -67,6 +67,5 @@ Boundary analysis that can be performed:
 \item sd: Evaluates data using 2 standard deviations from average mean of the data or using defined mean and standard deviation values
 }
 
-To defined mean and standard deviation values to be used for "sd" boundary analysis, use
-list(mean = meanValue, sd = firstValueSD, sd2 = secondValueSD)
+To define mean and standard deviation values to be used for "sd" boundary analysis, use list(mean = meanValue, sd = firstValueSD, sd2 = secondValueSD)
 }

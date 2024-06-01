@@ -1,4 +1,4 @@
-#' extractPlate
+#' Extract Plate
 #'
 #' Extract plate number.
 #'
@@ -31,7 +31,7 @@ extractPlate <- function(input) {
       # Remove leading zeros
       plate <- stringr::str_replace(plate, "0+", "")
       
-      # If plate number string is empty after removing the character pattern and leading 0s
+      # If plate number string is empty after removing non-numeric characters and leading 0s
       if (plate == "") {
         plate <- "0"
       }

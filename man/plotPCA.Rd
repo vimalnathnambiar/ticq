@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotPCA.R
 \name{plotPCA}
 \alias{plotPCA}
-\title{plotPCA}
+\title{Plot PCA}
 \usage{
 plotPCA(
   data,
@@ -54,5 +54,5 @@ plotPCA(
 \item{biPlotToggle}{Toggle to display biplot (Default: TRUE, Options: TRUE or FALSE): boolean}
 }
 \description{
-Perform Principle Component Analysis (PCA) and plot all associated plots (scree plot, scores plot, loadings plot and biplot).
+Perform Principle Component Analysis (PCA) and display associated plots (scree plot, scores plot, loadings plot and biplot).
 }

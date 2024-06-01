@@ -1,4 +1,4 @@
-#' configureChromatogramRegion
+#' Configure Chromatogram Region
 #'
 #' Configure the start and end time points of the different chromatogram regions of interest: prewash, mass calibration, analyte and wash. 
 #'

@@ -1,4 +1,4 @@
-#' checkUndefinedSampleType
+#' Check Undefined Sample Type
 #'
 #' Check and filter for samples that have an undefined sample type.
 #'

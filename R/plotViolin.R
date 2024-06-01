@@ -1,14 +1,13 @@
-#' plotViolin
+#' Plot Violin
 #'
-#' Plot violin plots and perform boundary analysis (if specified).
+#' Plot violin plot (and perform boundary analysis if defined).
 #'
 #' Boundary analysis that can be performed:
 #' - value: Evaluates data by +/- value from 0
 #' - percentage: Evaluates data +/- value from 100
 #' - sd: Evaluates data using 2 standard deviations from average mean of the data or using defined mean and standard deviation values
 #'
-#' To defined mean and standard deviation values to be used for "sd" boundary analysis, use
-#' list(mean = meanValue, sd = firstValueSD, sd2 = secondValueSD)
+#' To define mean and standard deviation values to be used for "sd" boundary analysis, use list(mean = meanValue, sd = firstValueSD, sd2 = secondValueSD)
 #'
 #' @import ggplot2
 #' @import dplyr
@@ -33,8 +32,8 @@
 #' @param tailTrimToggle Toggle to trim the tails of the violin plot. Applicable only if violinPlotToggle is set to TRUE (Default: FALSE, Options: TRUE or FALSE): boolean
 #' @param boxPlotToggle Toggle to display box plot (Default: TRUE, Options: TRUE or FALSE): boolean
 #' @param boxWidth Box plot width. Applicable only if boxPlotToggle is set to TRUE (Default: 1): double
-#' @returns A data frame containing the result of the boundary analysis performed (if specified)
-plotViolin <- function(data,
+#' @returns A data frame containing the result of the boundary analysis performed
+plotViolin <- function(data, 
                        x,
                        y,
                        colour = NULL,
@@ -57,22 +56,21 @@ plotViolin <- function(data,
     # Plot violin plot
     violinPlot <- ggplot2::ggplot(data = data, aes(x = .data[[x]], y = .data[[y]]))
     
-      # Display box plot or violin plot or both
-        # Violin plot
-        if (violinPlotToggle) {
-          violinPlot <- violinPlot +
-            ggplot2::geom_violin(trim = tailTrimToggle)
-        }
-      
-        # Box plot
-        if (boxPlotToggle) {
-          violinPlot <- violinPlot +
-            ggplot2::geom_boxplot(outlier.color = "red",
-                                  outlier.shape = outlierShape,
-                                  width = boxWidth)
-        }
+      # Display violin plot
+      if (violinPlotToggle) {
+        violinPlot <- violinPlot +
+          ggplot2::geom_violin(trim = tailTrimToggle)
+      }
     
-      # Add colour and shape grouping, theme and labels
+      # Display box plot
+      if (boxPlotToggle) {
+        violinPlot <- violinPlot +
+          ggplot2::geom_boxplot(outlier.color = "red",
+                                outlier.shape = outlierShape,
+                                width = boxWidth)
+      }
+    
+      # Colour and shape grouping, theme and labels
       violinPlot <- violinPlot +
         ggplot2::geom_jitter(aes(colour = if (!is.null(colour)) .data[[colour]] else NULL,
                                  shape = if (!is.null(shape)) .data[[shape]] else NULL,
@@ -91,25 +89,26 @@ plotViolin <- function(data,
                       colour = colourLabel,
                       shape = shapeLabel)
     
-    # Add and perform boundary analysis
+    # Perform boundary analysis if defined
     result <- NULL
     if (!is.null(boundary)) {
       # Check boundary type
       if (boundary == "value") {
-        # Add boundaries
+        # Determine boundaries
         lowerBound <- 0 - boundaryValue
         upperBound <- 0 + boundaryValue
         
+        # Display boundaries
         violinPlot <- violinPlot +
           ggplot2::geom_hline(yintercept = 0,
                               linetype = "dashed",
                               colour = "grey") +
           ggplot2::geom_hline(yintercept = lowerBound,
                               linetype = "dashed",
-                              colour = "darkred") +
+                              colour = "red") +
           ggplot2::geom_hline(yintercept = upperBound,
                               linetype = "dashed",
-                              colour = "darkred")
+                              colour = "red")
         
         # Analysis result
         low <- data %>%
@@ -126,20 +125,21 @@ plotViolin <- function(data,
         
         result <- rbind(low, normal, high)
       } else if (boundary == "percentage") {
-        # Add boundaries
+        # Determine boundaries
         lowerBound <- 100 - boundaryValue
         upperBound <- 100 + boundaryValue
         
+        # Display boundaries
         violinPlot <- violinPlot +
           ggplot2::geom_hline(yintercept = 100,
                               linetype = "dashed",
                               colour = "grey") +
           ggplot2::geom_hline(yintercept = lowerBound,
                               linetype = "dashed",
-                              colour = "darkred") +
+                              colour = "red") +
           ggplot2::geom_hline(yintercept = upperBound,
                               linetype = "dashed",
-                              colour = "darkred")
+                              colour = "red")
         
         # Analysis result
         low <- data %>%
@@ -156,9 +156,9 @@ plotViolin <- function(data,
         
         result <- rbind(low, normal, high)
       } else if (boundary == "sd") {
-        # Check if there are more than 1 data point or if boundary value is defined as a list
+        # Check if there are more than 1 data point or if boundary value list is defined
         if (nrow(data) > 1 || is.list(boundaryValue)) {
-          # Get mean and standard deviation values
+          # Determine boundaries
           if (is.list(boundaryValue)) {
             mean <- boundaryValue$mean
             sd <- boundaryValue$sd
@@ -169,28 +169,28 @@ plotViolin <- function(data,
             sd2 <- sd(2 * data[[y]])
           }
           
-          # Add boundaries
           lowerBound1 <- mean - sd
           upperBound1 <- mean + sd
           lowerBound2 <- mean - sd2
           upperBound2 <- mean + sd2
           
+          # Display boundaries
           violinPlot <- violinPlot +
             ggplot2::geom_hline(yintercept = mean,
                                 linetype = "dashed",
                                 colour = "grey") +
             ggplot2::geom_hline(yintercept = lowerBound1,
                                 linetype = "dashed",
-                                colour = "darkblue") +
+                                colour = "blue") +
             ggplot2::geom_hline(yintercept = upperBound1,
                                 linetype = "dashed",
-                                colour = "darkblue") +
+                                colour = "blue") +
             ggplot2::geom_hline(yintercept = lowerBound2,
                                 linetype = "dashed",
-                                colour = "darkred") +
+                                colour = "red") +
             ggplot2::geom_hline(yintercept = upperBound2,
                                 linetype = "dashed",
-                                colour = "darkred")
+                                colour = "red")
           
           # Analysis result
           veryLow <- data %>%
@@ -225,11 +225,11 @@ plotViolin <- function(data,
     return(result)
   }, 
   warning = function(w) {
-    print(paste0("Unable to perform Violin Plot Analysis - ", w))
+    print(paste0("Unable to display Violin Plot Analysis - ", w))
     return(NULL)
   },
   error = function(e) {
-    print(paste0("Unable to perform Violin Plot Analysis - ", e))
+    print(paste0("Unable to display Violin Plot Analysis - ", e))
     return(NULL)
   })
 }

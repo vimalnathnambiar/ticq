@@ -1,4 +1,4 @@
-#' extractInstrument
+#' Extract Instrument
 #'
 #' Extract instrument name.
 #'

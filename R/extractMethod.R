@@ -1,4 +1,4 @@
-#' extractMethod
+#' Extract Method
 #'
 #' Extract method name.
 #'

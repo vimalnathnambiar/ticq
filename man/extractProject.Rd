@@ -2,7 +2,7 @@
 % Please edit documentation in R/extractProject.R
 \name{extractProject}
 \alias{extractProject}
-\title{extractProject}
+\title{Extract Project}
 \usage{
 extractProject(input)
 }

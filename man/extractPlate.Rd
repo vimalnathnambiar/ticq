@@ -2,7 +2,7 @@
 % Please edit documentation in R/extractPlate.R
 \name{extractPlate}
 \alias{extractPlate}
-\title{extractPlate}
+\title{Extract Plate}
 \usage{
 extractPlate(input)
 }

@@ -1,4 +1,4 @@
-#' extractMatrix
+#' Extract Matrix
 #'
 #' Extract matrix type.
 #'

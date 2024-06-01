@@ -2,7 +2,7 @@
 % Please edit documentation in R/extractInstrument.R
 \name{extractInstrument}
 \alias{extractInstrument}
-\title{extractInstrument}
+\title{Extract Instrument}
 \usage{
 extractInstrument(input)
 }

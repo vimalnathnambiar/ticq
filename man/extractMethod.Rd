@@ -2,7 +2,7 @@
 % Please edit documentation in R/extractMethod.R
 \name{extractMethod}
 \alias{extractMethod}
-\title{extractMethod}
+\title{Extract Method}
 \usage{
 extractMethod(input)
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/filterChromatogramRegion.R
 \name{filterChromatogramRegion}
 \alias{filterChromatogramRegion}
-\title{filterChromatogramRegion}
+\title{Filter Chromatogram Region}
 \usage{
 filterChromatogramRegion(data, regionOfInterest = NULL, retentionTime)
 }
@@ -17,5 +17,5 @@ filterChromatogramRegion(data, regionOfInterest = NULL, retentionTime)
 A data frame containing spectral data that falls within the retention time of the chromatogram region of interest
 }
 \description{
-Filter for retention time of a chromatogram region of interest.
+Filter data for specific chromatogram region of interest.
 }

@@ -1,4 +1,4 @@
-#' extractSampleType
+#' Extract Sample Type
 #'
 #' Extract sample type.
 #'

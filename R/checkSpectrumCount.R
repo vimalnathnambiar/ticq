@@ -1,6 +1,6 @@
-#' checkSpectrumCount
+#' Check Spectrum Count
 #'
-#' Check and filter samples against a specified threshold limit from the average mean of spectral data (spectrum count) present.
+#' Check and filter samples against a defined threshold limit from the average mean of spectral data (spectrum count) present.
 #'
 #' @import dplyr
 #'
@@ -16,7 +16,7 @@ checkSpectrumCount <- function(data,
                                sampleID,
                                spectrumCount,
                                threshold = 20) {
-  # Summarise data and obtain total number of spectrum of each sample
+  # Count total number of spectrum of each sample
   summarisedData <- ticq::countSpectrum(data = data,
                                         commonColumn = commonColumn,
                                         spectrumCount = spectrumCount)

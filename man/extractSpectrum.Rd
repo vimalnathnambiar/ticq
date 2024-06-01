@@ -2,7 +2,7 @@
 % Please edit documentation in R/extractSpectrum.R
 \name{extractSpectrum}
 \alias{extractSpectrum}
-\title{extractSpectrum}
+\title{Extract Spectrum}
 \usage{
 extractSpectrum(input, inputFiles)
 }

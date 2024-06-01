@@ -1,14 +1,13 @@
-#' plotTimeSeries
+#' Plot Time Series
 #'
-#' Plot time series data and perform boundary analysis (if specified).
+#' Plot time series data (and perform boundary analysis if defined).
 #'
 #' Boundary analysis that can be performed:
 #' - value: Evaluates data by +/- value from 0
 #' - percentage: Evaluates data +/- value from 100
 #' - sd: Evaluates data using 2 standard deviations from average mean of the data or using defined mean and standard deviation values
 #'
-#' To defined mean and standard deviation values to be used for "sd" boundary analysis, use
-#' list(mean = meanValue, sd = firstValueSD, sd2 = secondValueSD)
+#' To define mean and standard deviation values to be used for "sd" boundary analysis, use list(mean = meanValue, sd = firstValueSD, sd2 = secondValueSD)
 #'
 #' @import ggplot2
 #' @import dplyr
@@ -29,8 +28,8 @@
 #' @param boundary Boundary analysis to perform (Default: NULL, Options: "value", "percentage", "sd"): NULL or character.
 #' @param boundaryValue Value used for boundary analysis. (Default: 0): double or list
 #' @param xTickToggle Toggle to display ticks on x-axis (Default: TRUE, Options: TRUE or FALSE): boolean
-#' @returns A data frame containing the result of the boundary analysis performed (if specified)
-plotTimeSeries <- function(data,
+#' @returns A data frame containing the result of the boundary analysis performed
+plotTimeSeries <- function(data, 
                            x,
                            y,
                            colour = NULL,
@@ -52,6 +51,7 @@ plotTimeSeries <- function(data,
                               shape = if (!is.null(shape)) .data[[shape]] else NULL,
                               group = if (!is.null(colour)) ifelse(.data[[colour]] == "Historical", 1, 2) else NULL),
                           alpha = 0.25) +
+      ggplot2::geom_smooth(colour = "red", fill = "grey", alpha = 0.25) +
       ggplot2::theme(panel.background = element_blank(),
                      axis.line = element_line(colour = "black"),
                      legend.title = element_text(size = 8),
@@ -64,31 +64,32 @@ plotTimeSeries <- function(data,
                     colour = colourLabel,
                     shape = shapeLabel)
     
-      # Display ticks on x-axis
+      # Remove ticks on x-axis
       if (!xTickToggle) {
         timeSeries <- timeSeries +
           ggplot2::theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
       }
     
-    # Add and perform boundary analysis
+    # Perform boundary analysis if defined
     result <- NULL
     if (!is.null(boundary)) {
       # Check boundary type
       if (boundary == "value") {
-        # Add boundaries
+        # Determine boundaries
         lowerBound <- 0 - boundaryValue
         upperBound <- 0 + boundaryValue
         
+        # Display boundaries
         timeSeries <- timeSeries +
           ggplot2::geom_hline(yintercept = 0,
                               linetype = "dashed",
                               colour = "grey") +
           ggplot2::geom_hline(yintercept = lowerBound,
                               linetype = "dashed",
-                              colour = "darkred") +
+                              colour = "red") +
           ggplot2::geom_hline(yintercept = upperBound,
                               linetype = "dashed",
-                              colour = "darkred")
+                              colour = "red")
         
         # Analysis result
         low <- data %>%
@@ -105,20 +106,21 @@ plotTimeSeries <- function(data,
         
         result <- rbind(low, normal, high)
       } else if (boundary == "percentage") {
-        # Add boundaries
+        # Determine boundaries
         lowerBound <- 100 - boundaryValue
         upperBound <- 100 + boundaryValue
         
+        # Display boundaries
         timeSeries <- timeSeries +
           ggplot2::geom_hline(yintercept = 100,
                               linetype = "dashed",
                               colour = "grey") +
           ggplot2::geom_hline(yintercept = lowerBound,
                               linetype = "dashed",
-                              colour = "darkred") +
+                              colour = "red") +
           ggplot2::geom_hline(yintercept = upperBound,
                               linetype = "dashed",
-                              colour = "darkred")
+                              colour = "red")
         
         # Analysis result
         low <- data %>%
@@ -135,9 +137,9 @@ plotTimeSeries <- function(data,
         
         result <- rbind(low, normal, high)
       } else if (boundary == "sd") {
-        # Check if there are more than 1 data point or if boundary value is defined as a list
+        # Check if there are more than 1 data point or if boundary value list is defined 
         if (nrow(data) > 1 || is.list(boundaryValue)) {
-          # Get mean and standard deviation values
+          # Determine boundaries
           if (is.list(boundaryValue)) {
             mean <- boundaryValue$mean
             sd <- boundaryValue$sd
@@ -148,28 +150,28 @@ plotTimeSeries <- function(data,
             sd2 <- sd(2 * data[[y]])
           }
           
-          # Add boundaries
           lowerBound1 <- mean - sd
           upperBound1 <- mean + sd
           lowerBound2 <- mean - sd2
           upperBound2 <- mean + sd2
           
+          # Display boundaries
           timeSeries <- timeSeries +
             ggplot2::geom_hline(yintercept = mean,
                                 linetype = "dashed",
                                 colour = "grey") +
             ggplot2::geom_hline(yintercept = lowerBound1,
                                 linetype = "dashed",
-                                colour = "darkblue") +
+                                colour = "blue") +
             ggplot2::geom_hline(yintercept = upperBound1,
                                 linetype = "dashed",
-                                colour = "darkblue") +
+                                colour = "blue") +
             ggplot2::geom_hline(yintercept = lowerBound2,
                                 linetype = "dashed",
-                                colour = "darkred") +
+                                colour = "red") +
             ggplot2::geom_hline(yintercept = upperBound2,
                                 linetype = "dashed",
-                                colour = "darkred")
+                                colour = "red")
           
           # Analysis result
           veryLow <- data %>%
@@ -200,15 +202,15 @@ plotTimeSeries <- function(data,
       }
     }
     
-    print(timeSeries)
+    suppressMessages(print(timeSeries))
     return(result)
   }, 
   warning = function(w) {
-    print(paste0("Unable to perform Time Series Analysis - ", w))
+    print(paste0("Unable to display Time Series Analysis - ", w))
     return(NULL)
   },
   error = function(e) {
-    print(paste0("Unable to perform Time Series Analysis - ", e))
+    print(paste0("Unable to display Time Series Analysis - ", e))
     return(NULL)
   })
 }

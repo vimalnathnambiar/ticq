@@ -1,4 +1,4 @@
-#' countSpectrum
+#' Count Spectrum
 #'
 #' Count the total number of spectral data (spectrum count) of each sample present within the data frame.
 #'

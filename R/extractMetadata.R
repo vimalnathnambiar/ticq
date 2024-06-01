@@ -1,6 +1,6 @@
-#' extractMetadata
+#' Extract Metadata
 #'
-#' Extract metadata. This includes project name, cohort name, matrix type, sample type, acquisition method, instrument name, and plate number.
+#' Extract sample metadata including project name, cohort name, matrix type, sample type, acquisition method, instrument name, and plate number.
 #'
 #' Applicable only to data acquired at the Australian National Phenome Centre (ANPC).
 #'
@@ -18,7 +18,7 @@ extractMetadata <- function(input) {
   # Extract cohort name
   cohort <- ticq::extractCohort(input = input)
   
-  # Combine project name and cohort name as a single variable
+  # Combine project name and cohort name as a unique variable
   projectCohort <- ifelse(is.na(project),
                           ifelse(is.na(cohort), NA_character_, cohort),
                           ifelse(is.na(cohort), project, paste(project, cohort)))

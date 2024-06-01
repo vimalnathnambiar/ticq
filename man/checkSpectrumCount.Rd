@@ -2,7 +2,7 @@
 % Please edit documentation in R/checkSpectrumCount.R
 \name{checkSpectrumCount}
 \alias{checkSpectrumCount}
-\title{checkSpectrumCount}
+\title{Check Spectrum Count}
 \usage{
 checkSpectrumCount(data, commonColumn, sampleID, spectrumCount, threshold = 20)
 }
@@ -21,5 +21,5 @@ checkSpectrumCount(data, commonColumn, sampleID, spectrumCount, threshold = 20)
 A list containing the statistical result (sample size n, total and mean of spectrum count, and the threshold limit value), and two data frames (passed and failed data)
 }
 \description{
-Check and filter samples against a specified threshold limit from the average mean of spectral data (spectrum count) present.
+Check and filter samples against a defined threshold limit from the average mean of spectral data (spectrum count) present.
 }

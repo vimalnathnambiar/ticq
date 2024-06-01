@@ -2,7 +2,7 @@
 % Please edit documentation in R/extractSampleType.R
 \name{extractSampleType}
 \alias{extractSampleType}
-\title{extractSampleType}
+\title{Extract Sample Type}
 \usage{
 extractSampleType(input, matrix = NA_character_)
 }

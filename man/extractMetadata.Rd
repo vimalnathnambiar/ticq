@@ -2,7 +2,7 @@
 % Please edit documentation in R/extractMetadata.R
 \name{extractMetadata}
 \alias{extractMetadata}
-\title{extractMetadata}
+\title{Extract Metadata}
 \usage{
 extractMetadata(input)
 }
@@ -13,7 +13,7 @@ extractMetadata(input)
 List containing the metadata associated to the data
 }
 \description{
-Extract metadata. This includes project name, cohort name, matrix type, sample type, acquisition method, instrument name, and plate number.
+Extract sample metadata including project name, cohort name, matrix type, sample type, acquisition method, instrument name, and plate number.
 }
 \details{
 Applicable only to data acquired at the Australian National Phenome Centre (ANPC).

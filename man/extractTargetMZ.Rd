@@ -2,7 +2,7 @@
 % Please edit documentation in R/extractTargetMZ.R
 \name{extractTargetMZ}
 \alias{extractTargetMZ}
-\title{extractTargetMZ}
+\title{Extract Target m/z}
 \usage{
 extractTargetMZ(
   targetFile = NULL,
@@ -18,24 +18,24 @@ extractTargetMZ(
 \item{roundDecimal}{Number of decimal places for precision value rounding (Default: NULL): NULL or double}
 }
 \value{
-A data frame containing the target m/z data
+A data frame containing target m/z data
 }
 \description{
 Extract target m/z data from a target file (published to web URL or local TSV document) or an in-house method library used at the Australian National Phenome Centre (ANPC).
 }
 \details{
-Specify either a target file OR an in-house method library. If both is specified, only target file is checked for.
+Define either a target file OR an in-house method library. If both is defined, only target file is checked for.
 
-If using a target file, please ensure it follows a specified layout.
+When defining a target file, please ensure it follows a specified layout.
 }
 \examples{
-# Example 1: Specifying a target file with no rounding of precision values
+# Example 1: Defining a target file with no rounding of precision values
 targetMZ <- ticq::extractTargetMZ(targetFile = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSeo31hlruA3QuwoESz5IDJ9Nu6ndSAgLTRn3uc45rOPO4BlksfHzh9xtNB22Oes9JOxhEbI4NK-zxl/pub?gid=0&single=true&output=tsv",
                                   anpcMethodLibrary = NULL,
                                   roundDecimal = NULL)
 print(targetMZ)
 
-# Example 2: Specifying an in-house method library with rounding of precision values to 4 decimal places
+# Example 2: Defining an in-house method library with rounding of precision values to 4 decimal places
 targetMZ <- ticq::extractTargetMZ(targetFile = NULL,
                                   anpcMethodLibrary = "MS-AA-POS",
                                   roundDecimal = 4)

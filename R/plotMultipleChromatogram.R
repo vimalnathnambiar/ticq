@@ -1,6 +1,6 @@
-#' plotMultipleChromatogram
+#' Plot Multiple Chromatogram
 #'
-#' Plot multiple chromatogram data in specified number of rows and columns based on the same x-axis but different y-axis.
+#' Plot multiple chromatogram data.
 #'
 #' @import ggplot2
 #' @import ggpubr
@@ -17,7 +17,7 @@
 #' @param colourLabel Colour grouping label (Default: Value used for colour): NULL or character
 #' @param nPlotCol Number of plots to be plotted in a single column (Default: 1): double
 #' @param nPlotRow Number of plot to be plotted in a single row (Default: 1): double
-plotMultipleChromatogram <- function(data,
+plotMultipleChromatogram <- function(data, 
                                      x,
                                      startIDX,
                                      endIDX = NULL,
@@ -35,14 +35,14 @@ plotMultipleChromatogram <- function(data,
     nPlotData <- nPlotCol * nPlotRow
     
     
-      # If index of last data column to plot is NULL
+    # Check index of the last data column to plot
       if (is.null(endIDX)) {
         endIDX <- ncol(data)
       }
     
-    # Loop through data columns for plotting y-axis
+    # Loop through data columns
     for (i in startIDX:endIDX) {
-      # y-axis data column name
+      # Data column name
       y <- colnames(data)[i]
       
       # Plot chromatogram
@@ -59,10 +59,10 @@ plotMultipleChromatogram <- function(data,
                       y = yLabel,
                       colour = colourLabel)
       
-      # Add plot to plotList
+      # Append plot to plotList
       plotList[[y]] <- chromatogram
       
-      # Display plots in specified columns and rows
+      # Display plots
       if (length(plotList) %% nPlotData == 0 || i == endIDX) {
         plotGrid <- ggpubr::ggarrange(plotlist = plotList,
                                       ncol = nPlotCol, 
@@ -71,12 +71,12 @@ plotMultipleChromatogram <- function(data,
                                       legend = ifelse(isFirstPlot, "top", "none"))
         print(plotGrid)
         
-        # Reset
+        # Reset variables
         plotList <- list()
         isFirstPlot <- FALSE
       }
     }
   },
-  warning = function(w) print(paste0("Unable to generate Chromatogram - ", w)), 
-  error = function(e) print(paste0("Unable to generate Chromatogram - ", e)))
+  warning = function(w) print(paste0("Unable to display Chromatogram - ", w)), 
+  error = function(e) print(paste0("Unable to display Chromatogram - ", e)))
 }

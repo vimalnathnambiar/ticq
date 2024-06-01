@@ -1,4 +1,4 @@
-#' extractProject
+#' Extract Project
 #'
 #' Extract project name.
 #'

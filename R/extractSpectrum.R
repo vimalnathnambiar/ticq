@@ -1,4 +1,4 @@
-#' extractSpectrum
+#' Extract Spectrum
 #'
 #' Extract spectral data from JSON files generated using ExfilMS (https://github.com/vmalnathnambiar/exfilms). Also includes retrievable metadata from sample name or file path. 
 #'
@@ -15,26 +15,26 @@ extractSpectrum <- function(input, inputFiles) {
   passedData <- data.frame()
   failedFiles <- character(0)
   
-  # If input is NOT NULL and there are JSON files for extraction
+  # If input is defined and there are input files for extraction
   if (!is.null(input) && length(inputFiles) > 0) {
     # Extract file information
     fileInfo <- file.info(input)
     
-    # Loop through input files for extraction
+    # Loop through input files
     for (i in inputFiles) {
-      # Check and determine path to file
+      # Check and determine file path
       if (fileInfo$isdir) {
         filePath <- paste0(input, i)
       } else {
         filePath <- input
       }
       
-      # Extract spectral data from JSON file
+      # Extract spectral data
       sample <- tryCatch(jsonlite::fromJSON(filePath),
                          warning = function(w) NULL,
                          error = function(e) NULL)
       
-      # Check if error / warning occurred during extraction
+      # Check if error / warning occurred
       if (!is.null(sample)) {
         # Extract metadata
         sampleInfo <- ticq::extractMetadata(input = filePath)
@@ -52,10 +52,11 @@ extractSpectrum <- function(input, inputFiles) {
                                        plate = sampleInfo$plate,
                                        date = sample$date,
                                        time = sample$time,
+                                       timestamp = as.POSIXct(paste(sample$date, sample$time)),
                                        spectrumCount = sample$spectrumCount,
                                        spectrum = sample$spectrum))
       } else {
-        # Add file name that failed extraction to the vector of failed files
+        # Add filename to failed files
         failedFiles <- c(failedFiles, i)
       }
     }

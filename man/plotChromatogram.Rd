@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotChromatogram.R
 \name{plotChromatogram}
 \alias{plotChromatogram}
-\title{plotChromatogram}
+\title{Plot Chromatogram}
 \usage{
 plotChromatogram(
   data,

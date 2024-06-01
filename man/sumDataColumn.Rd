@@ -2,20 +2,20 @@
 % Please edit documentation in R/sumDataColumn.R
 \name{sumDataColumn}
 \alias{sumDataColumn}
-\title{sumDataColumn}
+\title{Sum Data Column}
 \usage{
-sumDataColumn(data, commonColumn, sumBy)
+sumDataColumn(data, commonColumn, sumColumn)
 }
 \arguments{
 \item{data}{A data frame containing spectral data: data frame}
 
 \item{commonColumn}{Column names of data common for each unique sample: character vector}
 
-\item{sumBy}{Column name of the data to be summed: character}
+\item{sumColumn}{Column name of the data to be summed: character}
 }
 \value{
 A data frame grouped by common columns and the sum value of the data column specified
 }
 \description{
-Sum values of a data column by grouping using its common columns.
+Sum values of a data column.
 }

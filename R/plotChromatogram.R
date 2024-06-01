@@ -1,4 +1,4 @@
-#' plotChromatogram
+#' Plot Chromatogram
 #'
 #' Plot chromatogram data.
 #'
@@ -70,6 +70,6 @@ plotChromatogram <- function(data,
     
     print(chromatogram)
   },
-  warning = function(w) print(paste0("Unable to generate Chromatogram - ", w)),
-  error = function(e) print(paste0("Unable to generate Chromatogram - ", e)))
+  warning = function(w) print(paste0("Unable to display Chromatogram - ", w)),
+  error = function(e) print(paste0("Unable to display Chromatogram - ", e)))
 }

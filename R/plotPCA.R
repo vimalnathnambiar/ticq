@@ -1,6 +1,6 @@
-#' plotPCA
+#' Plot PCA
 #'
-#' Perform Principle Component Analysis (PCA) and plot all associated plots (scree plot, scores plot, loadings plot and biplot).
+#' Perform Principle Component Analysis (PCA) and display associated plots (scree plot, scores plot, loadings plot and biplot).
 #'
 #' @import ggplot2
 #' @import HotellingEllipse
@@ -38,7 +38,7 @@ plotPCA <- function(data,
                     loadingsPlotToggle = TRUE,
                     biPlotToggle = TRUE) {
   tryCatch({
-    # Check and ensure no NA values in data
+    # Check and ensure no NA values
     if (is.null(endIDX)) {
       tmp <- data[, startIDX:ncol(data)]
     } else {
@@ -49,16 +49,14 @@ plotPCA <- function(data,
     # Perform PCA
     pca <- summary(prcomp(tmp, scale = scale))
     
-    # Identify variance based on the PCA
+    # Identify variances
     variance <- data.frame(principalComponent = paste0("PC", 1:length(pca$importance[1, ])),
                            standardDev = pca$importance[1, ],
                            varianceProportion = pca$importance[2, ] * 100,
                            cumulativeProportion = pca$importance[3, ] * 100)
     
-    # Threshold limit based on variance and data confidence %
-    threshold <- which(variance$cumulativeProportion >= confidence)[1]
-    
     # Check PC threshold status
+    threshold <- which(variance$cumulativeProportion >= confidence)[1]
     if (threshold > 1) {
       # Plot scree plot
       screePlot <- ggplot2::ggplot(data = variance, aes(x = principalComponent, y = varianceProportion, group = 1)) + 
@@ -132,9 +130,9 @@ plotPCA <- function(data,
                             y = paste0("PC", j, " [", round(pca$importance[2, j] * 100, 2), "%]"),
                             colour = colourLabel,
                             shape = shapeLabel,
-                            caption = paste0("Hotelling T² Ellipse (Blue: 95% Confidence; Red: 99% Confidence)"))
+                            caption = paste0("Hotelling T² Ellipse (95% (Blue) and 99% (Red) Confidence)"))
               
-              # Display data distribution at a specific confidence
+              # Display data distribution if defined
               if (!is.null(distribution)) {
                 if (distribution == "normal") {
                   scoresPlot <- scoresPlot +
@@ -189,10 +187,10 @@ plotPCA <- function(data,
           }
         }
       },
-      warning = function(w) print(paste0("Unable to generate PCA results - ", w)),
-      error = function(e) print(paste0("Unable to generate PCA results - ", e)))
+      warning = function(w) print(paste0("Unable to display Principal Component Analysis - ", w)),
+      error = function(e) print(paste0("Unable to display Principal Component Analysis - ", e)))
     } else {
-      print(paste("Unable to generate PCA results - Only PC1 satisfies the threshold limit"))
+      print(paste("Unable to display Principal Component Analysis - Only PC1 satisfies the threshold limit"))
     }
   },
   warning = function(w) print(paste0("Unable to perform Principal Component Analysis - ", w)),

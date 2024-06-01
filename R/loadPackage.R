@@ -1,6 +1,6 @@
-#' loadPackage
+#' Load Package
 #'
-#' Identify (and install missing) and load packages to use.
+#' Identify, install and load packages to use.
 #'
 #' @export
 #' @param packageList Package names to be loaded: character vector

@@ -2,7 +2,7 @@
 % Please edit documentation in R/loadPackage.R
 \name{loadPackage}
 \alias{loadPackage}
-\title{loadPackage}
+\title{Load Package}
 \usage{
 loadPackage(packageList)
 }
@@ -10,7 +10,7 @@ loadPackage(packageList)
 \item{packageList}{Package names to be loaded: character vector}
 }
 \description{
-Identify (and install missing) and load packages to use.
+Identify, install and load packages to use.
 }
 \examples{
 # Example 1: Loading a single package

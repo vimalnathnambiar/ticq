@@ -2,7 +2,7 @@
 % Please edit documentation in R/extractMatrix.R
 \name{extractMatrix}
 \alias{extractMatrix}
-\title{extractMatrix}
+\title{Extract Matrix}
 \usage{
 extractMatrix(input)
 }

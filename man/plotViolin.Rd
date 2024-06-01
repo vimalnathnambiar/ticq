@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotViolin.R
 \name{plotViolin}
 \alias{plotViolin}
-\title{plotViolin}
+\title{Plot Violin}
 \usage{
 plotViolin(
   data,
@@ -66,10 +66,10 @@ plotViolin(
 \item{boxWidth}{Box plot width. Applicable only if boxPlotToggle is set to TRUE (Default: 1): double}
 }
 \value{
-A data frame containing the result of the boundary analysis performed (if specified)
+A data frame containing the result of the boundary analysis performed
 }
 \description{
-Plot violin plots and perform boundary analysis (if specified).
+Plot violin plot (and perform boundary analysis if defined).
 }
 \details{
 Boundary analysis that can be performed:
@@ -79,6 +79,5 @@ Boundary analysis that can be performed:
 \item sd: Evaluates data using 2 standard deviations from average mean of the data or using defined mean and standard deviation values
 }
 
-To defined mean and standard deviation values to be used for "sd" boundary analysis, use
-list(mean = meanValue, sd = firstValueSD, sd2 = secondValueSD)
+To define mean and standard deviation values to be used for "sd" boundary analysis, use list(mean = meanValue, sd = firstValueSD, sd2 = secondValueSD)
 }

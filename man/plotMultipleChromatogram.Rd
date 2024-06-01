@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotMultipleChromatogram.R
 \name{plotMultipleChromatogram}
 \alias{plotMultipleChromatogram}
-\title{plotMultipleChromatogram}
+\title{Plot Multiple Chromatogram}
 \usage{
 plotMultipleChromatogram(
   data,
@@ -42,5 +42,5 @@ plotMultipleChromatogram(
 \item{nPlotRow}{Number of plot to be plotted in a single row (Default: 1): double}
 }
 \description{
-Plot multiple chromatogram data in specified number of rows and columns based on the same x-axis but different y-axis.
+Plot multiple chromatogram data.
 }

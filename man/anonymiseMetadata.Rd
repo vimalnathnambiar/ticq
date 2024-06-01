@@ -2,7 +2,7 @@
 % Please edit documentation in R/anonymiseMetadata.R
 \name{anonymiseMetadata}
 \alias{anonymiseMetadata}
-\title{anonymiseMetadata}
+\title{Anonymise Metadata}
 \usage{
 anonymiseMetadata(
   data,

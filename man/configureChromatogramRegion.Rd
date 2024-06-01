@@ -2,7 +2,7 @@
 % Please edit documentation in R/configureChromatogramRegion.R
 \name{configureChromatogramRegion}
 \alias{configureChromatogramRegion}
-\title{configureChromatogramRegion}
+\title{Configure Chromatogram Region}
 \usage{
 configureChromatogramRegion(
   massCalStart = 0,

@@ -2,7 +2,7 @@
 % Please edit documentation in R/spliceChromatogramRegion.R
 \name{spliceChromatogramRegion}
 \alias{spliceChromatogramRegion}
-\title{spliceChromatogramRegion}
+\title{Splice Chromatogram Region}
 \usage{
 spliceChromatogramRegion(
   data,
@@ -10,7 +10,7 @@ spliceChromatogramRegion(
   spectrumCount,
   chromatogramRegion = NULL,
   retentionTime,
-  sumBy
+  sumColumn
 )
 }
 \arguments{
@@ -24,11 +24,11 @@ spliceChromatogramRegion(
 
 \item{retentionTime}{Retention time column name: character}
 
-\item{sumBy}{Column name of the data to be summed: character}
+\item{sumColumn}{Column name of the data to be summed: character}
 }
 \value{
 A data frame containing the summed values for each chromatogram regions of interest
 }
 \description{
-Splice chromatogram regions and sum values of a specific data column together.
+Splice and sum values for each chromatogram regions of interest.
 }

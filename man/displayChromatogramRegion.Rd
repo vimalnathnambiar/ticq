@@ -2,12 +2,12 @@
 % Please edit documentation in R/displayChromatogramRegion.R
 \name{displayChromatogramRegion}
 \alias{displayChromatogramRegion}
-\title{displayChromatogramRegion}
+\title{Display Chromatogram Region}
 \usage{
 displayChromatogramRegion(plot, maxX, maxY, chromatogramRegion, label)
 }
 \arguments{
-\item{plot}{A ggplot object representing a chromatogram: ggplot}
+\item{plot}{A ggplot object of a chromatogram: ggplot}
 
 \item{maxX}{x-axis maximum value: double}
 
@@ -21,7 +21,7 @@ displayChromatogramRegion(plot, maxX, maxY, chromatogramRegion, label)
 A ggplot object with the added vertical lines displaying the chromatogram region start and end time points
 }
 \description{
-Add vertical lines to display the start and end time points of a chromatogram region.
+Add vertical lines to display the start and end time points of a chromatogram region on a chromatogram plot.
 }
 \details{
 This function is not exported as it is only used by:

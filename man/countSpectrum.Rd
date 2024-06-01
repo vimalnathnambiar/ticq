@@ -2,7 +2,7 @@
 % Please edit documentation in R/countSpectrum.R
 \name{countSpectrum}
 \alias{countSpectrum}
-\title{countSpectrum}
+\title{Count Spectrum}
 \usage{
 countSpectrum(data, commonColumn, spectrumCount)
 }
