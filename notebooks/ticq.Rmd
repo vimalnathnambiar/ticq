@@ -53,7 +53,7 @@ anonymiserStatus <- params$anonymiserStatus
 ```
 
 ```{r, echo = FALSE, warning = FALSE, include = FALSE}
-# Identify path to historical data (In-house ANPC method specific)
+# Historical data path (In-house ANPC method specific)
 historicalDataPath <- paste0(getwd(), "/../data/historical/")
 if (!is.null(anpcMethodLibrary)) {
   switch(anpcMethodLibrary,
@@ -135,7 +135,7 @@ if (newStatus) {
   result <- ticq::extractSpectrum(input = input, inputFiles = inputFiles)
   passedData <- result$passedData
   
-  # Update new sample status (and save data if applicable)
+  # Update new sample status
   if (nrow(passedData) != 0) {
     newStatus <- TRUE
     saveRDS(passedData, file = paste0(getwd(), "/../data/raw.rds"))
@@ -270,7 +270,7 @@ if (newStatus) {
     result <- NULL
   }
   
-  # If spectrum count check performed
+  # If result is available
   if (!is.null(result)) {
     # Remove historical data from passed and failed results
     result$passedData <- result$passedData %>%
@@ -692,7 +692,7 @@ The chromatogram regions of interest (mass calibration, analyte, and wash region
 ```{r, echo = FALSE, warning = FALSE, include = FALSE}
 # Check new sample status and spectral data status
 if (newStatus && msStatus) {
-  # Splice chromatogram regions (New plot data)
+  # Splice chromatogram regions for analysis and plotting
   plotData <- ticq::spliceChromatogramRegion(data = plotData,
                                              commonColumn = colnames(plotData)[which(colnames(plotData) == sampleID):
                                                                                which(colnames(plotData) == spectrumCount)],
@@ -3370,11 +3370,10 @@ if (newStatus) {
 # Extracted Ion Chromatogram {.tabset}
 Chromatogram overview (Extracted Ion Current, EIC vs Retention Time, RT) of targeted mass calibration references, internal standards, endogenous analytes, and product ions present within the samples are plotted by their corresponding chromatogram region and sample type. The chromatograms are plotted using MS level 1 spectral data for mass calibration references, internal standards, and endogenous analytes; whereas MS level 2 spectral data is used for product ions. 
 ```{r, echo = FALSE, warning = FALSE}
-# Check new sample status and availability of target m/z data
+# Check new sample status and if target m/z data is available
 if (newStatus && !is.null(targetMZ)) {
-  # Filter target m/z data against MS level of spectral data present
-  targetMZ <- targetMZ[targetMZ$msLevel %in% unique(passedData[[msLevel]]), ]
-  if (nrow(targetMZ) == 0) {
+  # If none of the target m/z belong to the same MS level as the existing spectral data
+  if (!any(targetMZ$msLevel %in% unique(passedData[[msLevel]]))) {
     # Update new sample status
     newStatus <- FALSE
     print("Unable to generate Extracted Ion Chromatogram: No available target m/z data")
@@ -3462,7 +3461,7 @@ if (newStatus && msStatus) {
     dplyr::filter(analyteType == "Mass Calibration" & msLevel == 1)
   targetList <- as.character(sort(unique(targetList$mzValue)))
   
-  # Check availability of target m/z
+  # Check if target m/z is available
   if (length(targetList) > 0) {
     # Update target m/z status
     targetStatus <- TRUE
@@ -4373,7 +4372,7 @@ if (newStatus && msStatus) {
     dplyr::filter(analyteType == "Internal Standard" & msLevel == 1)
   targetList <- as.character(sort(unique(targetList$mzValue)))
   
-  # Check availability of target m/z
+  # Check if target m/z is available
   if (length(targetList) > 0) {
     # Update target m/z status
     targetStatus <- TRUE
@@ -5284,7 +5283,7 @@ if (newStatus && msStatus) {
     dplyr::filter(analyteType == "Analyte" & msLevel == 1)
   targetList <- as.character(sort(unique(targetList$mzValue)))
   
-  # Check availability of target m/z
+  # Check if target m/z is available
   if (length(targetList) > 0) {
     # Update target m/z status
     targetStatus <- TRUE
@@ -6250,7 +6249,7 @@ if (newStatus && msStatus) {
     dplyr::filter(analyteType == "Product" & msLevel == 2)
   targetList <- as.character(sort(unique(targetList$mzValue)))
   
-  # Check availability of target m/z
+  # Check if target m/z is available
   if (length(targetList) > 0) {
     # Update target m/z status
     targetStatus <- TRUE
@@ -7173,8 +7172,7 @@ Time series analysis provides a temporal trendline and assesses the performance 
 # Check new sample status
 if (newStatus) {
   # Common data columns
-  commonColumn <- colnames(passedData)[which(colnames(passedData) == sampleID):
-                                       which(colnames(passedData) == spectrumCount)]
+  commonColumn <- colnames(passedData)[which(colnames(passedData) == sampleID):which(colnames(passedData) == spectrumCount)]
   
   # Plot variables and labels
   x <- timestamp
@@ -7250,7 +7248,7 @@ if (newStatus && msStatus) {
     dplyr::filter(analyteType == "Mass Calibration" & msLevel == 1)
   targetList <- as.character(sort(unique(targetList$mzValue)))
   
-  # Check availability of target m/z
+  # Check if target m/z is available
   if (length(targetList) > 0) {
     # Update target m/z status
     targetStatus <- TRUE
@@ -8493,7 +8491,7 @@ if (newStatus && msStatus) {
     dplyr::filter(analyteType == "Internal Standard" & msLevel == 1)
   targetList <- as.character(sort(unique(targetList$mzValue)))
   
-  # Check availability of target m/z
+  # Check if target m/z is available
   if (length(targetList) > 0) {
     # Update target m/z status
     targetStatus <- TRUE
@@ -9736,7 +9734,7 @@ if (newStatus && msStatus) {
     dplyr::filter(analyteType == "Analyte" & msLevel == 1)
   targetList <- as.character(sort(unique(targetList$mzValue)))
   
-  # Check availability of target m/z
+  # Check if target m/z is available
   if (length(targetList) > 0) {
     # Update target m/z status
     targetStatus <- TRUE
@@ -11034,7 +11032,7 @@ if (newStatus && msStatus) {
     dplyr::filter(analyteType == "Product" & msLevel == 2)
   targetList <- as.character(sort(unique(targetList$mzValue)))
   
-  # Check availability of target m/z
+  # Check if target m/z is available
   if (length(targetList) > 0) {
     # Update target m/z status
     targetStatus <- TRUE
@@ -12279,3 +12277,29 @@ if (newStatus) {
   rm(commonColumn, x, caption, xLabel, yLabel, shape, shapeLabel, boundary, xTickToggle, nPlotCol, nPlotRow, msStatus)
 }
 ```
+
+## Mass Accuracy Analysis {.tabset}
+Mass accuracy analysis provides a trendline (mass accuracy shift) and assessment of instrument performance in detecting a target m/z based on the average mass error (in ppm). A report is generated highlighting the target m/z that have a significant 1st and 2nd standard deviation from the average mean performance.
+```{r, echo = FALSE, warning = FALSE}
+# Check new sample status
+if (newStatus) {
+  # Common data columns
+  commonColumn <- colnames(passedData)[which(colnames(passedData) == sampleID):which(colnames(passedData) == spectrumCount)]
+  
+  # Plot variables and labels
+  x <- timestamp
+  caption <- "m/z"
+  xLabel <- "Timestamp"
+  yLabel <- "ppm"
+  shape <- sampleType
+  shapeLabel <- "Sample Type"
+  boundary <- "sd"
+  xTickToggle <- FALSE
+  nPlotCol <- 2
+  nPlotRow <- 2
+} else {
+  print("Unable to perform Mass Accuracy Analysis: No new samples to analyse")
+}
+```
+
+

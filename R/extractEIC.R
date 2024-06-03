@@ -2,14 +2,14 @@
 #'
 #' Extract the intensity of each target m/z (EIC) detected within the spectra.
 #' 
-#' The length of the target list of unique m/z values MUST BE EQUAL to the length of spectra array (m/z and intensity)
+#' The length of the target list containing unique m/z values MUST BE EQUAL to the length of intensity array for each spectra.
 #'
 #' @import dplyr
 #'
 #' @export
 #' @param data A data frame containing spectral data: data frame
 #' @param intensityArray Intensity array column name: character
-#' @param targetList A list of unique target m/z mirroring the values stored within the intensity array (Must be equal length): character vector
+#' @param targetList A list of unique target m/z (Must be equal length as values stored within intensity array): character vector
 #' @returns A data frame with appended columns representing the extracted intensity of each target m/z (EIC)
 extractEIC <- function(data, intensityArray, targetList) {
   # Extract intensity of each target m/z into a matrix

@@ -7,7 +7,7 @@
 #' - percentage: Evaluates data +/- value from 100
 #' - sd: Evaluates data using 2 standard deviations from average mean of the data or using defined mean and standard deviation values
 #'
-#' To define mean and standard deviation values to be used for "sd" boundary analysis, use list(mean = meanValue, sd = firstValueSD, sd2 = secondValueSD)
+#' To define mean and standard deviation values to be used for "sd" boundary analysis, pass reference data that mirrors the same columns as data.
 #'
 #' @import ggplot2
 #' @import dplyr
