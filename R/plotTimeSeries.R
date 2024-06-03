@@ -7,7 +7,7 @@
 #' - percentage: Evaluates data +/- value from 100
 #' - sd: Evaluates data using 2 standard deviations from average mean of the data or using defined mean and standard deviation values
 #'
-#' To define mean and standard deviation values to be used for "sd" boundary analysis, use list(mean = meanValue, sd = firstValueSD, sd2 = secondValueSD)
+#' To define mean and standard deviation values to be used for "sd" boundary analysis, pass reference data that mirrors the same columns as data.
 #'
 #' @import ggplot2
 #' @import dplyr
@@ -26,7 +26,8 @@
 #' @param colourLabel Colour grouping label (Default: Value used for colour): NULL or character
 #' @param shapeLabel Shape grouping label (Default: Value used for shape)
 #' @param boundary Boundary analysis to perform (Default: NULL, Options: "value", "percentage", "sd"): NULL or character.
-#' @param boundaryValue Value used for boundary analysis. (Default: 0): double or list
+#' @param boundaryValue Value used for "value" and "percentage" boundary analysis (Default: 0): double
+#' @param referenceData A data frame with the same column names and data to calculate "sd" boundaries (Default: NULL): NULL or data frame
 #' @param xTickToggle Toggle to display ticks on x-axis (Default: TRUE, Options: TRUE or FALSE): boolean
 #' @returns A data frame containing the result of the boundary analysis performed
 plotTimeSeries <- function(data, 
@@ -43,6 +44,7 @@ plotTimeSeries <- function(data,
                            shapeLabel = shape,
                            boundary = NULL,
                            boundaryValue = 0,
+                           referenceData = NULL,
                            xTickToggle = TRUE) {
   tryCatch({
     # Plot time series
@@ -137,13 +139,27 @@ plotTimeSeries <- function(data,
         
         result <- rbind(low, normal, high)
       } else if (boundary == "sd") {
-        # Check if there are more than 1 data point or if boundary value list is defined 
-        if (nrow(data) > 1 || is.list(boundaryValue)) {
+        # Check status of reference data
+        if (!is.null(referenceData)) {
+          if (!is.data.frame(referenceData) ||
+              ncol(referenceData) != ncol(data) ||
+              all(colnames(referenceData) != colnames(data)) ||
+              nrow(referenceData) < 2 ||
+              any(is.na(referenceData[[y]]))) {
+            referenceData <- NULL
+          }
+        }
+        
+        # Check if there are more than 1 data point or if reference data is available
+        if (nrow(data) > 1 || !is.null(referenceData)) {
           # Determine boundaries
-          if (is.list(boundaryValue)) {
-            mean <- boundaryValue$mean
-            sd <- boundaryValue$sd
-            sd2 <- boundaryValue$sd2
+          if (!is.null(referenceData)) {
+            # Generate statistics
+            stat <- ticq::generateStat(data = referenceData[[y]])
+            
+            mean <- stat$mean
+            sd <- stat$sd
+            sd2 <- stat$sd2
           } else {
             mean <- mean(data[[y]])
             sd <- sd(data[[y]])

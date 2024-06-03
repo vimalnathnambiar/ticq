@@ -1,6 +1,6 @@
-#' generateStat
+#' Generate Statistics
 #'
-#' Generate statistical information including: 
+#' Generate statistical information of a dataset including: 
 #' - Sample size (n)
 #' - Minimum (min)
 #' - Mean (mean)
@@ -17,10 +17,12 @@
 #' - Margin error (me) - 95% and 99%
 #' - Confidence interval (CI) - 95% and 99% (Lower and upper)
 #' - Confidence quantile range (CQ) - 95% and 99% (Lower and upper)
+#' 
+#' Data MUST HAVE a minimum of 2 data points and MUST NOT contain any NA values.
 #'
 #' @export
-#' @param data A continuous data series of numerical values (Requires a minimum of 2 data points and must not contain NA values): numerical vector
-#' @returns A data frame containing all generated statistics
+#' @param data A continuous data series of numerical values (A minimum of 2 data points and do not contain NA values): numerical vector
+#' @returns A list of all generated statistics
 #'
 #' @examples
 #' stat <- ticq::generateStat(data = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
@@ -72,7 +74,7 @@ generateStat <- function(data) {
   
     # Check sample size and calculate margin error
     if (n < 30) {
-      # Use t-critical score
+      # Calculate using t-critical score
         # 95%
         tCritical95 <- abs(qt(probArea95, (n - 1)))
         me95 <- tCritical95 * se
@@ -81,7 +83,7 @@ generateStat <- function(data) {
         tCritical99 <- abs(qt(probArea99, (n - 1)))
         me99 <- tCritical99 * se
     } else {
-      # Use z-score
+      # Calculate using z-score
         # 95%
         zScore95 <- 1.960
         me95 <- zScore95 * se
@@ -109,29 +111,29 @@ generateStat <- function(data) {
     lowerCQ99 <- quantile(data, probArea99)
     upperCQ99 <- quantile(data, (1 - probArea99))
   
-  return(data.frame(n = n,
-                    min = min,
-                    mean = mean,
-                    max = max,
-                    Q1 = Q1,
-                    median = median,
-                    Q3 = Q3,
-                    IQR = IQR,
-                    lowerInnerFence = lowerInnerFence,
-                    upperInnerFence = upperInnerFence,
-                    lowerOuterFence = lowerOuterFence,
-                    upperOuterFence = upperOuterFence,
-                    sd = sd,
-                    sd2 = sd2,
-                    se = se,
-                    me95 = me95,
-                    me99 = me99,
-                    lowerCI95 = lowerCI95,
-                    upperCI95 = upperCI95,
-                    lowerCI99 = lowerCI99,
-                    upperCI99 = upperCI99,
-                    lowerCQ95 = lowerCQ95,
-                    upperCQ95 = upperCQ95,
-                    lowerCQ99 = lowerCQ99,
-                    upperCQ99 = upperCQ99))
+  return(list(n = n,
+              min = min,
+              mean = mean,
+              max = max,
+              Q1 = Q1,
+              median = median,
+              Q3 = Q3,
+              IQR = IQR,
+              lowerInnerFence = lowerInnerFence,
+              upperInnerFence = upperInnerFence,
+              lowerOuterFence = lowerOuterFence,
+              upperOuterFence = upperOuterFence,
+              sd = sd,
+              sd2 = sd2,
+              se = se,
+              me95 = me95,
+              me99 = me99,
+              lowerCI95 = lowerCI95,
+              upperCI95 = upperCI95,
+              lowerCI99 = lowerCI99,
+              upperCI99 = upperCI99,
+              lowerCQ95 = lowerCQ95,
+              upperCQ95 = upperCQ95,
+              lowerCQ99 = lowerCQ99,
+              upperCQ99 = upperCQ99))
 }

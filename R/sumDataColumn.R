@@ -11,9 +11,9 @@
 #' @returns A data frame grouped by common columns and the sum value of the data column specified
 sumDataColumn <- function(data, commonColumn, sumColumn) {
   # Group data by common columns and sum the values in the defined data column
-  sumData <- data %>%
+  summedData <- data %>%
     dplyr::group_by(across(all_of(commonColumn))) %>%
     dplyr::summarise(sum = sum(.data[[sumColumn]]), .groups = "keep")
   
-  return(sumData)
+  return(summedData)
 }

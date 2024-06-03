@@ -2,7 +2,7 @@
 #'
 #' Extract target m/z data from a target file (published to web URL or local TSV document) or an in-house method library used at the Australian National Phenome Centre (ANPC).
 #' 
-#' Define either a target file OR an in-house method library. If both is defined, only target file is checked for.
+#' Define EITHER a target file OR an in-house method library. If both are defined, only target file is checked for.
 #' 
 #' When defining a target file, please ensure it follows a specified layout.
 #'

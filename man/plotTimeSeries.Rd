@@ -19,6 +19,7 @@ plotTimeSeries(
   shapeLabel = shape,
   boundary = NULL,
   boundaryValue = 0,
+  referenceData = NULL,
   xTickToggle = TRUE
 )
 }
@@ -49,7 +50,9 @@ plotTimeSeries(
 
 \item{boundary}{Boundary analysis to perform (Default: NULL, Options: "value", "percentage", "sd"): NULL or character.}
 
-\item{boundaryValue}{Value used for boundary analysis. (Default: 0): double or list}
+\item{boundaryValue}{Value used for "value" and "percentage" boundary analysis (Default: 0): double}
+
+\item{referenceData}{A data frame with the same column names and data to calculate "sd" boundaries (Default: NULL): NULL or data frame}
 
 \item{xTickToggle}{Toggle to display ticks on x-axis (Default: TRUE, Options: TRUE or FALSE): boolean}
 }
@@ -67,5 +70,5 @@ Boundary analysis that can be performed:
 \item sd: Evaluates data using 2 standard deviations from average mean of the data or using defined mean and standard deviation values
 }
 
-To define mean and standard deviation values to be used for "sd" boundary analysis, use list(mean = meanValue, sd = firstValueSD, sd2 = secondValueSD)
+To define mean and standard deviation values to be used for "sd" boundary analysis, pass reference data that mirrors the same columns as data.
 }

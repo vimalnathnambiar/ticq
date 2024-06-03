@@ -2,18 +2,18 @@
 % Please edit documentation in R/generateStat.R
 \name{generateStat}
 \alias{generateStat}
-\title{generateStat}
+\title{Generate Statistics}
 \usage{
 generateStat(data)
 }
 \arguments{
-\item{data}{A continuous data series of numerical values (Requires a minimum of 2 data points and must not contain NA values): numerical vector}
+\item{data}{A continuous data series of numerical values (A minimum of 2 data points and do not contain NA values): numerical vector}
 }
 \value{
-A data frame containing all generated statistics
+A list of all generated statistics
 }
 \description{
-Generate statistical information including:
+Generate statistical information of a dataset including:
 \itemize{
 \item Sample size (n)
 \item Minimum (min)
@@ -32,6 +32,9 @@ Generate statistical information including:
 \item Confidence interval (CI) - 95\% and 99\% (Lower and upper)
 \item Confidence quantile range (CQ) - 95\% and 99\% (Lower and upper)
 }
+}
+\details{
+Data MUST HAVE a minimum of 2 data points and MUST NOT contain any NA values.
 }
 \examples{
 stat <- ticq::generateStat(data = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))

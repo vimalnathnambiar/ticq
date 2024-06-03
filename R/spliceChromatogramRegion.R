@@ -16,7 +16,7 @@ spliceChromatogramRegion <- function(data,
                                      chromatogramRegion = NULL,
                                      retentionTime,
                                      sumColumn) {
-  # Base data frame to store splice chromatogram data
+  # Base data frame to append splice chromatogram data
   splicedData <- ticq::countSpectrum(data = data,
                                      commonColumn = commonColumn,
                                      spectrumCount = spectrumCount)

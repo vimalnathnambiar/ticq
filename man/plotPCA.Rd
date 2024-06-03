@@ -56,3 +56,6 @@ plotPCA(
 \description{
 Perform Principle Component Analysis (PCA) and display associated plots (scree plot, scores plot, loadings plot and biplot).
 }
+\details{
+Data used for PCA MUST NOT contain NA values.
+}

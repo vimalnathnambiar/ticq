@@ -1,6 +1,8 @@
 #' Plot PCA
 #'
 #' Perform Principle Component Analysis (PCA) and display associated plots (scree plot, scores plot, loadings plot and biplot).
+#' 
+#' Data used for PCA MUST NOT contain NA values.
 #'
 #' @import ggplot2
 #' @import HotellingEllipse

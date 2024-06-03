@@ -35,12 +35,12 @@ plotMultipleChromatogram <- function(data,
     nPlotData <- nPlotCol * nPlotRow
     
     
-    # Check index of the last data column to plot
+    # Check index of the last plot data column
       if (is.null(endIDX)) {
         endIDX <- ncol(data)
       }
     
-    # Loop through data columns
+    # Loop through plot data columns
     for (i in startIDX:endIDX) {
       # Data column name
       y <- colnames(data)[i]
@@ -59,7 +59,7 @@ plotMultipleChromatogram <- function(data,
                       y = yLabel,
                       colour = colourLabel)
       
-      # Append plot to plotList
+      # Append plot to plot list
       plotList[[y]] <- chromatogram
       
       # Display plots

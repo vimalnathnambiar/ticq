@@ -1,6 +1,6 @@
-#' sumEIC
+#' Sum Extracted Ion Current (EIC)
 #'
-#' Sum EIC values of multiple data columns by grouping using its common columns.
+#' Sum intensity values of target m/z (EIC) from multiple data columns by grouping using its common columns.
 #'
 #' @import dplyr
 #'
@@ -16,10 +16,10 @@ sumEIC <- function(data,
                    spectrumCount,
                    startIDX,
                    endIDX = NULL) {
-  # Base data frame to append summed data to
-  summarisedData <- ticq::countSpectrum(data = data,
-                                 commonColumn = commonColumn,
-                                 spectrumCount = spectrumCount)
+  # Base data frame to append summed EIC values
+  summedDataEIC <- ticq::countSpectrum(data = data,
+                                       commonColumn = commonColumn,
+                                       spectrumCount = spectrumCount)
   
   # If index of last data column is NULL
   if (is.null(endIDX)) {
@@ -31,14 +31,13 @@ sumEIC <- function(data,
     # Column name to be summed
     y <- colnames(data)[i]
     
-    # Group data by common columns, and sum values
+    # Group data by common columns, and sum EIC values
     tmp <- data %>%
       dplyr::group_by(across(all_of(commonColumn))) %>%
       dplyr::summarise(!!spectrumCount := n(), !!y := sum(.data[[y]]), .groups = "keep")
     
-    # Append summed data column to base data frame
-    summarisedData <- dplyr::left_join(summarisedData, tmp, by = commonColumn)
+    summedDataEIC <- dplyr::left_join(summedDataEIC, tmp, by = commonColumn)
   }
   
-  return(summarisedData)
+  return(summedDataEIC)
 }

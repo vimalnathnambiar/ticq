@@ -19,6 +19,7 @@ plotMultipleTimeSeries(
   shapeLabel = shape,
   boundary = NULL,
   boundaryValue = 0,
+  referenceData = NULL,
   xTickToggle = TRUE,
   nPlotCol = 1,
   nPlotRow = 1
@@ -51,7 +52,9 @@ plotMultipleTimeSeries(
 
 \item{boundary}{Boundary analysis to perform (Default: NULL, Options: "value", "percentage", "sd"): NULL or character.}
 
-\item{boundaryValue}{Value used for boundary analysis. (Default: 0): double or list}
+\item{boundaryValue}{Value used for "value" and "percentage" boundary analysis (Default: 0): double}
+
+\item{referenceData}{A data frame with the same column names and data to calculate "sd" boundaries (Default: NULL): NULL or data frame}
 
 \item{xTickToggle}{Toggle to display ticks on x-axis (Default: TRUE, Options: TRUE or FALSE): boolean}
 

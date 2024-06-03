@@ -2,7 +2,7 @@
 % Please edit documentation in R/extractEIC.R
 \name{extractEIC}
 \alias{extractEIC}
-\title{extractEIC}
+\title{Extract Extracted Ion Current (EIC)}
 \usage{
 extractEIC(data, intensityArray, targetList)
 }
@@ -11,11 +11,14 @@ extractEIC(data, intensityArray, targetList)
 
 \item{intensityArray}{Intensity array column name: character}
 
-\item{targetList}{A list of unique target m/z mirroring the values stored within the intensity array: character vector}
+\item{targetList}{A list of unique target m/z mirroring the values stored within the intensity array (Must be equal length): character vector}
 }
 \value{
 A data frame with appended columns representing the extracted intensity of each target m/z (EIC)
 }
 \description{
-Extract the intensity of each target m/z (Extracted Ion Current, EIC) stored within the spectra.
+Extract the intensity of each target m/z (EIC) detected within the spectra.
+}
+\details{
+The length of the target list of unique m/z values MUST BE EQUAL to the length of spectra array (m/z and intensity)
 }

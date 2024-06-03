@@ -26,7 +26,8 @@
 #' @param colourLabel Colour grouping label (Default: Value used for colour): NULL or character
 #' @param shapeLabel Shape grouping label (Default: Value used for shape)
 #' @param boundary Boundary analysis to perform (Default: NULL, Options: "value", "percentage", "sd"): NULL or character.
-#' @param boundaryValue Value used for boundary analysis. (Default: 0): double or list
+#' @param boundaryValue Value used for "value" and "percentage" boundary analysis (Default: 0): double
+#' @param referenceData A data frame with the same column names and data to calculate "sd" boundaries (Default: NULL): NULL or data frame
 #' @param xTickToggle Toggle to display ticks on x-axis (Default: TRUE, Options: TRUE or FALSE): boolean
 #' @param nPlotCol Number of plots to be plotted in a single column (Default: 1): double
 #' @param nPlotRow Number of plots to be plotted in a single row (Default: 1): double
@@ -45,6 +46,7 @@ plotMultipleTimeSeries <- function(data,
                                    shapeLabel = shape,
                                    boundary = NULL,
                                    boundaryValue = 0,
+                                   referenceData = NULL,
                                    xTickToggle = TRUE,
                                    nPlotCol = 1,
                                    nPlotRow = 1) {
@@ -54,12 +56,12 @@ plotMultipleTimeSeries <- function(data,
     isFirstPlot <- TRUE
     nPlotData <- nPlotCol * nPlotRow
     
-    # Check index of the last data column to plot
+    # Check index of the last plot data column
       if (is.null(endIDX)) {
         endIDX <- ncol(data)
       }
     
-      # Base data frame to store results of boundary analysis if defined
+      # Base data frame to append results of boundary analysis if defined
       if (!is.null(boundary)) {
         result <- data %>%
           dplyr::select(all_of(commonColumn))
@@ -67,7 +69,7 @@ plotMultipleTimeSeries <- function(data,
         result <- NULL
       }
       
-    # Loop through data columns
+    # Loop through plot data columns
     for (i in startIDX:endIDX) {
       # Data column name
       y <- colnames(data)[i]
@@ -169,13 +171,27 @@ plotMultipleTimeSeries <- function(data,
           result <- dplyr::left_join(result, rbind(low, normal, high), by = commonColumn) %>%
             dplyr::rename(!!y := sampleRange)
         } else if (boundary == "sd") {
-          # Check if there are more than 1 data point or if boundary value list is defined
-          if (nrow(data) > 1 || is.list(boundaryValue)) {
+          # Check status of reference data
+          if (!is.null(referenceData)) {
+            if (!is.data.frame(referenceData) ||
+                ncol(referenceData) != ncol(data) ||
+                all(colnames(referenceData) != colnames(data)) ||
+                nrow(referenceData) < 2 ||
+                any(is.na(referenceData[[y]]))) {
+              referenceData <- NULL
+            }
+          }
+          
+          # Check if there are more than 1 data point or if reference data is available
+          if (nrow(data) > 1 || !is.null(referenceData)) {
             # Determine boundaries
-            if (is.list(boundaryValue)) {
-              mean <- boundaryValue$mean
-              sd <- boundaryValue$sd
-              sd2 <- boundaryValue$sd2
+            if (!is.null(referenceData)) {
+              # Generate statistics
+              stat <- ticq::generateStat(data = referenceData[[y]])
+              
+              mean <- stat$mean
+              sd <- stat$sd
+              sd2 <- stat$sd2
             } else {
               mean <- mean(data[[y]])
               sd <- sd(data[[y]])
@@ -246,22 +262,24 @@ plotMultipleTimeSeries <- function(data,
         }
       }
       
-      # Append plot to plotList
+      # Append plot to plot list
       plotList[[y]] <- timeSeries
       
       # Display plots
-      if (length(plotList) %% nPlotData == 0 || i == endIDX) {
-        plotGrid <- ggpubr::ggarrange(plotlist = plotList,
-                                      ncol = nPlotCol, 
-                                      nrow = nPlotRow,
-                                      common.legend = TRUE,
-                                      legend = ifelse(isFirstPlot, "top", "none"))
-        print(plotGrid)
-        
-        # Reset variables
-        plotList <- list()
-        isFirstPlot <- FALSE
-      }
+      suppressMessages(
+        if (length(plotList) %% nPlotData == 0 || i == endIDX) {
+          plotGrid <- ggpubr::ggarrange(plotlist = plotList,
+                                        ncol = nPlotCol, 
+                                        nrow = nPlotRow,
+                                        common.legend = TRUE,
+                                        legend = ifelse(isFirstPlot, "top", "none"))
+          print(plotGrid)
+          
+          # Reset variables
+          plotList <- list()
+          isFirstPlot <- FALSE
+        }
+      )
     }
     
     return(result)

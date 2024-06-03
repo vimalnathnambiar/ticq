@@ -2,7 +2,7 @@
 % Please edit documentation in R/sumEIC.R
 \name{sumEIC}
 \alias{sumEIC}
-\title{sumEIC}
+\title{Sum Extracted Ion Current (EIC)}
 \usage{
 sumEIC(data, commonColumn, spectrumCount, startIDX, endIDX = NULL)
 }
@@ -21,5 +21,5 @@ sumEIC(data, commonColumn, spectrumCount, startIDX, endIDX = NULL)
 A data frame grouped by common columns and the summed values of each column specified
 }
 \description{
-Sum EIC values of multiple data columns by grouping using its common columns.
+Sum intensity values of target m/z (EIC) from multiple data columns by grouping using its common columns.
 }
