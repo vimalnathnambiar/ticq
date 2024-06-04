@@ -30,7 +30,13 @@ configureChromatogramRegion(
 A list containing the start and end time points of the different chromatogram regions of interest (prewash, mass calibration, analyte, and wash)
 }
 \description{
-Configure the start and end time points of the different chromatogram regions of interest: prewash, mass calibration, analyte and wash.
+Configure the start and end time points of the different chromatogram regions of interest:
+\itemize{
+\item Prewash region
+\item Mass calibration region
+\item Analyte region
+\item Wash region
+}
 }
 \examples{
 # Example 1: Using default values for analyteStart, analyteEnd and washEnd

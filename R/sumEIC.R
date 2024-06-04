@@ -31,7 +31,7 @@ sumEIC <- function(data,
     # Column name to be summed
     y <- colnames(data)[i]
     
-    # Group data by common columns, and sum EIC values
+    # Group data by common columns and sum EIC values
     tmp <- data %>%
       dplyr::group_by(across(all_of(commonColumn))) %>%
       dplyr::summarise(!!spectrumCount := n(), !!y := sum(.data[[y]]), .groups = "keep")

@@ -36,8 +36,7 @@ input <- "/run/media/vimalnathnambiar/WD/data/JSON/barwon/"
 
 # Define chromatogram regions
 # chromatogramRegion <- params$chromatogramRegion
-chromatogramRegion <- ticq::configureChromatogramRegion(massCalStart = 0, massCalEnd = 0.3,
-                                                        washStart = 5)
+chromatogramRegion <- ticq::configureChromatogramRegion(massCalStart = 0, massCalEnd = 0.3, washStart = 5)
 
 # Define target file or in-house ANPC method library (Either one)
 targetFile <- params$targetFile
@@ -162,25 +161,21 @@ if (newStatus) {
 ```{r, echo = FALSE, warning = FALSE, include = FALSE}
 # Check new sample status
 if (newStatus) {
-  # Column names of extracted spectral data
+  # Column names of extracted spectral data used in workflow
   sampleID <- "sampleID"
   project <- "project"
   cohort <- "cohort"
   projectCohort <- "projectCohort"
-  matrix <- "matrix"
   sampleType <- "sampleType"
   method <- "method"
   instrument <- "instrument"
   plate <- "plate"
-  date <- "date"
-  time <- "time"
   timestamp <- "timestamp"
   spectrumCount <- "spectrumCount"
-  spectrumIndex <- "spectrum.index"
+  arrayLength <- "spectrum.arrayLength"
   msLevel <- "spectrum.msLevel"
   retentionTime <- "spectrum.retentionTime"
   basePeakIntensity <- "spectrum.basePeakIntensity"
-  basePeakMZ <- "spectrum.basePeakMZ"
   totalIonCurrent <- "spectrum.totalIonCurrent"
   mzArray <- "spectrum.mzArray"
   intensityArray <- "spectrum.intensityArray"
@@ -247,6 +242,7 @@ Spectrum count of samples are checked against a threshold limit of 20% below ave
 if (newStatus) {
   # If historical data exists
   if (file.exists(historicalDataPath)) {
+    # Read historical data
     historicalData <- readRDS(historicalDataPath)
     
     # Merge historical data and new data
@@ -337,6 +333,7 @@ if (newStatus) {
     
     # If historical data exists
     if (file.exists(historicalDataPath)) {
+      # Read historical data
       historicalData <- readRDS(historicalDataPath)
       
       # Filter historical data
@@ -3012,6 +3009,7 @@ if (newStatus) {
     
     # If historical data exists
     if (file.exists(historicalDataPath)) {
+      # Read historical data
       historicalData <- readRDS(historicalDataPath)
       
       # Filter historical data
@@ -3372,18 +3370,20 @@ Chromatogram overview (Extracted Ion Current, EIC vs Retention Time, RT) of targ
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample status and if target m/z data is available
 if (newStatus && !is.null(targetMZ)) {
-  # If none of the target m/z belong to the same MS level as the existing spectral data
-  if (!any(targetMZ$msLevel %in% unique(passedData[[msLevel]]))) {
-    # Update new sample status
+  # Update new sample status
+  if (length(unique(passedData[[arrayLength]])) != 1) {
     newStatus <- FALSE
-    print("Unable to generate Extracted Ion Chromatogram: No available target m/z data")
+    print("Unable to display Extracted Ion Chromatogram: Samples do not share the same spectra array length")
+  } else if (length(unique(targetMZ$mzValue)) != unique(passedData[[arrayLength]])) {
+    newStatus <- FALSE
+    print("Unable to display Extracted Ion Chromatogram: Length of unique target m/z does not match length of available spectra array")
   }
 } else if (!newStatus) {
-  print("Unable to generate Extracted Ion Chromatogram: No new samples to analyse")
+  print("Unable to display Extracted Ion Chromatogram: No new samples to analyse")
 } else if (is.null(targetMZ)) {
   # Update new sample status
   newStatus <- FALSE
-  print("Unable to generate Extracted Ion Chromatogram: No available target m/z data")
+  print("Unable to display Extracted Ion Chromatogram: No available target m/z data")
 }
 ```
 
@@ -3406,8 +3406,8 @@ if (newStatus) {
 ```{r, echo = FALSE, warning = FALSE, include = FALSE}
 # Check new sample status
 if (newStatus) {
-  # Check if spectral data is available
-  if (any(passedData[[msLevel]] == 1)) {
+  # Check if spectral data and associated target m/z is available
+  if (any(passedData[[msLevel]] == 1) && any(targetMZ$msLevel == 1)) {
     # Update spectral data status
     msStatus <- TRUE
     
@@ -3417,6 +3417,7 @@ if (newStatus) {
     
     # If historical data exists
     if (file.exists(historicalDataPath)) {
+      # Read historical data
       historicalData <- readRDS(historicalDataPath)
       
       # Filter historical data
@@ -3482,7 +3483,7 @@ if (newStatus && msStatus) {
     print("Unable to display Extracted Ion Chromatogram: No available target m/z data")
   }
 } else if (newStatus && !msStatus) {
-  print("Unable to display Extracted Ion Chromatogram: No available MS level 1 spectral data")
+  print("Unable to display Extracted Ion Chromatogram: No available MS level 1 spectral (and/or associated target m/z) data")
 }
 ```
 
@@ -4393,7 +4394,7 @@ if (newStatus && msStatus) {
     print("Unable to display Extracted Ion Chromatogram: No available target m/z data")
   }
 } else if (newStatus && !msStatus) {
-  print("Unable to display Extracted Ion Chromatogram: No available MS level 1 spectral data")
+  print("Unable to display Extracted Ion Chromatogram: No available MS level 1 spectral (and/or associated target m/z) data")
 }
 ```
 
@@ -5304,7 +5305,7 @@ if (newStatus && msStatus) {
     print("Unable to display Extracted Ion Chromatogram: No available target m/z data")
   }
 } else if (newStatus && !msStatus) {
-  print("Unable to display Extracted Ion Chromatogram: No available MS level 1 spectral data")
+  print("Unable to display Extracted Ion Chromatogram: No available MS level 1 spectral (and/or associated target m/z) data")
 }
 ```
 
@@ -6194,8 +6195,8 @@ if (newStatus && msStatus) {
 ```{r, echo = FALSE, warning = FALSE, include = FALSE}
 # Check new sample status
 if (newStatus) {
-  # Check if spectral data is available
-  if (any(passedData[[msLevel]] == 2)) {
+  # Check if spectral data and associated target m/z is available
+  if (any(passedData[[msLevel]] == 2) && any(targetMZ$msLevel == 2)) {
     # Update spectral data status
     msStatus <- TRUE
     
@@ -6205,6 +6206,7 @@ if (newStatus) {
     
     # If historical data exists
     if (file.exists(historicalDataPath)) {
+      # Read historical data
       historicalData <- readRDS(historicalDataPath)
       
       # Filter historical data
@@ -6270,7 +6272,7 @@ if (newStatus && msStatus) {
     print("Unable to display Extracted Ion Chromatogram: No available target m/z data")
   }
 } else if (newStatus && !msStatus) {
-  print("Unable to display Extracted Ion Chromatogram: No available MS level 1 spectral data")
+  print("Unable to display Extracted Ion Chromatogram: No available MS level 2 spectral (and/or associated target m/z) data")
 }
 ```
 
@@ -7182,7 +7184,7 @@ if (newStatus) {
   shape <- sampleType
   shapeLabel <- "Sample Type"
   boundary <- "sd"
-  xTickToggle <- FALSE
+  xTickToggle <- TRUE
   nPlotCol <- 2
   nPlotRow <- 2
 } else {
@@ -7193,8 +7195,8 @@ if (newStatus) {
 ```{r, echo = FALSE, warning = FALSE, include = FALSE}
 # Check new sample status
 if (newStatus) {
-  # Check if spectral data is available
-  if (any(passedData[[msLevel]] == 1)) {
+  # Check if spectral data and associated target m/z is available
+  if (any(passedData[[msLevel]] == 1) && any(targetMZ$msLevel == 1)) {
     # Update spectral data status
     msStatus <- TRUE
     
@@ -7204,6 +7206,7 @@ if (newStatus) {
     
     # If historical data exists
     if (file.exists(historicalDataPath)) {
+      # Read historical data
       historicalData <- readRDS(historicalDataPath)
       
       # Filter historical data
@@ -7278,7 +7281,7 @@ if (newStatus && msStatus) {
     print("Unable to perform Time Series Analysis: No available target m/z data")
   }
 } else if (newStatus && !msStatus) {
-  print("Unable to perform Time Series Analysis: No available MS level 1 spectral data")
+  print("Unable to perform Time Series Analysis: No available MS level 1 spectral (and/or associated target m/z) data")
 }
 ```
 
@@ -8521,7 +8524,7 @@ if (newStatus && msStatus) {
     print("Unable to perform Time Series Analysis: No available target m/z data")
   }
 } else if (newStatus && !msStatus) {
-  print("Unable to perform Time Series Analysis: No available MS level 1 spectral data")
+  print("Unable to perform Time Series Analysis: No available MS level 1 spectral (and/or associated target m/z) data")
 }
 ```
 
@@ -9764,7 +9767,7 @@ if (newStatus && msStatus) {
     print("Unable to perform Time Series Analysis: No available target m/z data")
   }
 } else if (newStatus && !msStatus) {
-  print("Unable to perform Time Series Analysis: No available MS level 1 spectral data")
+  print("Unable to perform Time Series Analysis: No available MS level 1 spectral (and/or associated target m/z) data")
 }
 ```
 
@@ -10977,8 +10980,8 @@ if (newStatus && msStatus) {
 ```{r, echo = FALSE, warning = FALSE, include = FALSE}
 # Check new sample status
 if (newStatus) {
-  # Check if spectral data is available
-  if (any(passedData[[msLevel]] == 2)) {
+  # Check if spectral data and associated target m/z is available
+  if (any(passedData[[msLevel]] == 2) && any(targetMZ$msLevel == 2)) {
     # Update spectral data status
     msStatus <- TRUE
     
@@ -10988,6 +10991,7 @@ if (newStatus) {
     
     # If historical data exists
     if (file.exists(historicalDataPath)) {
+      # Read historical data
       historicalData <- readRDS(historicalDataPath)
       
       # Filter historical data
@@ -11062,7 +11066,7 @@ if (newStatus && msStatus) {
     print("Unable to perform Time Series Analysis: No available target m/z data")
   }
 } else if (newStatus && !msStatus) {
-  print("Unable to perform Time Series Analysis: No available MS level 1 spectral data")
+  print("Unable to perform Time Series Analysis: No available MS level 2 spectral (and/or associated target m/z) data")
 }
 ```
 
@@ -12286,17 +12290,74 @@ if (newStatus) {
   # Common data columns
   commonColumn <- colnames(passedData)[which(colnames(passedData) == sampleID):which(colnames(passedData) == spectrumCount)]
   
+  # Target list
+  targetList <- sort(unique(targetMZ$mzValue))
+
+  # Extract plot data
+  plotData <- passedData
+  
+  # If historical data exists
+  if (file.exists(historicalDataPath)) {
+    # Read historical data
+    historicalData <- readRDS(historicalDataPath)
+
+    # Merge historical data and new data
+    plotData <- rbind(historicalData, plotData)
+
+    # Clean environment
+    rm(historicalData)
+    invisible(gc())
+  }
+
+  # Extract and calculate average mass error of each unique target m/z
+  plotData <- ticq::extractMassError(data = plotData,
+                                     mzArray = mzArray,
+                                     targetList = targetList)
+  
+  plotData <- ticq::calculateAverageMassError(data = plotData,
+                                              commonColumn = commonColumn,
+                                              spectrumCount = spectrumCount,
+                                              startIDX = which(colnames(plotData) == as.character(targetList[1])),
+                                              roundDecimal = roundDecimal)
+
   # Plot variables and labels
   x <- timestamp
+  startIDX <- which(colnames(plotData) == as.character(targetList[1]))
   caption <- "m/z"
   xLabel <- "Timestamp"
   yLabel <- "ppm"
-  shape <- sampleType
-  shapeLabel <- "Sample Type"
-  boundary <- "sd"
-  xTickToggle <- FALSE
+  boundary <- "value"
+  boundaryValue <- 5
+  xTickToggle <- TRUE
   nPlotCol <- 2
   nPlotRow <- 2
+  facetWrap <- instrument
+
+    # Colour grouping variable and label
+    if (length(unique(plotData[[projectCohort]])) > 1) {
+      colour <- projectCohort
+      colourLabel <- "Project"
+    } else {
+      colour <- plate
+      colourLabel <- "Plate"
+    }
+  
+  # Plot time series
+  result <- ticq::plotMultipleTimeSeries(data = plotData,
+                                         commonColumn = commonColumn,
+                                         x = x,
+                                         startIDX = startIDX,
+                                         colour = colour,
+                                         caption = caption,
+                                         xLabel = xLabel,
+                                         yLabel = yLabel,
+                                         colourLabel = colourLabel,
+                                         boundary = boundary,
+                                         boundaryValue = boundaryValue,
+                                         xTickToggle = xTickToggle,
+                                         nPlotCol = nPlotCol,
+                                         nPlotRow = nPlotRow,
+                                         facetWrap = instrument)
 } else {
   print("Unable to perform Mass Accuracy Analysis: No new samples to analyse")
 }

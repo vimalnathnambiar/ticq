@@ -11,16 +11,16 @@ extractMassError(data, mzArray, targetList)
 
 \item{mzArray}{m/z array column name: character}
 
-\item{targetList}{A list of unique target m/z (Must be equal length as values stored within m/z array): numeric vector}
+\item{targetList}{A list of unique target m/z (Must be equal length and correspond to the values stored within m/z array): numeric vector}
 
 \item{commonColumn}{Column names of data common for each unique sample: character vector}
 }
 \value{
-A data frame with appended columns representing the calculated mass error (ppm) of each target m/z
+A data frame with appended columns representing the calculated mass error (ppm) of each target m/z (EIC)
 }
 \description{
-Calculate and extract the mass error (in ppm) of each target m/z data detected within the spectra.
+Extract the mass error (in ppm) of each target m/z data detected within the spectra.
 }
 \details{
-The length of the target list containing unique m/z values MUST BE EQUAL to the length of m/z array for each spectra.
+The length of the target list containing unique m/z values must be equal to the length of m/z array for each spectral data and reflect the corresponding m/z values stored.
 }

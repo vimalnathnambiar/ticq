@@ -7,7 +7,7 @@
 generateStat(data)
 }
 \arguments{
-\item{data}{A continuous data series of numerical values (A minimum of 2 data points and do not contain NA values): numerical vector}
+\item{data}{A continuous data series of numerical values (Must have a minimum of 2 data points and do not contain NA values): numerical vector}
 }
 \value{
 A list of all generated statistics
@@ -34,7 +34,7 @@ Generate statistical information of a dataset including:
 }
 }
 \details{
-Data MUST HAVE a minimum of 2 data points and MUST NOT contain any NA values.
+Data must have a minimum of 2 data points and must not contain any NA values.
 }
 \examples{
 stat <- ticq::generateStat(data = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))

@@ -18,10 +18,10 @@
 #' - Confidence interval (CI) - 95% and 99% (Lower and upper)
 #' - Confidence quantile range (CQ) - 95% and 99% (Lower and upper)
 #' 
-#' Data MUST HAVE a minimum of 2 data points and MUST NOT contain any NA values.
+#' Data must have a minimum of 2 data points and must not contain any NA values.
 #'
 #' @export
-#' @param data A continuous data series of numerical values (A minimum of 2 data points and do not contain NA values): numerical vector
+#' @param data A continuous data series of numerical values (Must have a minimum of 2 data points and do not contain NA values): numerical vector
 #' @returns A list of all generated statistics
 #'
 #' @examples

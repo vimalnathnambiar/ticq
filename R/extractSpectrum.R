@@ -3,12 +3,14 @@
 #' Extract spectral data from JSON files generated using ExfilMS (https://github.com/vmalnathnambiar/exfilms). Also includes retrievable metadata from sample name or file path. 
 #'
 #' Metadata extraction only applicable to data acquired at the Australian National Phenome Centre (ANPC).
+#' 
+#' To evaluate target m/z with TICQ, perform targeted spectra filtering using ExfilMS. The target file used for ExfilMS should match the target file defined in TICQ for comparison
 #'
 #' @import jsonlite
 #'
 #' @export
-#' @param input Input path (Either a directory containing JSON files or a single file path): character
-#' @param inputFiles JSON input files to be extracted: character vector
+#' @param input Input path (Either a directory path containing JSON files or a single file path): character
+#' @param inputFiles JSON input files to extract spectral data from: character vector
 #' @returns A list containing two data frames (passed and failed data)
 extractSpectrum <- function(input, inputFiles) {
   # Defaults

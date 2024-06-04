@@ -22,7 +22,10 @@ plotMultipleTimeSeries(
   referenceData = NULL,
   xTickToggle = TRUE,
   nPlotCol = 1,
-  nPlotRow = 1
+  nPlotRow = 1,
+  facetWrap = NULL,
+  nFacetCol = NULL,
+  nFacetRow = NULL
 )
 }
 \arguments{
@@ -61,6 +64,12 @@ plotMultipleTimeSeries(
 \item{nPlotCol}{Number of plots to be plotted in a single column (Default: 1): double}
 
 \item{nPlotRow}{Number of plots to be plotted in a single row (Default: 1): double}
+
+\item{facetWrap}{Column nanme representing data to be used for facet wrapping (Default: NULL): NULL or character}
+
+\item{nFacetCol}{Number of plots to be facet wrapped in a single column (Default: NULL): NULL or double}
+
+\item{nFacetRow}{Number of plots to be facet wrapped in a single row (Default: NULL): NULL or double}
 }
 \value{
 A data frame containing the result of the boundary analysis performed

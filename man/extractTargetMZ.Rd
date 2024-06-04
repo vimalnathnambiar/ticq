@@ -11,7 +11,7 @@ extractTargetMZ(
 )
 }
 \arguments{
-\item{targetFile}{Published to web or local TSV document containing target m/z data (Default: NULL, Options: Published to web URL or local file path): NULL or character}
+\item{targetFile}{Published to web or local TSV document containing target m/z data used by ExfilMS for spectra filtering (Default: NULL, Options: Published to web URL or local file path): NULL or character}
 
 \item{anpcMethodLibrary}{ANPC in-house method library (Default: NULL, Options: "MS-AA-POS", "MS-HIL-POS", "MS-HIL-NEG", "MS-RP-POS" or "MS-RP-NEG"): NULL or character}
 
@@ -24,9 +24,9 @@ A data frame containing target m/z data
 Extract target m/z data from a target file (published to web URL or local TSV document) or an in-house method library used at the Australian National Phenome Centre (ANPC).
 }
 \details{
-Define EITHER a target file OR an in-house method library. If both are defined, only target file is checked for.
+To assess targeted MS spectral data acquired using ExfilMS post-targeted spectra filtering, ensure the same target file or in-house method library is defined in TICQ.
 
-When defining a target file, please ensure it follows a specified layout.
+If both target file and in-house method library is defined, only target file will be checked for. The target file should follow a pre-determined layout used by ExfilMS (https://github.com/vmalnathnambiar/exfilms/blob/main/docs/how-to-create-a-target-file.md).
 }
 \examples{
 # Example 1: Defining a target file with no rounding of precision values

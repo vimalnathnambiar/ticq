@@ -1,6 +1,10 @@
 #' Configure Chromatogram Region
 #'
-#' Configure the start and end time points of the different chromatogram regions of interest: prewash, mass calibration, analyte and wash. 
+#' Configure the start and end time points of the different chromatogram regions of interest:
+#' - Prewash region
+#' - Mass calibration region
+#' - Analyte region
+#' - Wash region
 #'
 #' @export
 #' @param massCalStart Start of mass calibration cycle (Default: 0): double

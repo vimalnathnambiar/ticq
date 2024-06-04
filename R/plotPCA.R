@@ -2,14 +2,14 @@
 #'
 #' Perform Principle Component Analysis (PCA) and display associated plots (scree plot, scores plot, loadings plot and biplot).
 #' 
-#' Data used for PCA MUST BE equal sized and MUST NOT contain NA values.
+#' Data used for PCA must be equal sized and must not contain NA values.
 #'
 #' @import ggplot2
 #' @import HotellingEllipse
 #' @import ggforce
 #'
 #' @export
-#' @param data A data frame containing data to perform PCA (Equal sized and must not contain NA values): data frame
+#' @param data A data frame containing data to perform PCA (Must be equal sized and do not contain NA values): data frame
 #' @param startIDX Index of the first data column to perform PCA on: double
 #' @param endIDX Index of the last data column data to perform PCA on (Default: NULL): NULL or double
 #' @param scale PCA scaling (Default: TRUE, Options: TRUE or FALSE): boolean

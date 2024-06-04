@@ -7,9 +7,9 @@
 extractSpectrum(input, inputFiles)
 }
 \arguments{
-\item{input}{Input path (Either a directory containing JSON files or a single file path): character}
+\item{input}{Input path (Either a directory path containing JSON files or a single file path): character}
 
-\item{inputFiles}{JSON input files to be extracted: character vector}
+\item{inputFiles}{JSON input files to extract spectral data from: character vector}
 }
 \value{
 A list containing two data frames (passed and failed data)
@@ -19,4 +19,6 @@ Extract spectral data from JSON files generated using ExfilMS (https://github.co
 }
 \details{
 Metadata extraction only applicable to data acquired at the Australian National Phenome Centre (ANPC).
+
+To evaluate target m/z with TICQ, perform targeted spectra filtering using ExfilMS. The target file used for ExfilMS should match the target file defined in TICQ for comparison
 }

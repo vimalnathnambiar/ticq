@@ -11,7 +11,7 @@ extractEIC(data, intensityArray, targetList)
 
 \item{intensityArray}{Intensity array column name: character}
 
-\item{targetList}{A list of unique target m/z (Must be equal length as values stored within intensity array): character vector}
+\item{targetList}{A list of unique target m/z (Must be equal length and correspond to the values stored within intensity array): character vector}
 }
 \value{
 A data frame with appended columns representing the extracted intensity of each target m/z (EIC)
@@ -20,5 +20,5 @@ A data frame with appended columns representing the extracted intensity of each 
 Extract the intensity of each target m/z (EIC) detected within the spectra.
 }
 \details{
-The length of the target list containing unique m/z values MUST BE EQUAL to the length of intensity array for each spectra.
+The length of the target list containing unique m/z values must be equal to the length of intensity array for each spectral data and reflect the corresponding m/z values.
 }

@@ -23,7 +23,7 @@ plotPCA(
 )
 }
 \arguments{
-\item{data}{A data frame containing data to perform PCA (Equal sized and must not contain NA values): data frame}
+\item{data}{A data frame containing data to perform PCA (Must be equal sized and do not contain NA values): data frame}
 
 \item{startIDX}{Index of the first data column to perform PCA on: double}
 
@@ -57,5 +57,5 @@ plotPCA(
 Perform Principle Component Analysis (PCA) and display associated plots (scree plot, scores plot, loadings plot and biplot).
 }
 \details{
-Data used for PCA MUST BE equal sized and MUST NOT contain NA values.
+Data used for PCA must be equal sized and must not contain NA values.
 }

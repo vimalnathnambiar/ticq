@@ -31,6 +31,9 @@
 #' @param xTickToggle Toggle to display ticks on x-axis (Default: TRUE, Options: TRUE or FALSE): boolean
 #' @param nPlotCol Number of plots to be plotted in a single column (Default: 1): double
 #' @param nPlotRow Number of plots to be plotted in a single row (Default: 1): double
+#' @param facetWrap Column nanme representing data to be used for facet wrapping (Default: NULL): NULL or character
+#' @param nFacetCol Number of plots to be facet wrapped in a single column (Default: NULL): NULL or double
+#' @param nFacetRow Number of plots to be facet wrapped in a single row (Default: NULL): NULL or double
 #' @returns A data frame containing the result of the boundary analysis performed
 plotMultipleTimeSeries <- function(data,
                                    commonColumn,
@@ -49,7 +52,10 @@ plotMultipleTimeSeries <- function(data,
                                    referenceData = NULL,
                                    xTickToggle = TRUE,
                                    nPlotCol = 1,
-                                   nPlotRow = 1) {
+                                   nPlotRow = 1,
+                                   facetWrap = NULL,
+                                   nFacetCol = NULL,
+                                   nFacetRow = NULL) {
   tryCatch({
     # Defaults
     plotList <- list()
@@ -90,6 +96,12 @@ plotMultipleTimeSeries <- function(data,
                       y = yLabel,
                       colour = colourLabel,
                       shape = shapeLabel)
+      
+        # Facet wrap
+        if (!is.null(facetWrap)) {
+          timeSeries <- timeSeries +
+            ggplot2::facet_wrap(~ .data[[facetWrap]], ncol = nFacetCol, nrow = nFacetRow)
+        }
       
         # Remove ticks on x-axis
         if (!xTickToggle) {
