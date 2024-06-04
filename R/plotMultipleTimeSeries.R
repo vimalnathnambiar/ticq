@@ -97,16 +97,16 @@ plotMultipleTimeSeries <- function(data,
                       colour = colourLabel,
                       shape = shapeLabel)
       
-        # Facet wrap
-        if (!is.null(facetWrap)) {
-          timeSeries <- timeSeries +
-            ggplot2::facet_wrap(~ .data[[facetWrap]], ncol = nFacetCol, nrow = nFacetRow)
-        }
-      
         # Remove ticks on x-axis
         if (!xTickToggle) {
           timeSeries <- timeSeries +
             ggplot2::theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
+        }
+      
+        # Facet wrap
+        if (!is.null(facetWrap)) {
+          timeSeries <- timeSeries +
+            ggplot2::facet_wrap(~ .data[[facetWrap]], ncol = nFacetCol, nrow = nFacetRow)
         }
       
       # Perform boundary analysis if defined
