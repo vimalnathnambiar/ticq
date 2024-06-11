@@ -58,6 +58,9 @@ extractTargetFile <- function(targetFile = NULL, anpcMethodLibrary = NULL, round
         print(paste("Unable to extract target file: Path not found -", targetFile))
         NULL
       }
+    }else {
+      print("Unable to extract target file: Invalid target file type")
+      NULL
     }
   } else if (!is.null(anpcMethodLibrary)) {
     # Retrieve URL path to method library
