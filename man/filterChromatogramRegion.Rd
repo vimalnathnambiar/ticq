@@ -14,8 +14,8 @@ filterChromatogramRegion(data, regionOfInterest = NULL, retentionTime)
 \item{retentionTime}{Retention time column name: character}
 }
 \value{
-A data frame containing spectral data that falls within the retention time of the chromatogram region of interest
+A data frame containing spectral data that falls between the start and end time point of the chromatogram region of interest
 }
 \description{
-Filter data for specific chromatogram region of interest.
+Filter data for a specific chromatogram region of interest by the respective start and end time points.
 }

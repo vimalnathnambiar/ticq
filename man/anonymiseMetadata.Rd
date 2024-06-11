@@ -33,7 +33,7 @@ anonymiseMetadata(
 \item{plate}{Plate number column name: character}
 }
 \value{
-A data frame with anonymised sample metadata containing spectral data
+A data frame with anonymised sample metadata and associated spectral data
 }
 \description{
 Anonymise sample metadata including sample ID, project name, cohort name, method name, instrument name, and plate number.
@@ -42,20 +42,9 @@ Anonymise sample metadata including sample ID, project name, cohort name, method
 Only applicable to data acquired at the Australian National Phenome Centre (ANPC).
 }
 \examples{
-data <- data.frame(sampleID = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29",
-                   project = "COVID-19",
-                   cohort = "Heidelberg",
-                   projectCohort = "COVID-19 Heidelberg",
-                   method = "MS-AA-POS",
-                   instrument = "PAI05",
-                   plate = 88)
-data <- ticq::anonymiseMetadata(data = data,
-                                sampleID = "sampleID",
-                                project = "project",
-                                cohort = "cohort",
-                                projectCohort = "projectCohort",
-                                method = "method",
-                                instrument = "instrument",
-                                plate = "plate")
+data <- data.frame(sampleID = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29", project = "COVID-19", cohort = "Heidelberg",
+                   projectCohort = "COVID-19 Heidelberg", method = "MS-AA-POS", instrument = "PAI05", plate = "88")
+data <- ticq::anonymiseMetadata(data = data, sampleID = "sampleID", project = "project", cohort = "cohort", projectCohort = "projectCohort",
+                                method = "method", instrument = "instrument", plate = "plate")
 print(data)
 }

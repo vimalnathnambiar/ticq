@@ -15,33 +15,15 @@
 #' @param method Method column name: character
 #' @param instrument Instrument column name: character
 #' @param plate Plate number column name: character
-#' @returns A data frame with anonymised sample metadata containing spectral data
+#' @returns A data frame with anonymised sample metadata and associated spectral data
 #'
 #' @examples
-#' data <- data.frame(sampleID = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29",
-#'                    project = "COVID-19",
-#'                    cohort = "Heidelberg",
-#'                    projectCohort = "COVID-19 Heidelberg",
-#'                    method = "MS-AA-POS",
-#'                    instrument = "PAI05",
-#'                    plate = 88)
-#' data <- ticq::anonymiseMetadata(data = data,
-#'                                 sampleID = "sampleID",
-#'                                 project = "project",
-#'                                 cohort = "cohort",
-#'                                 projectCohort = "projectCohort",
-#'                                 method = "method",
-#'                                 instrument = "instrument",
-#'                                 plate = "plate")
+#' data <- data.frame(sampleID = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29", project = "COVID-19", cohort = "Heidelberg",
+#'                    projectCohort = "COVID-19 Heidelberg", method = "MS-AA-POS", instrument = "PAI05", plate = "88")
+#' data <- ticq::anonymiseMetadata(data = data, sampleID = "sampleID", project = "project", cohort = "cohort", projectCohort = "projectCohort",
+#'                                 method = "method", instrument = "instrument", plate = "plate")
 #' print(data)
-anonymiseMetadata <- function(data,
-                              sampleID,
-                              project,
-                              cohort,
-                              projectCohort,
-                              method,
-                              instrument,
-                              plate) {
+anonymiseMetadata <- function(data, sampleID, project, cohort, projectCohort, method, instrument, plate) {
   # Anonymise (and replace NA) metadata values
   anonymisedData <- data %>% 
     dplyr::mutate(

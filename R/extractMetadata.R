@@ -18,10 +18,8 @@ extractMetadata <- function(input) {
   # Extract cohort name
   cohort <- ticq::extractCohort(input = input)
   
-  # Combine project name and cohort name as a unique variable
-  projectCohort <- ifelse(is.na(project),
-                          ifelse(is.na(cohort), NA_character_, cohort),
-                          ifelse(is.na(cohort), project, paste(project, cohort)))
+  # Combine project name and cohort name
+  projectCohort <- ifelse(is.na(project), ifelse(is.na(cohort), NA_character_, cohort), ifelse(is.na(cohort), project, paste(project, cohort)))
   
   # Extract matrix type
   matrix <- ticq::extractMatrix(input = input)
@@ -38,12 +36,16 @@ extractMetadata <- function(input) {
   # Extract plate number
   plate <- ticq::extractPlate(input = input)
   
-  return(list(project = project,
-              cohort = cohort,
-              projectCohort = projectCohort,
-              matrix = matrix,
-              sampleType = sampleType,
-              method = method,
-              instrument = instrument,
-              plate = plate))
+  return(
+    list(
+      project = project,
+      cohort = cohort,
+      projectCohort = projectCohort,
+      matrix = matrix,
+      sampleType = sampleType,
+      method = method,
+      instrument = instrument,
+      plate = plate
+    )
+  )
 }

@@ -37,6 +37,6 @@ Generate statistical information of a dataset including:
 Data must have a minimum of 2 data points and must not contain any NA values.
 }
 \examples{
-stat <- ticq::generateStat(data = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
-print(stat)
+stats <- ticq::generateStat(data = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
+print(stats)
 }

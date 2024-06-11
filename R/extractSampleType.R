@@ -12,8 +12,7 @@
 #' @returns Sample type
 #'
 #' @examples
-#' sampleType <- ticq::extractSampleType(input = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29.json",
-#'                                       matrix = "Serum")
+#' sampleType <- ticq::extractSampleType(input = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29.json", matrix = "Serum")
 #' print(sampleType)
 extractSampleType <- function(input, matrix = NA_character_) {
   # Sample type patterns

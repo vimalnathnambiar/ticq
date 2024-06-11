@@ -4,18 +4,18 @@
 \alias{loadPackage}
 \title{Load Package}
 \usage{
-loadPackage(packageList)
+loadPackage(packageName)
 }
 \arguments{
-\item{packageList}{Package names to be loaded: character vector}
+\item{packageName}{Package names to be loaded: character vector}
 }
 \description{
 Identify, install and load packages to use.
 }
 \examples{
 # Example 1: Loading a single package
-ticq::loadPackage(packageList = c("DT"))
+ticq::loadPackage(packageName = "DT")
 
 # Example 2: Loading multiple packages
-ticq::loadPackage(packageList = c("DT", "dplyr"))
+ticq::loadPackage(packageName = c("DT", "dplyr"))
 }

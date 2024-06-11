@@ -21,9 +21,10 @@ displayChromatogramRegion(plot, maxX, maxY, chromatogramRegion, label)
 A ggplot object with the added vertical lines displaying the chromatogram region start and end time points
 }
 \description{
-Add vertical lines to display the start and end time points of a chromatogram region on a chromatogram plot.
+Display vertical lines highlighting the start and end time points of a chromatogram region on a chromatogram plot.
 }
 \details{
 This function is not exported as it is only used by:
-ticq::plotChromatogram()
+ticq::displayChromatogram()
+ticq::displayMultipleChromatogram()
 }

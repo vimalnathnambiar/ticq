@@ -16,7 +16,7 @@ spliceChromatogramRegion(
 \arguments{
 \item{data}{A data frame containing spectral data: data frame}
 
-\item{commonColumn}{Column names of data common for each unique sample: character vector}
+\item{commonColumn}{Column names of data common for each sample: character vector}
 
 \item{spectrumCount}{Spectrum count column name: character}
 
@@ -30,5 +30,8 @@ spliceChromatogramRegion(
 A data frame containing the summed values for each chromatogram regions of interest
 }
 \description{
-Splice and sum values for each chromatogram regions of interest.
+Splice chromatogram regions of interest by summing values of a column by the respective start and end time points.
+}
+\details{
+Configure chromatogram region using: ticq::configureChromatogramRegion()
 }

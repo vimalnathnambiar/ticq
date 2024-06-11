@@ -17,24 +17,27 @@
 #'
 #' @examples
 #' # Example 1: Using default values for analyteStart, analyteEnd and washEnd
-#' chromatogramRegion <- ticq::configureChromatogramRegion(massCalStart = 0, massCalEnd = 0.3,
-#'                                                         washStart = 5)
+#' chromatogramRegion <- ticq::configureChromatogramRegion(massCalibrationStart = 0, massCalibrationEnd = 0.3, washStart = 5)
 #' print(chromatogramRegion)
 #'
 #' # Example 2: Defining values for analyteStart, analyteEnd and washEnd
-#' chromatogramRegion <- ticq::configureChromatogramRegion(massCalStart = 0, massCalEnd = 0.3,
-#'                                                         analyteStart = 2, analyteEnd = 4
+#' chromatogramRegion <- ticq::configureChromatogramRegion(massCalibrationStart = 0, massCalibrationEnd = 0.3,
+#'                                                         analyteStart = 2, analyteEnd = 4,
 #'                                                         washStart = 5, washEnd = 6)
 #' print(chromatogramRegion)
-configureChromatogramRegion <- function(massCalStart = 0,
-                                        massCalEnd,
-                                        analyteStart = massCalEnd,
+configureChromatogramRegion <- function(massCalibrationStart = 0,
+                                        massCalibrationEnd,
+                                        analyteStart = massCalibrationEnd,
                                         analyteEnd = washStart,
                                         washStart,
                                         washEnd = NULL) {
   # Configure the start and end time points for prewash, mass calibration, analyte, and wash regions
-  return(list(prewash = list(start = 0, end = washStart),
-              massCal = list(start = massCalStart, end = massCalEnd),
-              analyte = list(start = analyteStart, end = analyteEnd),
-              wash = list(start = washStart, end = washEnd)))
+  return(
+    list(
+      prewash = list(start = 0, end = washStart),
+      massCalibration = list(start = massCalibrationStart, end = massCalibrationEnd),
+      analyte = list(start = analyteStart, end = analyteEnd),
+      wash = list(start = washStart, end = washEnd)
+    )
+  )
 }

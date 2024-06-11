@@ -5,19 +5,15 @@
 \title{Configure Chromatogram Region}
 \usage{
 configureChromatogramRegion(
-  massCalStart = 0,
-  massCalEnd,
-  analyteStart = massCalEnd,
+  massCalibrationStart = 0,
+  massCalibrationEnd,
+  analyteStart = massCalibrationEnd,
   analyteEnd = washStart,
   washStart,
   washEnd = NULL
 )
 }
 \arguments{
-\item{massCalStart}{Start of mass calibration cycle (Default: 0): double}
-
-\item{massCalEnd}{End of mass calibration cycle: double}
-
 \item{analyteStart}{Start of feature detection cycle (Default: End of mass calibration cycle): double}
 
 \item{analyteEnd}{End of feature detection cycle (Default: Start of wash cycle): double}
@@ -25,6 +21,10 @@ configureChromatogramRegion(
 \item{washStart}{Start of wash cycle: double}
 
 \item{washEnd}{End of wash cycle (Default: NULL): NULL or double}
+
+\item{massCalStart}{Start of mass calibration cycle (Default: 0): double}
+
+\item{massCalEnd}{End of mass calibration cycle: double}
 }
 \value{
 A list containing the start and end time points of the different chromatogram regions of interest (prewash, mass calibration, analyte, and wash)
@@ -40,13 +40,12 @@ Configure the start and end time points of the different chromatogram regions of
 }
 \examples{
 # Example 1: Using default values for analyteStart, analyteEnd and washEnd
-chromatogramRegion <- ticq::configureChromatogramRegion(massCalStart = 0, massCalEnd = 0.3,
-                                                        washStart = 5)
+chromatogramRegion <- ticq::configureChromatogramRegion(massCalibrationStart = 0, massCalibrationEnd = 0.3, washStart = 5)
 print(chromatogramRegion)
 
 # Example 2: Defining values for analyteStart, analyteEnd and washEnd
-chromatogramRegion <- ticq::configureChromatogramRegion(massCalStart = 0, massCalEnd = 0.3,
-                                                        analyteStart = 2, analyteEnd = 4
+chromatogramRegion <- ticq::configureChromatogramRegion(massCalibrationStart = 0, massCalibrationEnd = 0.3,
+                                                        analyteStart = 2, analyteEnd = 4,
                                                         washStart = 5, washEnd = 6)
 print(chromatogramRegion)
 }

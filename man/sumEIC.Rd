@@ -4,18 +4,24 @@
 \alias{sumEIC}
 \title{Sum Extracted Ion Current (EIC)}
 \usage{
-sumEIC(data, commonColumn, spectrumCount, startIDX, endIDX = NULL)
+sumEIC(
+  data,
+  commonColumn,
+  spectrumCount,
+  firstColumnIndex,
+  lastColumnIndex = NULL
+)
 }
 \arguments{
 \item{data}{A data frame containing spectral data: data frame}
 
-\item{commonColumn}{Column names of data common for each unique sample: character vector}
+\item{commonColumn}{Column names of data common for each sample: character vector}
 
 \item{spectrumCount}{Spectrum count column name: character}
 
-\item{startIDX}{Index of the first data column to summed: double}
+\item{firstColumnIndex}{Index of the first data column to summed: double}
 
-\item{endIDX}{Index of the last data column to summed: double}
+\item{lastColumnIndex}{Index of the last data column to summed: double}
 }
 \value{
 A data frame grouped by common columns and the summed values of each column specified

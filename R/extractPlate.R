@@ -20,18 +20,16 @@ extractPlate <- function(input) {
   
   # Loop through patterns
   for (p in pattern) {
-    # If pattern matches
+    # Check pattern
     if (grepl(p, input)) {
       # Extract pattern
       plate <- stringr::str_extract(input, p)
       
-      # Remove non-numeric characters
+      # Remove non-numeric characters and leading zeros
       plate <- stringr::str_replace(plate, "[a-zA-Z]+", "")
-      
-      # Remove leading zeros
       plate <- stringr::str_replace(plate, "0+", "")
       
-      # If plate number string is empty after removing non-numeric characters and leading 0s
+      # Check if plate number string is empty
       if (plate == "") {
         plate <- "0"
       }

@@ -9,7 +9,7 @@ checkUndefinedSampleType(data, commonColumn, sampleType, spectrumCount)
 \arguments{
 \item{data}{A data frame containing spectral data: data frame}
 
-\item{commonColumn}{Column names of data common for each unique sample: character vector}
+\item{commonColumn}{Column names of data common for each sample: character vector}
 
 \item{sampleType}{Sample type column name: character}
 
@@ -19,7 +19,7 @@ checkUndefinedSampleType(data, commonColumn, sampleType, spectrumCount)
 A list containing two data frames (passed and failed data)
 }
 \description{
-Check and filter for samples that have an undefined sample type.
+Check for samples that have an undefined sample type.
 }
 \details{
 Only applicable to data acquired at the Australian National Phenome Centre (ANPC).

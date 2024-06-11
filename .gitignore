@@ -48,15 +48,10 @@ po/*~
 # RStudio Connect folder
 rsconnect/
 
-# Knitted HTML files
+# Output files
 *.nb.html
-*.html
-
-# Rendered HTML files (Report)
-report/
-
-# Data files
-data/
+output/
+inst/scripts/
 
 # macOS DS Store
 .DS_Store

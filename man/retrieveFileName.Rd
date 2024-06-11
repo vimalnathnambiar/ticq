@@ -4,16 +4,16 @@
 \alias{retrieveFileName}
 \title{Retrieve File Name}
 \usage{
-retrieveFileName(input, fileExtension = NULL)
+retrieveFileName(inputPath, fileExtension = NULL)
 }
 \arguments{
-\item{input}{Input path containing files of interest: character}
+\item{inputPath}{Input path: character}
 
-\item{fileExtension}{File extension to filter for (Default: NULL): NULL or character}
+\item{fileExtension}{File extension for file name retrieval (Default: NULL): NULL or character}
 }
 \value{
-File names matching the file extension defined: character vector
+File names with matching file extension: character vector
 }
 \description{
-Filter and retrieve file names of a specific extension type stored within an input path.
+Retrieve file names of a specific extension type stored within an input path.
 }

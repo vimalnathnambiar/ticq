@@ -25,8 +25,8 @@
 #' @returns A list of all generated statistics
 #'
 #' @examples
-#' stat <- ticq::generateStat(data = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
-#' print(stat)
+#' stats <- ticq::generateStat(data = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
+#' print(stats)
 generateStat <- function(data) {
   # Sample size (n)
   n <- length(data)
@@ -72,7 +72,7 @@ generateStat <- function(data) {
   me95 <- 0
   me99 <- 0
   
-    # Check sample size and calculate margin error
+    # Check sample size
     if (n < 30) {
       # Calculate using t-critical score
         # 95%
@@ -111,29 +111,33 @@ generateStat <- function(data) {
     lowerCQ99 <- quantile(data, probArea99)
     upperCQ99 <- quantile(data, (1 - probArea99))
   
-  return(list(n = n,
-              min = min,
-              mean = mean,
-              max = max,
-              Q1 = Q1,
-              median = median,
-              Q3 = Q3,
-              IQR = IQR,
-              lowerInnerFence = lowerInnerFence,
-              upperInnerFence = upperInnerFence,
-              lowerOuterFence = lowerOuterFence,
-              upperOuterFence = upperOuterFence,
-              sd = sd,
-              sd2 = sd2,
-              se = se,
-              me95 = me95,
-              me99 = me99,
-              lowerCI95 = lowerCI95,
-              upperCI95 = upperCI95,
-              lowerCI99 = lowerCI99,
-              upperCI99 = upperCI99,
-              lowerCQ95 = lowerCQ95,
-              upperCQ95 = upperCQ95,
-              lowerCQ99 = lowerCQ99,
-              upperCQ99 = upperCQ99))
+  return(
+    list(
+      n = n,
+      min = min,
+      mean = mean,
+      max = max,
+      Q1 = Q1,
+      median = median,
+      Q3 = Q3,
+      IQR = IQR,
+      lowerInnerFence = lowerInnerFence,
+      upperInnerFence = upperInnerFence,
+      lowerOuterFence = lowerOuterFence,
+      upperOuterFence = upperOuterFence,
+      sd = sd,
+      sd2 = sd2,
+      se = se,
+      me95 = me95,
+      me99 = me99,
+      lowerCI95 = lowerCI95,
+      upperCI95 = upperCI95,
+      lowerCI99 = lowerCI99,
+      upperCI99 = upperCI99,
+      lowerCQ95 = lowerCQ95,
+      upperCQ95 = upperCQ95,
+      lowerCQ99 = lowerCQ99,
+      upperCQ99 = upperCQ99
+    )
+  )
 }

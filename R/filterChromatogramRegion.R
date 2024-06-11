@@ -1,6 +1,6 @@
 #' Filter Chromatogram Region
 #'
-#' Filter data for specific chromatogram region of interest.
+#' Filter data for a specific chromatogram region of interest by the respective start and end time points.
 #'
 #' @import dplyr
 #'
@@ -8,7 +8,7 @@
 #' @param data A data frame containing spectral data: data frame
 #' @param regionOfInterest A list representing the start and end time points of a chromatogram region (Default: NULL): NULL or list
 #' @param retentionTime Retention time column name: character
-#' @returns A data frame containing spectral data that falls within the retention time of the chromatogram region of interest
+#' @returns A data frame containing spectral data that falls between the start and end time point of the chromatogram region of interest
 filterChromatogramRegion <- function(data, regionOfInterest = NULL, retentionTime) {
   # Check chromatogram region of interest
   if (is.null(regionOfInterest)) {

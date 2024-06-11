@@ -3,21 +3,21 @@
 #' Identify, install and load packages to use.
 #'
 #' @export
-#' @param packageList Package names to be loaded: character vector
+#' @param packageName Package names to be loaded: character vector
 #'
 #' @examples
 #' # Example 1: Loading a single package
-#' ticq::loadPackage(packageList = c("DT"))
+#' ticq::loadPackage(packageName = "DT")
 #'
 #' # Example 2: Loading multiple packages
-#' ticq::loadPackage(packageList = c("DT", "dplyr"))
-loadPackage <- function(packageList) {
+#' ticq::loadPackage(packageName = c("DT", "dplyr"))
+loadPackage <- function(packageName) {
   # Identify and install missing packages
-  missingPackage <- packageList[!(packageList %in% installed.packages()[, "Package"])]
-  if (length(missingPackage)) {
+  missingPackage <- packageName[!(packageName %in% installed.packages()[, "Package"])]
+  if (length(missingPackage) > 0) {
     install.packages(missingPackage)
   }
   
   # Load packages
-  lapply(packageList, require, character.only = TRUE)
+  lapply(packageName, require, character.only = TRUE)
 }

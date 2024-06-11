@@ -4,14 +4,14 @@
 \alias{extractEIC}
 \title{Extract Extracted Ion Current (EIC)}
 \usage{
-extractEIC(data, intensityArray, targetList)
+extractEIC(data, intensityArray, targetMZ)
 }
 \arguments{
 \item{data}{A data frame containing spectral data: data frame}
 
 \item{intensityArray}{Intensity array column name: character}
 
-\item{targetList}{A list of unique target m/z (Must be equal length and correspond to the values stored within intensity array): character vector}
+\item{targetMZ}{Target m/z values (Must be unique, sorted, and equal length and correspond to the values stored within intensity array): character vector}
 }
 \value{
 A data frame with appended columns representing the extracted intensity of each target m/z (EIC)
