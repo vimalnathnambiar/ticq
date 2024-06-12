@@ -1,4 +1,4 @@
-# TICQ
+# TICQ: Total Ion Current Assessment of Mass Spectrometry Spectral Data
 
 ## Introduction
 

@@ -9,7 +9,7 @@ authors:
     orcid: 'https://orcid.org/0000-0002-6713-1705'
 title: 'TICQ: Total Ion Current Quality Assessment of Mass Spectrometry Spectral Data'
 version: 0.0.0
-abstract: 'TICQ is a R package that allows you to quickly assess mass spectrometry (MS) spectral data for sample quality and instrument performance using total ion current (TIC).'
+abstract: 'TICQ is a R package to assess mass spectrometry spectral data for sample quality and instrument performance using total ion current.'
 keywords:
   - 'mass spectrometry'
   - 'data assessment'
