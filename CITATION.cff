@@ -1,12 +1,5 @@
 cff-version: 1.2.0
 message: 'If you use TICQ in your work, please cite it using the following:'
-authors:
-  - family-names: 'Nambiar'
-    given-names: 'Vimalnath'
-    orcid: 'https://orcid.org/0000-0001-5384-6788'
-  - family-names: 'Nambiar'
-    given-names: 'Shabarinath'
-    orcid: 'https://orcid.org/0000-0002-6713-1705'
 title: 'TICQ: Total Ion Current Quality Assessment of Mass Spectrometry Spectral Data'
 version: 0.0.0
 abstract: 'TICQ is a R package to assess mass spectrometry spectral data for sample quality and instrument performance using total ion current.'
@@ -18,6 +11,21 @@ keywords:
   - 'total ion current'
   - 'package'
 license: 'MIT'
-doi: 10.5281/zenodo
+repository-code: 'https://github.com/vmalnathnambiar/ticq'
+url: 'https://github.com/vmalnathnambiar/ticq#readme'
 date-released: '2024-05-05'
-url: 'https://github.com/vmalnathnambiar/ticq'
+authors:
+  - family-names: 'Nambiar'
+    given-names: 'Vimalnath'
+    orcid: 'https://orcid.org/0000-0001-5384-6788'
+  - family-names: 'Nambiar'
+    given-names: 'Shabarinath'
+    orcid: 'https://orcid.org/0000-0002-6713-1705'
+contributors:
+  - family-names: "Whiley"
+    given-names: "Luke"
+    orcid: 'https://orcid.org/0000-0002-9088-4799'
+  - family-names: "Wist"
+    given-names: "Julien"
+    orcid: 'https://orcid.org/0000-0002-3416-2572'
+doi: 10.5281/zenodo
