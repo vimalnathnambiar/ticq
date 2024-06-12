@@ -1,4 +1,4 @@
-# TICQ: Total Ion Current Assessment of Mass Spectrometry Spectral Data
+# TICQ: Total Ion Current Quality Assessment of Mass Spectrometry Spectral Data
 
 ## Introduction
 
@@ -18,7 +18,7 @@ devtools::install_github("vmalnathnambiar/ticq")
 
 If you use TICQ in your work, please cite it using the following:
 
-Nambiar, V., & Nambiar, S. (2024). _TICQ: Total Ion Current Quality Assessment of Mass Spectrometry Spectral Data_ (Version 0.0.0) [Computer Software]. https://doi.org/10.5281/zenodo
+Nambiar, V., & Nambiar, S. (2024). TICQ: Total Ion Current Quality Assessment of Mass Spectrometry Spectral Data (Version 0.0.0) [Computer software]. https://doi.org/10.5281/zenodo
 
 ## License
 
