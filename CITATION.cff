@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: 'If you use TICQ in your work, please cite it using the following:'
+authors:
+  - family-names: 'Nambiar'
+    given-names: 'Vimalnath'
+    orcid: 'https://orcid.org/0000-0001-5384-6788'
+  - family-names: 'Nambiar'
+    given-names: 'Shabarinath'
+    orcid: 'https://orcid.org/0000-0002-6713-1705'
+title: 'TICQ'
+version: 0.0.0
+abstract: 'TICQ is a R package that allows you to quickly assess mass spectrometry (MS) spectral data for sample quality and instrument performance using total ion current (TIC).'
+keywords:
+  - 'mass spectrometry'
+  - 'data assessment'
+  - 'sample quality'
+  - 'instrument performance'
+  - 'total ion current'
+  - 'package'
+license: 'MIT'
+doi: 10.5281/zenodo
+date-released: '2024-05-05'
+url: 'https://github.com/vmalnathnambiar/ticq'
