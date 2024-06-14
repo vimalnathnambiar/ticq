@@ -14,11 +14,16 @@
 #' @returns A list containing two data frames (passed and failed data)
 checkUndefinedSampleType <- function(data, commonColumn, sampleType, spectrumCount) {
   # Filter for data that have valid (passed) and undefined (failed) sample type 
-  passedData <- data %>%
-    dplyr::filter(!is.na(.data[[sampleType]]))
-  
-  failedData <- ticq::countSpectrum(data = data, commonColumn = commonColumn, spectrumCount = spectrumCount) %>%
-    dplyr::filter(is.na(.data[[sampleType]]))
-  
-  return(list(passedData = passedData, failedData = failedData))
+  return(
+    list(
+      passedData = data %>%
+        dplyr::filter(!is.na(.data[[sampleType]])),
+      failedData = ticq::countSpectrum(
+        data = data,
+        commonColumn = commonColumn,
+        spectrumCount = spectrumCount
+      ) %>%
+        dplyr::filter(is.na(.data[[sampleType]]))
+    )
+  )
 }

@@ -69,32 +69,23 @@ displayChromatogram <- function(data,
       
       # Chromatogram regions of interest
       if (!is.null(chromatogramRegion)) {
-        # Mass calibration region
-        chromatogram <- displayChromatogramRegion(
-          plot = chromatogram,
-          maxX = max(data[[x]]),
-          maxY = max(data[[y]]),
-          chromatogramRegion = chromatogramRegion$massCalibration,
-          label = "Mass Calibration Region"
-        )
+        # Region label
+        regionLabel <- list(massCalibration = "Mass Calibration Region", analyte = "Analyte Region", wash = "Wash Region")
         
-        # Analyte region
-        chromatogram <- displayChromatogramRegion(
-          plot = chromatogram,
-          maxX = max(data[[x]]),
-          maxY = max(data[[y]]),
-          chromatogramRegion = chromatogramRegion$analyte,
-          label = "Analyte Region"
-        )
+        # Maximum value of x- and y-axis
+        maxX <- max(data[[x]])
+        maxY <- max(data[[y]])
         
-        # Wash region
-        chromatogram <- displayChromatogramRegion(
-          plot = chromatogram,
-          maxX = max(data[[x]]),
-          maxY = max(data[[y]]),
-          chromatogramRegion = chromatogramRegion$wash,
-          label = "Wash Region"
-        )
+        # Display region
+        for (i in names(regionLabel)) {
+          chromatogram <- displayChromatogramRegion(
+            plot = chromatogram,
+            maxX = maxX,
+            maxY = maxY,
+            chromatogramRegion = chromatogramRegion[[i]],
+            label = regionLabel[[i]]
+          )
+        }
       }
     
     # Display chromatogram

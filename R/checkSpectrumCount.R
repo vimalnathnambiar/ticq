@@ -19,15 +19,22 @@ checkSpectrumCount <- function(data, commonColumn, sampleID, spectrumCount, thre
   n <- nrow(summarisedData)
   total <- sum(summarisedData[[spectrumCount]])
   mean <- mean(summarisedData[[spectrumCount]])
-  floorThreshold <- floor(mean - ((threshold / 100) * mean))
-  ceilingThreshold <- ceiling(mean + ((threshold / 100) * mean))
+  lowerThreshold <- floor(mean - ((threshold / 100) * mean))
+  upperThreshold <- ceiling(mean + ((threshold / 100) * mean))
   
-  # Filter for samples that have a spectrum count above/equal to (passed) and below (failed) the accepted threshold limit
-  failedData <- summarisedData %>%
-    dplyr::filter(.data[[spectrumCount]] < floorThreshold | .data[[spectrumCount]] > ceilingThreshold)
+  # Filter for samples that have a spectrum count outside of the accepted threshold limit
+  summarisedData <- summarisedData %>%
+    dplyr::filter(.data[[spectrumCount]] < lowerThreshold | .data[[spectrumCount]] > upperThreshold)
   
-  passedData <- data %>%
-    dplyr::filter(!(.data[[sampleID]] %in% !!failedData[[sampleID]]))
-  
-  return(list(sampleSize = n, total = total, mean = mean, threshold = threshold, passedData = passedData, failedData = failedData))
+  return(
+    list(
+      sampleSize = n,
+      total = total,
+      mean = mean,
+      threshold = threshold,
+      passedData = data %>%
+        dplyr::filter(!(.data[[sampleID]] %in% !!summarisedData[[sampleID]])),
+      failedData = summarisedData
+    )
+  )
 }

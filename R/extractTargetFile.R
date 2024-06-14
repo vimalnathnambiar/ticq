@@ -96,9 +96,13 @@ extractTargetFile <- function(targetFile = NULL, anpcMethodLibrary = NULL, round
   
   # Round decimal place
   if (!is.null(targetFile) && !is.null(roundDecimal)) {
-    print(paste("NOTE: Precision values (m/z and retention time) rounded to", roundDecimal, "decimal place(s)"))
+    # m/z value
     targetFile$mzValue <- round(targetFile$mzValue, digits = roundDecimal)
+    
+    # Retention time
     targetFile$retentionTime <- round(targetFile$retentionTime, digits = roundDecimal)
+    
+    print(paste("NOTE: Precision values (m/z and retention time) rounded to", roundDecimal, "decimal place(s)"))
   }
   
   return(targetFile)

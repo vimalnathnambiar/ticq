@@ -21,9 +21,9 @@ displayChromatogramRegion <- function(plot, maxX, maxY, chromatogramRegion, labe
   }
   
   # Add vertical lines and annotate the chromatogram region
-  plot <- plot +
-    ggplot2::geom_vline(xintercept = chromatogramRegion$start, linetype = "dashed", color = "grey") +
-    ggplot2::annotate("text", label = label, x = (chromatogramRegion$start + chromatogramRegion$end) / 2, y = (maxY / 4) * 3, angle = 90, size = 2)
-  
-  return(plot)
+  return(
+    plot +
+      ggplot2::geom_vline(xintercept = chromatogramRegion$start, linetype = "dashed", color = "grey") +
+      ggplot2::annotate( "text", label = label, x = (chromatogramRegion$start + chromatogramRegion$end) / 2, y = (maxY / 4) * 3, angle = 90, size = 2)
+  )
 }

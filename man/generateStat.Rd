@@ -25,8 +25,7 @@ Generate statistical information of a dataset including:
 \item Inter-quantile range (IQR)
 \item IQR inner fence (Lower and upper)
 \item IQR outer fence (Lower and upper)
-\item 1st standard deviation (sd)
-\item 2nd standard deviation (sd2)
+\item Standard deviation (sd)
 \item Standard error (se)
 \item Margin error (me) - 95\% and 99\%
 \item Confidence interval (CI) - 95\% and 99\% (Lower and upper)

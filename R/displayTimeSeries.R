@@ -4,8 +4,8 @@
 #'
 #' Boundary analysis that can be performed:
 #' - value: Evaluates data by +/- value from 0
-#' - percentage: Evaluates data +/- value from 100
-#' - sd: Evaluates data using 2 standard deviations from average mean of the data or using defined mean and standard deviation values
+#' - percentage: Evaluates data by +/- value from 100
+#' - sd: Evaluates data using 1st and 2nd standard deviations from average mean of the data or reference data
 #'
 #' To define mean and standard deviation values to be used for "sd" boundary analysis, pass reference data that mirrors the same columns as data.
 #'
@@ -96,56 +96,27 @@ displayTimeSeries <- function(data,
     if (!is.null(boundary)) {
       tryCatch({
         # Check boundary type
-        if (boundary == "value") {
+        if (boundary == "value" || boundary == "percentage") {
           # Determine boundaries
-          lowerBound <- 0 - boundaryValue
-          upperBound <- 0 + boundaryValue
+          mid <- if (boundary == "value") 0 else 100
+          lowerBound <- mid - boundaryValue
+          upperBound <- mid + boundaryValue
           
           # Display boundaries
           timeSeries <- timeSeries +
-            ggplot2::geom_hline(yintercept = 0, linetype = "dashed", colour = "grey") +
+            ggplot2::geom_hline(yintercept = mid, linetype = "dashed", colour = "grey") +
             ggplot2::geom_hline(yintercept = lowerBound, linetype = "dashed", colour = "red") +
             ggplot2::geom_hline(yintercept = upperBound, linetype = "dashed", colour = "red")
           
           # Analysis result
-          low <- data %>%
-            dplyr::filter(.data[[y]] < lowerBound) %>%
-            dplyr::mutate(sampleRange = "Low")
-          
-          normal <- data %>%
-            dplyr::filter(.data[[y]] >= lowerBound & .data[[y]] <= upperBound) %>%
-            dplyr::mutate(sampleRange = "Normal")
-          
-          high <- data %>%
-            dplyr::filter(.data[[y]] > upperBound) %>%
-            dplyr::mutate(sampleRange = "High")
-          
-          result <- rbind(low, normal, high)
-        } else if (boundary == "percentage") {
-          # Determine boundaries
-          lowerBound <- 100 - boundaryValue
-          upperBound <- 100 + boundaryValue
-          
-          # Display boundaries
-          timeSeries <- timeSeries +
-            ggplot2::geom_hline(yintercept = 100, linetype = "dashed", colour = "grey") +
-            ggplot2::geom_hline(yintercept = lowerBound, linetype = "dashed", colour = "red") +
-            ggplot2::geom_hline(yintercept = upperBound, linetype = "dashed", colour = "red")
-          
-          # Analysis result
-          low <- data %>%
-            dplyr::filter(.data[[y]] < lowerBound) %>%
-            dplyr::mutate(sampleRange = "Low")
-          
-          normal <- data %>%
-            dplyr::filter(.data[[y]] >= lowerBound & .data[[y]] <= upperBound) %>%
-            dplyr::mutate(sampleRange = "Normal")
-          
-          high <- data %>%
-            dplyr::filter(.data[[y]] > upperBound) %>%
-            dplyr::mutate(sampleRange = "High")
-          
-          result <- rbind(low, normal, high)
+          result <- data %>%
+            dplyr::mutate(
+              sampleRange = dplyr::case_when(
+                .data[[y]] < lowerBound ~ "Low",
+                .data[[y]] >= lowerBound & .data[[y]] <= upperBound ~ "Normal",
+                .data[[y]] > upperBound ~ "High",
+              )
+            )
         } else if (boundary == "sd") {
           # Check reference data
           if (!is.null(referenceData)) {
@@ -167,17 +138,15 @@ displayTimeSeries <- function(data,
               
               mean <- stat$mean
               sd <- stat$sd
-              sd2 <- stat$sd2
             } else {
               mean <- mean(data[[y]])
               sd <- sd(data[[y]])
-              sd2 <- sd(2 * data[[y]])
             }
             
             lowerBound1 <- mean - sd
             upperBound1 <- mean + sd
-            lowerBound2 <- mean - sd2
-            upperBound2 <- mean + sd2
+            lowerBound2 <- mean - (2 * sd)
+            upperBound2 <- mean + (2 * sd)
             
             # Display boundaries
             timeSeries <- timeSeries +
@@ -188,28 +157,18 @@ displayTimeSeries <- function(data,
               ggplot2::geom_hline(yintercept = upperBound2, linetype = "dashed", colour = "red")
             
             # Analysis result
-            veryLow <- data %>%
-              dplyr::filter(.data[[y]] < lowerBound2) %>%
-              dplyr::mutate(sampleRange = "Very Low")
-            
-            low <- data %>%
-              dplyr::filter(.data[[y]] >= lowerBound2 & .data[[y]] < lowerBound1) %>%
-              dplyr::mutate(sampleRange = "Low")
-            
-            normal <- data %>%
-              dplyr::filter(.data[[y]] >= lowerBound1 & .data[[y]] <= upperBound1) %>%
-              dplyr::mutate(sampleRange = "Normal")
-            
-            high <- data %>%
-              dplyr::filter(.data[[y]] > upperBound1 & .data[[y]] <= upperBound2) %>%
-              dplyr::mutate(sampleRange = "High")
-            
-            veryHigh <- data %>%
-              dplyr::filter(.data[[y]] > upperBound2) %>%
-              dplyr::mutate(sampleRange = "Very High")
-            
-            result <- rbind(veryLow, low, normal, high, veryHigh)
+            result <- data %>%
+              dplyr::mutate(
+                sampleRange = dplyr::case_when(
+                  .data[[y]] < lowerBound2 ~ "Very Low",
+                  .data[[y]] >= lowerBound2 & .data[[y]] < lowerBound1 ~ "Low",
+                  .data[[y]] >= lowerBound1 & .data[[y]] <= upperBound1 ~ "Normal",
+                  .data[[y]] > upperBound1 & .data[[y]] <= upperBound2 ~ "High",
+                  .data[[y]] > upperBound2 ~ "Very High"
+                )
+              )
           } else {
+            # Analysis result
             result <- data %>%
               dplyr::mutate(sampleRange = "Normal")
           }

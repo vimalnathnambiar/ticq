@@ -22,7 +22,5 @@ extractEIC <- function(data, intensityArray, targetMZ) {
   colnames(tmp) <- targetMZ
   
   # Append new columns to data
-  data <- cbind(data, tmp)
-  
-  return(data)
+  return(cbind(data, tmp))
 }

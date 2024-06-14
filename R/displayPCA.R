@@ -40,16 +40,8 @@ displayPCA <- function(data,
                        loadingsPlotToggle = TRUE,
                        biPlotToggle = TRUE) {
   tryCatch({
-    # Check and ensure no NA values
-    if (is.null(lastColumnIndex)) {
-      tmp <- data[, firstColumnIndex:ncol(data)]
-    } else {
-      tmp <- data[, firstColumnIndex:lastColumnIndex]
-    }
-    tmp <- tmp[complete.cases(tmp), ]
-    
     # Perform PCA
-    pca <- summary(prcomp(tmp, scale = scale))
+    pca <- summary(prcomp(if (is.null(lastColumnIndex)) data[, firstColumnIndex:ncol(data)] else data[, firstColumnIndex:lastColumnIndex], scale = scale))
     
     # Identify variances
     variance <- data.frame(
@@ -133,16 +125,11 @@ displayPCA <- function(data,
               )
               
               # Data distribution
-              if (!is.null(distribution)) {
-                if (distribution == "normal") {
-                  scoresPlot <- scoresPlot +
-                    ggplot2::stat_ellipse(type = "norm", level = confidence / 100, linewidth = 0.25)
-                } else if (distribution == "t") {
-                  scoresPlot <- scoresPlot +
-                    ggplot2::stat_ellipse(type = "t", level = confidence / 100, linewidth = 0.25)
-                }
+              if (!is.null(distribution) && distribution %in% c("normal", "t")) {
+                scoresPlot <- scoresPlot +
+                  ggplot2::stat_ellipse(type = distribution, level = confidence / 100, linewidth = 0.25)
               }
-              
+            
               # Display scores plot
               if (scoresPlotToggle == TRUE) {
                 print(scoresPlot)

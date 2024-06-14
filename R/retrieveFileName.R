@@ -7,23 +7,23 @@
 #' @param fileExtension File extension for file name retrieval (Default: NULL): NULL or character
 #' @returns File names with matching file extension: character vector
 retrieveFileName <- function(inputPath, fileExtension = NULL) {
-  # Check input path and retrieve file names
-  inputFiles <- if (!is.null(inputPath) && (dir.exists(inputPath) || file.exists(inputPath))) {
-    if (file.info(inputPath)$isdir) {
-      list.files(
-        path = inputPath,
-        pattern = if (!is.null(fileExtension)) paste0("\\.", fileExtension, "$") else NULL,
-        ignore.case = TRUE
-      )
-    } else if (!is.null(fileExtension) && !grepl(paste0("\\.", fileExtension, "$"), inputPath, ignore.case = TRUE)) {
-      character(0)
+  # Retrieve file names
+  return(
+    if (!is.null(inputPath) && (dir.exists(inputPath) || file.exists(inputPath))) {
+      if (file.info(inputPath)$isdir) {
+        list.files(
+          path = inputPath,
+          pattern = if (!is.null(fileExtension)) paste0("\\.", fileExtension, "$") else NULL,
+          ignore.case = TRUE
+        )
+      } else if (!is.null(fileExtension) && !grepl(paste0("\\.", fileExtension, "$"), inputPath, ignore.case = TRUE)) {
+        character(0)
+      } else {
+        basename(inputPath)
+      }
     } else {
-      basename(inputPath)
+      print(paste("Unable to retrieve file names: Input path not found -", inputPath))
+      character(0)
     }
-  } else {
-    print(paste("Unable to retrieve file names: Input path not found -", inputPath))
-    character(0)
-  }
-  
-  return(inputFiles)
+  )
 }

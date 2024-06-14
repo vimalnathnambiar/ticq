@@ -26,11 +26,10 @@ sumEIC <- function(data, commonColumn, spectrumCount, firstColumnIndex, lastColu
     y <- colnames(data)[i]
     
     # Sum EIC
-    tmp <- data %>%
+    summedDataEIC <- data %>%
       dplyr::group_by(across(all_of(commonColumn))) %>%
-      dplyr::summarise(!!spectrumCount := n(), !!y := sum(.data[[y]]), .groups = "keep")
-    
-    summedDataEIC <- dplyr::left_join(summedDataEIC, tmp, by = commonColumn)
+      dplyr::summarise(!!spectrumCount := n(), !!y := sum(.data[[y]]), .groups = "drop") %>%
+      dplyr::left_join(summedDataEIC, ., by = commonColumn)
   }
   
   return(summedDataEIC)

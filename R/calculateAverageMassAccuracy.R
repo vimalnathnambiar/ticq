@@ -32,15 +32,14 @@ calculateAverageMassAccuracy <- function(data,
     y <- colnames(data)[i]
     
     # Calculate average mass accuracy
-    tmp <- data %>%
+    averagedDataMassAccuracy <- data %>%
       dplyr::group_by(across(all_of(commonColumn))) %>%
       dplyr::summarise(
         !!spectrumCount := n(),
         !!y := if (!is.null(roundDecimal)) round(sum(.data[[y]]) / spectrumCount, digits = roundDecimal) else sum(.data[[y]]) / spectrumCount,
-        .groups = "keep"
-      )
-    
-    averagedDataMassAccuracy <- dplyr::left_join(averagedDataMassAccuracy, tmp, by = commonColumn)
+        .groups = "drop"
+      ) %>%
+      dplyr::left_join(averagedDataMassAccuracy, ., by = commonColumn)
   }
   
   return(averagedDataMassAccuracy)

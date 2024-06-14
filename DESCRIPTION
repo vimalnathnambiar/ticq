@@ -11,7 +11,6 @@ Authors@R: c(person(given = "Vimalnath", family = "Nambiar", email = "vnathnambi
              person(given = "Shabarinath", family = "Nambiar", role = c("aut"), comment = c(ORCID = 0000-0002-6713-1705)),
              person(given = "Luke", family = "Whiley", role = c("ctb"), comment = c(ORCID = 0000-0002-9088-4799)),
              person(given = "Julien", family = "Wist", role = c("ctb"), comment = c(ORCID = 0000-0002-3416-2572)))
-DOI: 10.5281/zenodo
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.1
 Encoding: UTF-8

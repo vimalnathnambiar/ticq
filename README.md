@@ -7,7 +7,8 @@ TICQ is a R package that allows you to quickly assess mass spectrometry (MS) spe
 ## Installation
 
 ```r
-devtools::install_github("vmalnathnambiar/ticq")
+install.packages("remotes")
+remotes::install_github("vmalnathnambiar/ticq")
 ```
 
 ## Usage

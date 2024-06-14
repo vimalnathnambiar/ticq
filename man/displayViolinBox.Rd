@@ -87,8 +87,8 @@ Display data distribution using violin and/or box plot (and perform boundary ana
 Boundary analysis that can be performed:
 \itemize{
 \item value: Evaluates data by +/- value from 0
-\item percentage: Evaluates data +/- value from 100
-\item sd: Evaluates data using 2 standard deviations from average mean of the data or using defined mean and standard deviation values
+\item percentage: Evaluates data by +/- value from 100
+\item sd: Evaluates data using 1st and 2nd standard deviations from average mean of the data or reference data
 }
 
 To define mean and standard deviation values to be used for "sd" boundary analysis, pass reference data that mirrors the same columns as data.

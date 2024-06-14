@@ -11,8 +11,7 @@
 #' - Inter-quantile range (IQR)
 #' - IQR inner fence (Lower and upper)
 #' - IQR outer fence (Lower and upper)
-#' - 1st standard deviation (sd)
-#' - 2nd standard deviation (sd2)
+#' - Standard deviation (sd)
 #' - Standard error (se)
 #' - Margin error (me) - 95% and 99%
 #' - Confidence interval (CI) - 95% and 99% (Lower and upper)
@@ -52,9 +51,8 @@ generateStat <- function(data) {
     lowerOuterFence <- Q1 - (3 * IQR)
     upperOuterFence <- Q3 - (3 * IQR)
   
-  # Standard Deviations (1st and 2nd)
+  # Standard Deviation
   sd <- sd(data)
-  sd2 <- sd(2 * data)
   
   # Standard Error
   se <- sd / sqrt(n)
@@ -126,7 +124,6 @@ generateStat <- function(data) {
       lowerOuterFence = lowerOuterFence,
       upperOuterFence = upperOuterFence,
       sd = sd,
-      sd2 = sd2,
       se = se,
       me95 = me95,
       me99 = me99,

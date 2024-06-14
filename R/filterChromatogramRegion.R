@@ -26,8 +26,8 @@ filterChromatogramRegion <- function(data, regionOfInterest = NULL, retentionTim
   }
   
   # Filter data
-  regionData <- data %>%
-    dplyr::filter(.data[[retentionTime]] > regionOfInterest$start & .data[[retentionTime]] <= regionOfInterest$end)
-  
-  return(regionData)
+  return(
+    data %>%
+      dplyr::filter(.data[[retentionTime]] > regionOfInterest$start & .data[[retentionTime]] <= regionOfInterest$end)
+  )
 }

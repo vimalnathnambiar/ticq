@@ -11,9 +11,9 @@
 #' @returns A summarised data frame grouped by common columns and their respective total number of spectrum count
 countSpectrum <- function(data, commonColumn, spectrumCount) {
   # Sum the total number of spectral data (spectrum count) of each sample
-  summarisedData <- data %>%
-    dplyr::group_by(across(all_of(commonColumn))) %>%
-    dplyr::summarise(!!spectrumCount := n(), .groups = "keep")
-  
-  return(summarisedData)
+  return(
+    data %>%
+      dplyr::group_by(across(all_of(commonColumn))) %>%
+      dplyr::summarise(!!spectrumCount := n(), .groups = "drop")
+  )
 }
