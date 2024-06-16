@@ -4,8 +4,6 @@
 #'
 #' Metadata extraction only applicable to data acquired at the Australian National Phenome Centre (ANPC).
 #'
-#' To evaluate target m/z with TICQ, perform targeted spectra filtering using ExfilMS. The target file used for ExfilMS should match the target file defined in TICQ for comparison
-#'
 #' @import jsonlite
 #'
 #' @export
@@ -17,7 +15,7 @@ extractExfilMS <- function(inputPath) {
   fileName <- character(0)
   
   # Retrieve JSON file names
-  inputFiles <- ticq::retrieveFileName(inputPath = inputPath, fileExtension = "JSON")
+  inputFiles <- ticq::retrieveFileList(inputPath = inputPath, fileExtension = "JSON")
   
   # Check input files
   if (length(inputFiles) > 0) {

@@ -7,7 +7,7 @@
 loadPackage(packageName)
 }
 \arguments{
-\item{packageName}{Package names to be loaded: character vector}
+\item{packageName}{Package name: character or character vector}
 }
 \description{
 Identify, install and load packages to use.

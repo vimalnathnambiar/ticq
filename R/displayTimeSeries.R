@@ -92,7 +92,6 @@ displayTimeSeries <- function(data,
       }
     
     # Boundary analysis
-    result <- NULL
     if (!is.null(boundary)) {
       tryCatch({
         # Check boundary type
@@ -172,28 +171,27 @@ displayTimeSeries <- function(data,
             result <- data %>%
               dplyr::mutate(sampleRange = "Normal")
           }
+        } else {
+          message("Unable to perform boundary analysis: Invalid analysis type")
+          result <- NULL
         }
       },
       warning = function(w) {
-        print(paste("Unable to perform boundary analysis -", w))
+        message(paste("Unable to perform boundary analysis:", w))
         result <- NULL
       },
       error = function(e) {
-        print(paste("Unable to perform boundary analysis -", e))
+        message(paste("Unable to perform boundary analysis:", e))
         result <- NULL
       })
     }
     
-    # Display time series
+    # Display time series and return analysis result
     suppressMessages(print(timeSeries))
-    return(result)
+    if (!is.null(boundary)) {
+      return(result)
+    }
   }, 
-  warning = function(w) {
-    print(paste("Unable to display", title, "-", w))
-    return(NULL)
-  },
-  error = function(e) {
-    print(paste("Unable to display", title, "-", e))
-    return(NULL)
-  })
+  warning = function(w) message(paste0("Unable to display ", title, ": ", w)),
+  error = function(e) message(paste0("Unable to display ", title, ": ", e)))
 }

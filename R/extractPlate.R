@@ -15,14 +15,14 @@
 #' plate <- ticq::extractPlate(input = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29.json")
 #' print(plate)
 extractPlate <- function(input) {
-  # Plate number patterns
+  # Check plate number patterns
   pattern <- c("[pP][0-9]+", "PLATE[0-9]+", "PLASMA[0-9]+")
   
   # Loop through patterns
   for (p in pattern) {
     # Check pattern
     if (grepl(p, input)) {
-      # Remove non-numeric characters / leading zeros and extract plate number
+      # Extract plate number
       plate <- stringr::str_extract(input, p) %>%
         stringr::str_replace_all("^[a-zA-Z0]+", "")
       
@@ -30,6 +30,5 @@ extractPlate <- function(input) {
     }
   }
   
-  # If no pattern matches
   return(NA_character_)
 }

@@ -51,7 +51,7 @@ displayChromatogram(
 
 \item{facetRow}{Number of rows to use for facet wrapping (Default: NULL): NULL or double}
 
-\item{chromatogramRegion}{A list representing the different chromatogram regions of interest to be plotted (Default: NULL): NULL or list}
+\item{chromatogramRegion}{A list representing the different chromatogram regions of interest to be plotted (Default: NULL, Options: ticq::configureChromatogramRegion()): NULL or list}
 }
 \description{
 Display chromatogram data.

@@ -21,7 +21,7 @@
 #' @param facetWrapBy Column name representing data to be used for facet wrapping (Default: NULL): NULL or character
 #' @param facetColumn Number of columns to use for facet wrapping (Default: NULL): NULL or double
 #' @param facetRow Number of rows to use for facet wrapping (Default: NULL): NULL or double
-#' @param chromatogramRegion A list representing the different chromatogram regions of interest to be plotted (Default: NULL): NULL or list
+#' @param chromatogramRegion A list representing the different chromatogram regions of interest to be plotted (Default: NULL, Options: ticq::configureChromatogramRegion()): NULL or list
 displayChromatogram <- function(data,
                                 x,
                                 y,
@@ -91,6 +91,6 @@ displayChromatogram <- function(data,
     # Display chromatogram
     print(chromatogram)
   },
-  warning = function(w) print(paste("Unable to display", title, "-", w)),
-  error = function(e) print(paste("Unable to display", title, "-", e)))
+  warning = function(w) message(paste0("Unable to display ", title, ": ", w)),
+  error = function(e) message(paste0("Unable to display ", title, ": ", e)))
 }

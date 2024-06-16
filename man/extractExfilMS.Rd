@@ -17,6 +17,4 @@ Extract spectral data from JSON files generated using ExfilMS (https://github.co
 }
 \details{
 Metadata extraction only applicable to data acquired at the Australian National Phenome Centre (ANPC).
-
-To evaluate target m/z with TICQ, perform targeted spectra filtering using ExfilMS. The target file used for ExfilMS should match the target file defined in TICQ for comparison
 }

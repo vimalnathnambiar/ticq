@@ -60,7 +60,7 @@ displayMultipleChromatogram(
 
 \item{plotRow}{Number of rows to use for plotting (Default: 1): double}
 
-\item{chromatogramRegion}{A list representing the different chromatogram regions of interest to be plotted (Default: NULL): NULL or list}
+\item{chromatogramRegion}{A list representing the different chromatogram regions of interest to be plotted (Default: NULL, Options: ticq::configureChromatogramRegion()): NULL or list}
 }
 \description{
 Display multiple chromatogram data.

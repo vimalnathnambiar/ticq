@@ -15,15 +15,15 @@ output:
     toc_depth: 6
     theme: paper
 params:
-    title: ""
+    title: "test"
     inputPath: "/run/media/vimalnathnambiar/WD/data/JSON/test/"
-    outputPath: "/home/vimalnathnambiar/git/github/vmalnathnambiar/ticq/output/"
-    chromatogramRegion: NULL
-    targetFile: NULL
+    outputPath: NULL
+    historicalDataPath: "/run/media/vimalnathnambiar/WD/data/historical/test.rds"
+    targetFilePath: NULL
     anpcMethodLibrary: "MS-AA-POS"
-    historicalDataPath: NULL
-    roundDecimal: 4
-    anonymiserStatus: FALSE
+    chromatogramRegion: NULL
+    roundDecimalPlace: 4
+    metadataAnonymiser: FALSE
 ---
 
 # Configuration Parameters {.tabset}
@@ -32,86 +32,165 @@ Parameters configured for TICQ assessment.
 # Load packages
 ticq::loadPackage(packageName = c("DT", "dplyr"))
 
-# Define input path
-inputPath <- params$inputPath
-
-# Define output path
-outputPath <- params$outputPath
-
-# Define chromatogram regions
-# chromatogramRegion <- params$chromatogramRegion
-chromatogramRegion <- ticq::configureChromatogramRegion(massCalibrationStart = 0, massCalibrationEnd = 0.3, washStart = 5)
-
-# Define target file / in-house ANPC method library (Either one)
-targetFile <- params$targetFile
-anpcMethodLibrary <- params$anpcMethodLibrary
-
-# Define historical data path
-historicalDataPath <- params$historicalDataPath
-
-# Define number of decimal places for precision value rounding
-roundDecimal <- params$roundDecimal
-
-# Define anonymiser status
-anonymiserStatus <- params$anonymiserStatus
+# Configuration parameters
+  # Input path
+  inputPath <- params$inputPath
+  
+  # Output path
+  outputPath <- params$outputPath
+  
+  # Historical data path
+  historicalDataPath <- params$historicalDataPath
+  
+  # Target file path / ANPC method library
+  targetFilePath <- params$targetFilePath
+  anpcMethodLibrary <- params$anpcMethodLibrary
+  
+  # Chromatogram regions
+  chromatogramRegion <- params$chromatogramRegion
+  
+  # Number of decimal places for precision value rounding
+  roundDecimalPlace <- params$roundDecimalPlace
+  
+  # Sample anonymiser
+  metadataAnonymiser <- params$metadataAnonymiser
 ```
 
 ## Input
 ```{r, echo = FALSE, warning = FALSE}
-# Check input path
-inputFiles <- ticq::retrieveFileName(inputPath = inputPath, fileExtension = "JSON")
-
-# Update new sample status
+# Check input path and update new sample status
+inputFiles <- ticq::retrieveFileList(inputPath = inputPath, fileExtension = "JSON")
 newSampleStatus <- length(inputFiles) > 0
-if (newSampleStatus) {
-  # Display result
-  print(paste("Input path:", inputPath))
-  print(paste("Available JSON files:", length(inputFiles)))
-} else {
-  # Clean environment
-  rm(inputPath)
-}
+
+# Display input
+print(paste("Input path:", inputPath))
+print(paste("Available JSON files:", length(inputFiles)))
 
 # Clean environment
+if (!newSampleStatus) {
+  rm(inputPath)
+}
 rm(inputFiles)
 ```
 
-## Chromatogram Region
+## Output
 ```{r, echo = FALSE, warning = FALSE}
-# Check and update chromatogram region status
-chromatogramRegionStatus <- !is.null(chromatogramRegion) &&
-  all(c("prewash", "massCalibration", "analyte", "wash") %in% names(chromatogramRegion))
+# Check output path
+if (is.null(outputPath) || !is.character(outputPath) || outputPath == "") {
+  message("Invalid output path: Setting default")
+  outputPath <- paste0(getwd(), "/output/")
+}
 
-if (chromatogramRegionStatus) {
-  # Display chromatogram region data
-  print(chromatogramRegion)
+if (!dir.exists(outputPath)) {
+  dir.create(outputPath, recursive = TRUE)
+}
+
+# Display output
+print(paste("Output path:", outputPath))
+```
+
+## Historical Data
+```{r, echo = FALSE, warning = FALSE}
+# Check historical data path and update historical data status
+if (!is.null(historicalDataPath) || !is.character(historicalDataPath)) {
+  message("Invalid historical data path: Setting default (NULL)")
+  historicalDataPath <- NULL
+} else if (!file.exists(historicalDataPath)) {
+  message("Historical data path does not exist: Setting default (NULL)")
+  historicalDataPath <- NULL
+} else if (!grepl("\\.rds$", historicalDataPath, ignore.case = TRUE)) {
+  message("Invalid historical data format: Setting default (NULL)")
+  historicalDataPath <- NULL
+}
+
+historicalDataStatus <- !is.null(historicalDataPath)
+
+# Display historical data
+if (historicalDataStatus) {
+  print(paste("Historical data path:", historicalDataPath))
 } else {
-  # Reset
-  chromatogramRegion <- NULL
-  print("No available chromatogram region data")
+  print("No available historical data")
+  
+  # Clean environment
+  rm(historicalDataPath)
 }
 ```
 
 ## Target File
 ```{r, echo = FALSE, warning = FALSE}
-# Check target file
-targetFile <- ticq::extractTargetFile(targetFile = targetFile, anpcMethodLibrary = anpcMethodLibrary, roundDecimal = roundDecimal)
+# Check target file and update target file status
+targetFile <- ticq::extractTargetFile(
+  targetFilePath = targetFilePath,
+  anpcMethodLibrary = anpcMethodLibrary,
+  roundDecimalPlace = roundDecimalPlace
+)
 
-# Update target file status
 targetFileStatus <- !is.null(targetFile)
+
+# Display target file data
 if (targetFileStatus) {
   DT::datatable(data = targetFile, filter = "top", options = list(scrollX = TRUE))
 } else {
+  print("No available target file data")
+  
   # Clean environment
   rm(targetFile)
 }
 
 # Clean environment
-rm(anpcMethodLibrary)
+rm(targetFilePath)
+```
+
+## Chromatogram Region
+```{r, echo = FALSE, warning = FALSE}
+# Check chromatogram region data
+pattern <- c("prewash", "massCalibration", "analyte", "wash")
+if (!is.null(chromatogramRegion) && (!is.list(chromatogramRegion) || !all(pattern %in% names(chromatogramRegion)))) {
+  message("Invalid chromatogram region format: Setting default (NULL)")
+  chromatogramRegion <- NULL
+}
+
+if (is.null(chromatogramRegion) && !is.null(anpcMethodLibrary) && is.character(anpcMethodLibrary)) {
+  message("Attempting to use ANPC method library associated chromatogram region data")
+  # ANPC method library chromatogram region data
+  anpcChromatogramRegionData <- list(
+    "MS-AA-POS" = list(massCalibrationStart = 0, massCalibrationEnd = 0.3, washStart = 5),
+    "MS-HIL-POS" = list(massCalibrationStart = 0, massCalibrationEnd = 0.7, washStart = 11),
+    "MS-HIL-NEG" = list(massCalibrationStart = 0, massCalibrationEnd = 0.7, washStart = 11),
+    "MS-RP-POS" = list(massCalibrationStart = 0, massCalibrationEnd = 0.7, washStart = 11),
+    "MS-RP-NEG" = list(massCalibrationStart = 0, massCalibrationEnd = 0.7, washStart = 11)
+  )
+  
+  # Configure chromatogram region data
+  if ((anpcMethodLibrary %in% names(anpcChromatogramRegionData))) {
+    chromatogramRegion <- ticq::configureChromatogramRegion(
+      massCalibrationStart = anpcChromatogramRegionData[[anpcMethodLibrary]]$massCalibrationStart,
+      massCalibrationEnd = anpcChromatogramRegionData[[anpcMethodLibrary]]$massCalibrationEnd,
+      washStart = anpcChromatogramRegionData[[anpcMethodLibrary]]$washStart
+    )
+  } else {
+    message("Unable to configure chromatogram region data: No matching ANPC method library chromatogram region data available")
+  }
+  
+  # Clean environment
+  rm(anpcChromatogramRegionData)
+  invisible()
+}
+
+# Update chromatogram region status
+chromatogramRegionStatus <- !is.null(chromatogramRegion)
+if (chromatogramRegionStatus) {
+  print(chromatogramRegion)
+} else {
+  print("No available chromatogram region data")
+}
+
+# Clean environment
+rm(anpcMethodLibrary, pattern)
 ```
 
 # Spectral Data Extraction
-Spectral data is extracted from JSON file(s) retrieved from input.
+Spectral data is extracted from ExfilMS generated JSON files located at input path.
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample status
 if (newSampleStatus) {
@@ -136,7 +215,7 @@ if (newSampleStatus) {
   rm(inputPath, result)
   invisible(gc())
 } else {
-  print("Unable to perform Spectral Data Extraction: No available input files")
+  message("Unable to perform Spectral Data Extraction: No available JSON files")
 }
 ```
 
@@ -165,9 +244,14 @@ if (newSampleStatus) {
 ```
 
 ```{r, echo = FALSE, warning = FALSE, include = FALSE}
-# Check new sample and anonymiser status
-if (newSampleStatus && anonymiserStatus) {
-  # Anonymise metadata
+# Check metadata anonymiser
+if (!is.logical(metadataAnonymiser)) {
+  message("Invalid metadata anonymiser: Setting default (FALSE)")
+  metadataAnonymiser <- FALSE
+}
+
+# Check new sample status and Anonymise metadata
+if (newSampleStatus && metadataAnonymiser) {
   passedData <- ticq::anonymiseMetadata(
     data = passedData,
     sampleID = sampleID,
@@ -181,7 +265,7 @@ if (newSampleStatus && anonymiserStatus) {
 }
 
 # Clean environment
-rm(anonymiserStatus)
+rm(metadataAnonymiser)
 ```
 
 # Preliminary Data Check {.tabset}
@@ -220,7 +304,7 @@ if (newSampleStatus) {
   rm(result)
   invisible(gc())
 } else {
-  print("Unable to perform Undefined Sample Type Check: No available sample data")
+  message("Unable to perform Undefined Sample Type Check: No available sample data")
 }
 ```
 
@@ -229,14 +313,14 @@ Spectrum count of samples are checked against a threshold limit below the averag
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample status
 if (newSampleStatus) {
-  # Check historical data path
-  if (!is.null(historicalDataPath) && file.exists(historicalDataPath)) {
-    # Check historical data
+  # Check historical data status
+  if (historicalDataStatus) {
+    # Append historical data
     historicalData <- readRDS(historicalDataPath)
-    
     if (ncol(historicalData) == ncol(passedData) && all(colnames(historicalData) == colnames(passedData))) {
-      # Append historical data
       passedData <- rbind(historicalData, passedData)
+    } else {
+      message("Unable to append historical data: Inconsistencies between historical and sample data")
     }
     
     # Clean environment
@@ -253,7 +337,7 @@ if (newSampleStatus) {
       spectrumCount = spectrumCount
     )
   } else {
-    print("Unable to perform Spectrum Count Check: Only one sample data available")
+    message("Unable to perform Spectrum Count Check: Only one sample data available")
     NULL
   }
   
@@ -293,7 +377,7 @@ if (newSampleStatus) {
   rm(result)
   invisible(gc())
 } else {
-  print("Unable to perform Spectrum Count Check: No available sample data")
+  message("Unable to perform Spectrum Count Check: No available sample data")
 }
 ```
 
@@ -305,7 +389,7 @@ if (newSampleStatus) {
   sampleTypeList <- unique(passedData[[sampleType]])
   print(sampleTypeList)
 } else {
-  print("No available sample data")
+  print("No available data")
 }
 ```
 
@@ -325,13 +409,11 @@ if (newSampleStatus) {
         retentionTime, totalIonCurrent
       )
     
-    # Check historical data path
-    if (!is.null(historicalDataPath) && file.exists(historicalDataPath)) {
-      # Check historical data
+    # Check historical data status
+    if (historicalDataStatus) {
+      # Append historical data
       historicalData <- readRDS(historicalDataPath)
-      
       if (ncol(historicalData) == ncol(passedData) && all(colnames(historicalData) == colnames(passedData))) {
-        # Append historical data
         plotData <- historicalData %>%
           dplyr::filter(.data[[msLevel]] == 1) %>%
           dplyr::select(
@@ -339,6 +421,8 @@ if (newSampleStatus) {
             retentionTime, totalIonCurrent
           ) %>%
           rbind(., plotData)
+      } else {
+        message("Unable to append historical data: Inconsistencies between historical and sample data")
       }
       
       # Clean environment
@@ -355,10 +439,10 @@ if (newSampleStatus) {
     colour <- if (length(unique(plotData[[projectCohort]])) > 1) projectCohort else plate
     colourLabel <- if (length(unique(plotData[[projectCohort]])) > 1) "Project" else "Plate"
   } else {
-    print("Unable to display Total Ion Chromatogram: No available MS level 1 spectral data")
+    message("Unable to display Total Ion Chromatogram: No available MS level 1 spectral data")
   }
 } else {
-  print("Unable to display Total Ion Chromatogram: No available sample data")
+  message("Unable to display Total Ion Chromatogram: No available sample data")
 }
 ```
 
@@ -717,11 +801,11 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   scoresPlotToggle <- FALSE
   loadingsPlotToggle <- FALSE
 } else if (!newSampleStatus) {
-  print("Unable to perform Principal Component Analysis: No available sample data")
+  message("Unable to perform Principal Component Analysis: No available sample data")
 } else if (!spectralDataStatus) {
-  print("Unable to perform Principal Component Analysis: No available MS level 1 spectral data")
+  message("Unable to perform Principal Component Analysis: No available MS level 1 spectral data")
 } else if (!chromatogramRegionStatus) {
-  print("Unable to perform Principal Component Analysis: No available chromatogram region data")
+  message("Unable to perform Principal Component Analysis: No available chromatogram region data")
 }
 ```
 
@@ -734,7 +818,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   pattern <- c("sLTR Plasma", "LTR Plasma")
   
   if (any(pattern %in% sampleTypeList)) {
-    # Display PCA outcomes
+    # Display principal component analysis
     ticq::displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
@@ -761,7 +845,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   pattern <- c("sLTR Serum", "LTR Serum")
   
   if (any(pattern %in% sampleTypeList)) {
-    # Display PCA outcomes
+    # Display principal component analysis
     ticq::displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
@@ -788,7 +872,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   pattern <- c("sLTR Urine", "LTR Urine")
   
   if (any(pattern %in% sampleTypeList)) {
-    # Display PCA outcomes
+    # Display principal component analysis
     ticq::displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
@@ -816,7 +900,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   pattern <- c("dLTR Plasma")
   
   if (any(pattern %in% sampleTypeList)) {
-    # Display PCA outcomes
+    # Display principal component analysis
     ticq::displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
@@ -843,7 +927,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   pattern <- c("dLTR Serum")
   
   if (any(pattern %in% sampleTypeList)) {
-    # Display PCA outcomes
+    # Display principal component analysis
     ticq::displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
@@ -870,7 +954,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   pattern <- c("dLTR Urine")
   
   if (any(pattern %in% sampleTypeList)) {
-    # Display PCA outcomes
+    # Display principal component analysis
     ticq::displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
@@ -898,7 +982,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   pattern <- c("PQC Plasma")
   
   if (any(pattern %in% sampleTypeList)) {
-    # Display PCA outcomes
+    # Display principal component analysis
     ticq::displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
@@ -925,7 +1009,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   pattern <- c("PQC Serum")
   
   if (any(pattern %in% sampleTypeList)) {
-    # Display PCA outcomes
+    # Display principal component analysis
     ticq::displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
@@ -952,7 +1036,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   pattern <- c("PQC Urine")
   
   if (any(pattern %in% sampleTypeList)) {
-    # Display PCA outcomes
+    # Display principal component analysis
     ticq::displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
@@ -980,7 +1064,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   pattern <- c("dPQC Plasma")
   
   if (any(pattern %in% sampleTypeList)) {
-    # Display PCA outcomes
+    # Display principal component analysis
     ticq::displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
@@ -1007,7 +1091,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   pattern <- c("dPQC Serum")
   
   if (any(pattern %in% sampleTypeList)) {
-    # Display PCA outcomes
+    # Display principal component analysis
     ticq::displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
@@ -1034,7 +1118,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   pattern <- c("dPQC Urine")
   
   if (any(pattern %in% sampleTypeList)) {
-    # Display PCA outcomes
+    # Display principal component analysis
     ticq::displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
@@ -1062,7 +1146,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   pattern <- c("QC01")
   
   if (any(pattern %in% sampleTypeList)) {
-    # Display PCA outcomes
+    # Display principal component analysis
     ticq::displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
@@ -1089,7 +1173,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   pattern <- c("QC02")
   
   if (any(pattern %in% sampleTypeList)) {
-    # Display PCA outcomes
+    # Display principal component analysis
     ticq::displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
@@ -1116,7 +1200,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   pattern <- c("QC03")
   
   if (any(pattern %in% sampleTypeList)) {
-    # Display PCA outcomes
+    # Display principal component analysis
     ticq::displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
@@ -1143,7 +1227,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   pattern <- c("QC04")
   
   if (any(pattern %in% sampleTypeList)) {
-    # Display PCA outcomes
+    # Display principal component analysis
     ticq::displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
@@ -1171,7 +1255,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   pattern <- c("CAL01")
   
   if (any(pattern %in% sampleTypeList)) {
-    # Display PCA outcomes
+    # Display principal component analysis
     ticq::displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
@@ -1198,7 +1282,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   pattern <- c("CAL02")
   
   if (any(pattern %in% sampleTypeList)) {
-    # Display PCA outcomes
+    # Display principal component analysis
     ticq::displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
@@ -1225,7 +1309,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   pattern <- c("CAL03")
   
   if (any(pattern %in% sampleTypeList)) {
-    # Display PCA outcomes
+    # Display principal component analysis
     ticq::displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
@@ -1252,7 +1336,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   pattern <- c("CAL04")
   
   if (any(pattern %in% sampleTypeList)) {
-    # Display PCA outcomes
+    # Display principal component analysis
     ticq::displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
@@ -1279,7 +1363,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   pattern <- c("CAL05")
   
   if (any(pattern %in% sampleTypeList)) {
-    # Display PCA outcomes
+    # Display principal component analysis
     ticq::displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
@@ -1306,7 +1390,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   pattern <- c("CAL06")
   
   if (any(pattern %in% sampleTypeList)) {
-    # Display PCA outcomes
+    # Display principal component analysis
     ticq::displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
@@ -1333,7 +1417,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   pattern <- c("CAL07")
   
   if (any(pattern %in% sampleTypeList)) {
-    # Display PCA outcomes
+    # Display principal component analysis
     ticq::displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
@@ -1360,7 +1444,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   pattern <- c("CAL08")
   
   if (any(pattern %in% sampleTypeList)) {
-    # Display PCA outcomes
+    # Display principal component analysis
     ticq::displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
@@ -1388,7 +1472,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   pattern <- c("Single Blank")
   
   if (any(pattern %in% sampleTypeList)) {
-    # Display PCA outcomes
+    # Display principal component analysis
     ticq::displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
@@ -1415,7 +1499,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   pattern <- c("Double Blank")
   
   if (any(pattern %in% sampleTypeList)) {
-    # Display PCA outcomes
+    # Display principal component analysis
     ticq::displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
@@ -1446,7 +1530,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
     # Compare against long term references
     tmpPattern <- c("sLTR Plasma", "LTR Plasma")
     
-    # Display PCA outcomes
+    # Display principal component analysis
     ticq::displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, pattern)),
@@ -1479,7 +1563,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
     # Compare against long term references
     tmpPattern <- c("sLTR Serum", "LTR Serum")
     
-    # Display PCA outcomes
+    # Display principal component analysis
     ticq::displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, pattern)),
@@ -1512,7 +1596,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
     # Compare against long term references
     tmpPattern <- c("sLTR Urine", "LTR Urine")
     
-    # Display PCA outcomes
+    # Display principal component analysis
     ticq::displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, pattern)),
@@ -1546,7 +1630,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
     # Compare against long term references
     tmpPattern <- c("dLTR Plasma")
     
-    # Display PCA outcomes
+    # Display principal component analysis
     ticq::displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, pattern)),
@@ -1579,7 +1663,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
     # Compare against long term references
     tmpPattern <- c("dLTR Serum")
     
-    # Display PCA outcomes
+    # Display principal component analysis
     ticq::displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, pattern)),
@@ -1612,7 +1696,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
     # Compare against long term references
     tmpPattern <- c("dLTR Urine")
     
-    # Display PCA outcomes
+    # Display principal component analysis
     ticq::displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, pattern)),
@@ -1649,16 +1733,16 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   xLabel <- "Timestamp"
   yLabel <- "Prewash Region (TIC)"
   boundary <- "sd"
-  xTickToggle <- TRUE
+  xTickToggle <- FALSE
   
   # Data frame to store analysis result
   analysisResult_TS <- data.frame()
 } else if (!newSampleStatus) {
-  print("Unable to perform Time Series Analysis: No available sample data")
+  message("Unable to perform Time Series Analysis: No available sample data")
 } else if (!spectralDataStatus) {
-  print("Unable to perform Time Series Analysis: No available MS level 1 spectral data")
+  message("Unable to perform Time Series Analysis: No available MS level 1 spectral data")
 } else if (!chromatogramRegionStatus) {
-  print("Unable to perform Time Series Analysis: No available chromatogram region data")
+  message("Unable to perform Time Series Analysis: No available chromatogram region data")
 }
 ```
 
@@ -2043,11 +2127,11 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   boundary <- "sd"
   boxWidth <- 0.05
 } else if (!newSampleStatus) {
-  print("Unable to perform Violin Plot Analysis: No available sample data")
+  message("Unable to perform Violin Plot Analysis: No available sample data")
 } else if (!spectralDataStatus) {
-  print("Unable to perform Violin Plot Analysis: No available MS level 1 spectral data")
+  message("Unable to perform Violin Plot Analysis: No available MS level 1 spectral data")
 } else if (!chromatogramRegionStatus) {
-  print("Unable to perform Violin Plot Analysis: No available chromatogram region data")
+  message("Unable to perform Violin Plot Analysis: No available chromatogram region data")
 }
 ```
 
@@ -2856,11 +2940,11 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   rm(analysisResult_TS)
   invisible(gc())
 } else if (!newSampleStatus) {
-  print("Unable to report Time Series Analysis: No available sample data")
+  message("Unable to report Time Series Analysis: No available sample data")
 } else if (!spectralDataStatus) {
-  print("Unable to report Time Series Analysis: No available MS level 1 spectral data")
+  message("Unable to report Time Series Analysis: No available MS level 1 spectral data")
 } else if (!chromatogramRegionStatus) {
-  print("Unable to report Time Series Analysis: No available chromatogram region data")
+  message("Unable to report Time Series Analysis: No available chromatogram region data")
 }
 ```
 
@@ -2869,11 +2953,11 @@ The reports below highlights the deviation significance of the samples from the 
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample, spectral data and chromatogram region status
 if (!newSampleStatus) {
-  print("Unable to report Violin Plot Analysis: No available sample data")
+  message("Unable to report Violin Plot Analysis: No available sample data")
 } else if (!spectralDataStatus) {
-  print("Unable to report Violin Plot Analysis: No available MS level 1 spectral data")
+  message("Unable to report Violin Plot Analysis: No available MS level 1 spectral data")
 } else if (!chromatogramRegionStatus) {
-  print("Unable to report Violin Plot Analysis: No available chromatogram region data")
+  message("Unable to report Violin Plot Analysis: No available chromatogram region data")
 }
 ```
 
@@ -2983,13 +3067,11 @@ if (newSampleStatus) {
         retentionTime, basePeakIntensity
       )
     
-    # Check historical data path
-    if (!is.null(historicalDataPath) && file.exists(historicalDataPath)) {
-      # Check historical data
+    # Check historical data status
+    if (historicalDataStatus) {
+      # Append historical data
       historicalData <- readRDS(historicalDataPath)
-      
       if (ncol(historicalData) == ncol(passedData) && all(colnames(historicalData) == colnames(passedData))) {
-        # Append historical data
         plotData <- historicalData %>%
           dplyr::filter(.data[[msLevel]] == 1) %>%
           dplyr::select(
@@ -2997,6 +3079,8 @@ if (newSampleStatus) {
             retentionTime, basePeakIntensity
           ) %>%
           rbind(., plotData)
+      } else {
+        message("Unable to append historical data: Inconsistencies between historical and sample data")
       }
       
       # Clean environment
@@ -3013,10 +3097,10 @@ if (newSampleStatus) {
     colour <- if (length(unique(plotData[[projectCohort]])) > 1) projectCohort else plate
     colourLabel <- if (length(unique(plotData[[projectCohort]])) > 1) "Project" else "Plate"
   } else {
-    print("Unable to display Base Peak Chromatogram: No available MS level 1 spectral data")
+    message("Unable to display Base Peak Chromatogram: No available MS level 1 spectral data")
   }
 } else {
-  print("Unable to display Base Peak Chromatogram: No available sample data")
+  message("Unable to display Base Peak Chromatogram: No available sample data")
 }
 ```
 
@@ -3345,9 +3429,10 @@ Chromatogram overview (Extracted Ion Current, EIC vs Retention Time, RT) of targ
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample and target file status
 if (newSampleStatus && targetFileStatus) {
-  # Update extracted ion status
+  # Filter target file data
   targetFile <- targetFile[targetFile$msLevel %in% unique(passedData[[msLevel]]), ]
   
+  # Update extracted ion status
   extractedIonStatus <- if (length(unique(passedData[[arrayLength]])) != 1 ||
                             nrow(targetFile) == 0 ||
                             length(unique(targetFile$mzValue)) != unique(passedData[[arrayLength]])) FALSE else TRUE
@@ -3369,13 +3454,13 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   plotColumn <- 2
   plotRow <- 2
 } else if (!newSampleStatus) {
-  print("Unable to display Extracted Ion Chromatogram: No available sample data")
+  message("Unable to display Extracted Ion Chromatogram: No available sample data")
 } else if (!targetFileStatus) {
-  print("Unable to display Extracted Ion Chromatogram: No available target file data")
+  message("Unable to display Extracted Ion Chromatogram: No available target file data")
 } else if (!extractedIonStatus) {
-  print("Unable to display Extracted Ion Chromatogram: Inconsistencies between spectra and target m/z data")
+  message("Unable to display Extracted Ion Chromatogram: Inconsistencies between spectra and target m/z data")
 } else if (!chromatogramRegionStatus) {
-  print("Unable to display Extracted Ion Chromatogram: No available chromatogram region data")
+  message("Unable to display Extracted Ion Chromatogram: No available chromatogram region data")
 }
 ```
 
@@ -3389,19 +3474,19 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     plotData <- passedData %>%
       dplyr::filter(.data[[msLevel]] == 1)
     
-    # Check historical data path
-    if (!is.null(historicalDataPath) && file.exists(historicalDataPath)) {
-      # Check historical data
+    # Check historical data status
+    if (historicalDataStatus) {
+      # Append historical data
       historicalData <- readRDS(historicalDataPath)
-      
       if (ncol(historicalData) == ncol(passedData) &&
           all(colnames(historicalData) == colnames(passedData)) &&
           length(unique(historicalData[[arrayLength]])) == 1 &&
           unique(historicalData[[arrayLength]]) == unique(passedData[[arrayLength]])) {
-        # Append historical data
         plotData <- historicalData %>%
           dplyr::filter(.data[[msLevel]] == 1) %>%
           rbind(., plotData)
+      } else {
+        message("Unable to append historical data: Inconsistencies between historical and sample data")
       }
       
       # Clean environment
@@ -3441,13 +3526,13 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     # Plot variables and labels
     firstColumnIndex <- which(colnames(plotData_filtered) == targetMZ[1])
   } else {
-    print("Unable to display Extracted Ion Chromatogram: No available target m/z data")
+    message("Unable to display Extracted Ion Chromatogram: No available target m/z data")
   }
   
   # Clean environment
   rm(targetMZ)
 } else if (!spectralDataStatus) {
-  print("Unable to display Extracted Ion Chromatogram: No available MS level 1 spectral data")
+  message("Unable to display Extracted Ion Chromatogram: No available MS level 1 spectral data")
 }
 ```
 
@@ -4446,13 +4531,13 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     # Plot variables and labels
     firstColumnIndex <- which(colnames(plotData_filtered) == targetMZ[1])
   } else {
-    print("Unable to display Extracted Ion Chromatogram: No available target m/z data")
+    message("Unable to display Extracted Ion Chromatogram: No available target m/z data")
   }
   
   # Clean environment
   rm(targetMZ)
 } else if (!spectralDataStatus) {
-  print("Unable to display Extracted Ion Chromatogram: No available MS level 1 spectral data")
+  message("Unable to display Extracted Ion Chromatogram: No available MS level 1 spectral data")
 }
 ```
 
@@ -5451,13 +5536,13 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     # Plot variables and labels
     firstColumnIndex <- which(colnames(plotData_filtered) == targetMZ[1])
   } else {
-    print("Unable to display Extracted Ion Chromatogram: No available target m/z data")
+    message("Unable to display Extracted Ion Chromatogram: No available target m/z data")
   }
   
   # Clean environment
   rm(targetMZ)
 } else if (!spectralDataStatus) {
-  print("Unable to display Extracted Ion Chromatogram: No available MS level 1 spectral data")
+  message("Unable to display Extracted Ion Chromatogram: No available MS level 1 spectral data")
 }
 ```
 
@@ -6450,19 +6535,19 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     plotData <- passedData %>%
       dplyr::filter(.data[[msLevel]] == 2)
     
-    # Check historical data path
-    if (!is.null(historicalDataPath) && file.exists(historicalDataPath)) {
-      # Check historical data
+    # Check historical data status
+    if (historicalDataStatus) {
+      # Append historical data
       historicalData <- readRDS(historicalDataPath)
-      
       if (ncol(historicalData) == ncol(passedData) &&
           all(colnames(historicalData) == colnames(passedData)) &&
           length(unique(historicalData[[arrayLength]])) == 1 &&
           unique(historicalData[[arrayLength]]) == unique(passedData[[arrayLength]])) {
-        # Append historical data
         plotData <- historicalData %>%
           dplyr::filter(.data[[msLevel]] == 2) %>%
           rbind(., plotData)
+      } else {
+        message("Unable to append historical data: Inconsistencies between historical and sample data")
       }
       
       # Clean environment
@@ -6502,13 +6587,13 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     # Plot variables and labels
     firstColumnIndex <- which(colnames(plotData_filtered) == targetMZ[1])
   } else {
-    print("Unable to display Extracted Ion Chromatogram: No available target m/z data")
+    message("Unable to display Extracted Ion Chromatogram: No available target m/z data")
   }
   
   # Clean environment
   rm(targetMZ)
 } else if (!spectralDataStatus) {
-  print("Unable to display Extracted Ion Chromatogram: No available MS level 2 spectral data")
+  message("Unable to display Extracted Ion Chromatogram: No available MS level 2 spectral data")
 }
 ```
 
@@ -7517,17 +7602,17 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   shape <- sampleType
   shapeLabel <- "Sample Type"
   boundary <- "sd"
-  xTickToggle <- TRUE
+  xTickToggle <- FALSE
   plotColumn <- 2
   plotRow <- 2
 } else if (!newSampleStatus) {
-  print("Unable to perform Time Series Analysis: No available sample data")
+  message("Unable to perform Time Series Analysis: No available sample data")
 } else if (!targetFileStatus) {
-  print("Unable to perform Time Series Analysis: No available target file data")
+  message("Unable to perform Time Series Analysis: No available target file data")
 } else if (!extractedIonStatus) {
-  print("Unable to perform Time Series Analysis: Inconsistencies between spectra and target m/z data")
+  message("Unable to perform Time Series Analysis: Inconsistencies between spectra and target m/z data")
 } else if (!chromatogramRegionStatus) {
-  print("Unable to perform Time Series Analysis: No available chromatogram region data")
+  message("Unable to perform Time Series Analysis: No available chromatogram region data")
 }
 ```
 
@@ -7541,19 +7626,19 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     plotData <- passedData %>%
       dplyr::filter(.data[[msLevel]] == 1)
     
-    # Check historical data path
+    # Check historical data status
     if (!is.null(historicalDataPath) && file.exists(historicalDataPath)) {
-      # Check historical data
+      # Append historical data
       historicalData <- readRDS(historicalDataPath)
-      
       if (ncol(historicalData) == ncol(passedData) &&
           all(colnames(historicalData) == colnames(passedData)) &&
           length(unique(historicalData[[arrayLength]])) == 1 &&
           unique(historicalData[[arrayLength]]) == unique(passedData[[arrayLength]])) {
-        # Append historical data
         plotData <- historicalData %>%
           dplyr::filter(.data[[msLevel]] == 1) %>%
           rbind(., plotData)
+      } else {
+        message("Unable to append historical data: Inconsistencies between historical and sample data")
       }
       
       # Clean environment
@@ -7602,13 +7687,13 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     # Data frame to store analysis result
     analysisResult_TS_massCalibrationReference <- data.frame()
   } else {
-    print("Unable to perform Time Series Analysis: No available target m/z data")
+    message("Unable to perform Time Series Analysis: No available target m/z data")
   }
   
   # Clean environment
   rm(targetMZ)
 } else if (!spectralDataStatus) {
-  print("Unable to perform Time Series Analysis: No available MS level 1 spectral data")
+  message("Unable to perform Time Series Analysis: No available MS level 1 spectral data")
 }
 ```
 
@@ -8862,13 +8947,13 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     # Data frame to store analysis result
     analysisResult_TS_internalStandard <- data.frame()
   } else {
-    print("Unable to perform Time Series Analysis: No available target m/z data")
+    message("Unable to perform Time Series Analysis: No available target m/z data")
   }
   
   # Clean environment
   rm(targetMZ)
 } else if (!spectralDataStatus) {
-  print("Unable to perform Time Series Analysis: No available MS level 1 spectral data")
+  message("Unable to perform Time Series Analysis: No available MS level 1 spectral data")
 }
 ```
 
@@ -10122,13 +10207,13 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     # Data frame to store analysis result
     analysisResult_TS_endogenousAnalyte <- data.frame()
   } else {
-    print("Unable to perform Time Series Analysis: No available target m/z data")
+    message("Unable to perform Time Series Analysis: No available target m/z data")
   }
   
   # Clean environment
   rm(targetMZ)
 } else if (!spectralDataStatus) {
-  print("Unable to perform Time Series Analysis: No available MS level 1 spectral data")
+  message("Unable to perform Time Series Analysis: No available MS level 1 spectral data")
 }
 ```
 
@@ -11368,19 +11453,19 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     plotData <- passedData %>%
       dplyr::filter(.data[[msLevel]] == 2)
     
-    # Check historical data path
-    if (!is.null(historicalDataPath) && file.exists(historicalDataPath)) {
-      # Check historical data
+    # Check historical data status
+    if (historicalDataStatus) {
+      # Append historical data
       historicalData <- readRDS(historicalDataPath)
-      
       if (ncol(historicalData) == ncol(passedData) &&
           all(colnames(historicalData) == colnames(passedData)) &&
           length(unique(historicalData[[arrayLength]])) == 1 &&
           unique(historicalData[[arrayLength]]) == unique(passedData[[arrayLength]])) {
-        # Append historical data
         plotData <- historicalData %>%
           dplyr::filter(.data[[msLevel]] == 2) %>%
           rbind(., plotData)
+      } else {
+        message("Unable to append historical data: Inconsistencies between historical and sample data")
       }
       
       # Clean environment
@@ -11429,13 +11514,13 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     # Data frame to store analysis result
     analysisResult_TS_product <- data.frame()
   } else {
-    print("Unable to perform Time Series Analysis: No available target m/z data")
+    message("Unable to perform Time Series Analysis: No available target m/z data")
   }
   
   # Clean environment
   rm(targetMZ)
 } else if (!spectralDataStatus) {
-  print("Unable to perform Time Series Analysis: No available MS level 2 spectral data")
+  message("Unable to perform Time Series Analysis: No available MS level 2 spectral data")
 }
 ```
 
@@ -12682,18 +12767,18 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus) {
   # Target m/z
   targetMZ <- sort(unique(targetFile$mzValue))
   
-  # Check historical data path
+  # Check historical data status
   massAccuracyData <- passedData
-  if (!is.null(historicalDataPath) && file.exists(historicalDataPath)) {
-    # Check historical data
+  if (historicalDataStatus) {
+    # Append historical data
     historicalData <- readRDS(historicalDataPath)
-    
     if (ncol(historicalData) == ncol(passedData) &&
         all(colnames(historicalData) == colnames(passedData)) &&
         length(unique(historicalData[[arrayLength]])) == 1 &&
         unique(historicalData[[arrayLength]]) == unique(passedData[[arrayLength]])) {
-      # Append historical data
       massAccuracyData <- rbind(historicalData, massAccuracyData)
+    } else {
+      message("Unable to append historical data: Inconsistencies between historical and sample data")
     }
     
     # Clean environment
@@ -12707,7 +12792,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus) {
     data = massAccuracyData,
     mzArray = mzArray,
     targetMZ = targetMZ,
-    roundDecimal = roundDecimal
+    roundDecimalPlace = roundDecimalPlace
   )
   
     # Loop through each MS level
@@ -12726,7 +12811,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus) {
             commonColumn = commonColumn,
             spectrumCount = spectrumCount,
             firstColumnIndex = which(colnames(.) == targetMZ_filtered[1]),
-            roundDecimal = roundDecimal
+            roundDecimalPlace = roundDecimalPlace
           ) %>%
           dplyr::select(-spectrumCount) %>%
           dplyr::left_join(plotData, ., by = commonColumn[commonColumn != spectrumCount])
@@ -12754,7 +12839,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus) {
   boundary <- "value"
   boundaryValue <- 5
   trendlineToggle <- FALSE
-  xTickToggle <- TRUE
+  xTickToggle <- FALSE
   facetWrapBy <- instrument
   plotColumn <- 2
   plotRow <- 2
@@ -12788,11 +12873,11 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus) {
      xTickToggle, facetWrapBy, plotColumn, plotRow, colour, colourLabel)
   invisible(gc())
 } else if (!newSampleStatus) {
-  print("Unable to perform Mass Accuracy Analysis: No available sample data")
+  message("Unable to perform Mass Accuracy Analysis: No available sample data")
 } else if (!targetFileStatus) {
-  print("Unable to perform Mass Accuracy Analysis: No available target file data")
+  message("Unable to perform Mass Accuracy Analysis: No available target file data")
 } else if (!extractedIonStatus) {
-  print("Unable to perform Mass Accuracy Analysis: Inconsistencies between spectra and target m/z data")
+  message("Unable to perform Mass Accuracy Analysis: Inconsistencies between spectra and target m/z data")
 }
 ```
 
@@ -12802,13 +12887,13 @@ The report highlights the deviation significance of mass calibration references,
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample, target file, extracted ion and chromatogram region status
 if (!newSampleStatus) {
-  print("Unable to report Time Series Analysis: No available sample data")
+  message("Unable to report Time Series Analysis: No available sample data")
 } else if (!targetFileStatus) {
-  print("Unable to report Time Series Analysis: No available target file data")
+  message("Unable to report Time Series Analysis: No available target file data")
 } else if (!extractedIonStatus) {
-  print("Unable to report Time Series Analysis: Inconsistencies between spectra and target m/z data")
+  message("Unable to report Time Series Analysis: Inconsistencies between spectra and target m/z data")
 } else if (!chromatogramRegionStatus) {
-  print("Unable to report Time Series Analysis: No available chromatogram region data")
+  message("Unable to report Time Series Analysis: No available chromatogram region data")
 }
 ```
 
@@ -12859,10 +12944,10 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     rm(analysisResult_TS_massCalibrationReference)
     invisible(gc())
   } else {
-    print("Unable to report Time Series Analysis: No available target m/z data")
+    message("Unable to report Time Series Analysis: No available target m/z data")
   }
 } else if (!spectralDataStatus) {
-  print("Unable to report Time Series Analysis: No available MS level 1 spectral data")
+  message("Unable to report Time Series Analysis: No available MS level 1 spectral data")
 }
 ```
 
@@ -12905,10 +12990,10 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     rm(analysisResult_TS_internalStandard)
     invisible(gc())
   } else {
-    print("Unable to report Time Series Analysis: No available target m/z data")
+    message("Unable to report Time Series Analysis: No available target m/z data")
   }
 } else if (!spectralDataStatus) {
-  print("Unable to report Time Series Analysis: No available MS level 1 spectral data")
+  message("Unable to report Time Series Analysis: No available MS level 1 spectral data")
 }
 ```
 
@@ -12951,10 +13036,10 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     rm(analysisResult_TS_endogenousAnalyte)
     invisible(gc())
   } else {
-    print("Unable to report Time Series Analysis: No available target m/z data")
+    message("Unable to report Time Series Analysis: No available target m/z data")
   }
 } else if (!spectralDataStatus) {
-  print("Unable to report Time Series Analysis: No available MS level 1 spectral data")
+  message("Unable to report Time Series Analysis: No available MS level 1 spectral data")
 }
 
 # Check new sample, target file, extracted ion, chromatogram region, spectral data status
@@ -13011,10 +13096,10 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     rm(analysisResult_TS_product)
     invisible(gc())
   } else {
-    print("Unable to report Time Series Analysis: No available target m/z data")
+    message("Unable to report Time Series Analysis: No available target m/z data")
   }
 } else if (!spectralDataStatus) {
-  print("Unable to report Time Series Analysis: No available MS level 1 spectral data")
+  message("Unable to report Time Series Analysis: No available MS level 2 spectral data")
 }
 
 # Check new sample, target file, extracted ion, chromatogram region, spectral data status
@@ -13059,11 +13144,11 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus) {
   rm(analysisResult_MA)
   invisible(gc())
 } else if (!newSampleStatus) {
-  print("Unable to report Mass Accuracy Analysis: No available sample data")
+  message("Unable to report Mass Accuracy Analysis: No available sample data")
 } else if (!targetFileStatus) {
-  print("Unable to report Mass Accuracy Analysis: No available target file data")
+  message("Unable to report Mass Accuracy Analysis: No available target file data")
 } else if (!extractedIonStatus) {
-  print("Unable to report Mass Accuracy Analysis: Inconsistencies between spectra and target m/z data")
+  message("Unable to report Mass Accuracy Analysis: Inconsistencies between spectra and target m/z data")
 }
 
 # Check new sample and target file status
@@ -13074,22 +13159,26 @@ if (newSampleStatus && targetFileStatus) {
 ```
 
 ```{r, echo = FALSE, warning = FALSE}
-# Check new sample status
-if (newSampleStatus) {
-  # Clean environment
-  rm(passedData, sampleID, project, cohort, projectCohort, sampleType, method, instrument, plate, timestamp, spectrumCount, arrayLength,
-     msLevel, retentionTime, basePeakIntensity, totalIonCurrent, mzArray, intensityArray, sampleTypeList)
-  invisible(gc())
-}
-
-# Check target file status
-if (targetFileStatus) {
-  # Clean environment
-  rm(targetFile)
-  invisible(gc())
-}
-
 # Clean environment
-rm(params, outputPath, chromatogramRegion, historicalDataPath, roundDecimal, newSampleStatus, chromatogramRegionStatus, targetFileStatus)
+  # Check new sample status
+  if (newSampleStatus) {
+    rm(passedData, sampleID, project, cohort, projectCohort, sampleType, method, instrument, plate, timestamp, spectrumCount, arrayLength,
+       msLevel, retentionTime, basePeakIntensity, totalIonCurrent, mzArray, intensityArray, sampleTypeList)
+    invisible(gc())
+  }
+
+  # Check historical data status
+  if (historicalDataStatus) {
+    rm(historicalDataPath)
+  }
+
+  # Check target file status
+  if (targetFileStatus) {
+    rm(targetFile)
+    invisible(gc())
+  }
+
+  rm(params, outputPath, chromatogramRegion, roundDecimalPlace, newSampleStatus, historicalDataStatus, targetFileStatus,
+     chromatogramRegionStatus)
 
 ```

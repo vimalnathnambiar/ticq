@@ -13,15 +13,17 @@
 #' @param sumColumn Column name of the data to be summed: character
 #' @returns A data frame containing the summed values for each chromatogram regions of interest
 spliceChromatogramRegion <- function(data, commonColumn, spectrumCount, chromatogramRegion = NULL, retentionTime, sumColumn) {
-  # Check and splice chromatogram regions of interests
+  # Check chromatogram region
   splicedChromatogramData <- ticq::countSpectrum(data = data, commonColumn = commonColumn, spectrumCount = spectrumCount) %>%
     mutate(overallRegion = ticq::sumDataColumn(data = data, commonColumn = commonColumn, sumColumn = sumColumn)$sum)
   
   if (!is.null(chromatogramRegion)) {
-    # Chromatogram region pattern
+    # Chromatogram region data patterns
     pattern <- c("prewash", "massCalibration", "analyte", "wash")
     
+    # Loop through patterns
     for (i in pattern) {
+      # Splice chromatogram region
       splicedChromatogramData[[paste0(i, "Region")]] <- (
         ticq::filterChromatogramRegion(data = data, regionOfInterest = chromatogramRegion[[i]], retentionTime = retentionTime) %>%
         ticq::sumDataColumn(data = ., commonColumn = commonColumn, sumColumn = sumColumn)

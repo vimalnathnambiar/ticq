@@ -11,14 +11,14 @@
 #' @param commonColumn Column names of data common for each sample: character vector
 #' @param mzArray m/z array column name: character
 #' @param targetMZ Target m/z values (Must be unique, sorted, and equal length and correspond to the values stored within intensity array): character vector
-#' @param roundDecimal Number of decimal places for precision value rounding (Default: NULL): NULL or double
+#' @param roundDecimalPlace Number of decimal places for precision value rounding (Default: NULL): NULL or double
 #' @returns A data frame with appended columns representing the calculated mass accuracy (in ppm) for each target m/z (EIC)
-calculateMassAccuracy <- function(data, mzArray, targetMZ, roundDecimal = NULL) {
+calculateMassAccuracy <- function(data, mzArray, targetMZ, roundDecimalPlace = NULL) {
   # Extract m/z value within the array of each spectra into a matrix
   tmp <- do.call(cbind, data[[mzArray]])
   
   # Calculate mass accuracy (in ppm)
-  tmp <- if (!is.null(roundDecimal)) round((tmp - targetMZ) / targetMZ * 1e6, digits = roundDecimal) else (tmp - targetMZ) / targetMZ * 1e6
+  tmp <- if (!is.null(roundDecimalPlace)) round((tmp - targetMZ) / targetMZ * 1e6, digits = roundDecimalPlace) else (tmp - targetMZ) / targetMZ * 1e6
   
   # Transpose matrix and convert into data frame
   tmp <- as.data.frame(t(tmp))

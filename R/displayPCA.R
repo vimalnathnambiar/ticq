@@ -175,12 +175,12 @@ displayPCA <- function(data,
           }
         }
       },
-      warning = function(w) print(paste("Unable to display outcomes of Principal Component Analysis -", w)),
-      error = function(e) print(paste("Unable to display outcomes of Principal Component Analysis -", e)))
+      warning = function(w) message(paste("Unable to display Principal Component Analysis:", w)),
+      error = function(e) message(paste("Unable to display Principal Component Analysis:", e)))
     } else {
-      print(paste("Unable to display outcomes of Principal Component Analysis - Only PC1 satisfies the threshold limit"))
+      message("Unable to display Principal Component Analysis: Only PC1 satisfies the threshold limit")
     }
   },
-  warning = function(w) print(paste("Unable to perform Principal Component Analysis -", w)),
-  error = function(e) print(paste("Unable to perform Principal Component Analysis -", e)))
+  warning = function(w) message(paste("Unable to perform Principal Component Analysis:", w)),
+  error = function(e) message(paste("Unable to perform Principal Component Analysis:", e)))
 }

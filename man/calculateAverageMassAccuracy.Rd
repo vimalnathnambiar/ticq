@@ -10,7 +10,7 @@ calculateAverageMassAccuracy(
   spectrumCount,
   firstColumnIndex,
   lastColumnIndex = NULL,
-  roundDecimal = NULL
+  roundDecimalPlace = NULL
 )
 }
 \arguments{
@@ -24,7 +24,7 @@ calculateAverageMassAccuracy(
 
 \item{lastColumnIndex}{Index of the last data column to averaged: double}
 
-\item{roundDecimal}{Number of decimal places for precision value rounding (Default: NULL): NULL or double}
+\item{roundDecimalPlace}{Number of decimal places for precision value rounding (Default: NULL): NULL or double}
 }
 \value{
 A data frame grouped by common columns and the average ppm accuracy for each target m/z value

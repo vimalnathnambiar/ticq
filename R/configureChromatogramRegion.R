@@ -13,7 +13,7 @@
 #' @param analyteEnd End of feature detection cycle (Default: Start of wash cycle): double
 #' @param washStart Start of wash cycle: double
 #' @param washEnd End of wash cycle (Default: NULL): NULL or double
-#' @returns A list containing the start and end time points of the different chromatogram regions of interest (prewash, mass calibration, analyte, and wash)
+#' @returns A list containing the start and end time points of the different chromatogram regions of interest
 #'
 #' @examples
 #' # Example 1: Using default values for analyteStart, analyteEnd and washEnd
@@ -31,7 +31,7 @@ configureChromatogramRegion <- function(massCalibrationStart = 0,
                                         analyteEnd = washStart,
                                         washStart,
                                         washEnd = NULL) {
-  # Configure the start and end time points for prewash, mass calibration, analyte, and wash regions
+  # Configure the start and end time points of each region
   return(
     list(
       prewash = list(start = 0, end = washStart),

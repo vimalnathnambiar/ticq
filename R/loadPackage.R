@@ -3,7 +3,7 @@
 #' Identify, install and load packages to use.
 #'
 #' @export
-#' @param packageName Package names to be loaded: character vector
+#' @param packageName Package name: character or character vector
 #'
 #' @examples
 #' # Example 1: Loading a single package

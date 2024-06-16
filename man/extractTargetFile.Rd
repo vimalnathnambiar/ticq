@@ -5,36 +5,36 @@
 \title{Extract Target File}
 \usage{
 extractTargetFile(
-  targetFile = NULL,
+  targetFilePath = NULL,
   anpcMethodLibrary = NULL,
-  roundDecimal = NULL
+  roundDecimalPlace = NULL
 )
 }
 \arguments{
-\item{targetFile}{Published to web or local TSV document (Default: NULL, Options: Published to web URL or local file path): NULL or character}
+\item{targetFilePath}{Published to web URL or local path of the TSV formatted target file (Default: NULL, Options: Published to web URL or local file path): NULL or character}
 
-\item{anpcMethodLibrary}{ANPC in-house method library (Default: NULL, Options: "MS-AA-POS", "MS-HIL-POS", "MS-HIL-NEG", "MS-RP-POS" or "MS-RP-NEG"): NULL or character}
+\item{anpcMethodLibrary}{ANPC method library (Default: NULL, Options: "MS-AA-POS", "MS-HIL-POS", "MS-HIL-NEG", "MS-RP-POS" or "MS-RP-NEG"): NULL or character}
 
-\item{roundDecimal}{Number of decimal places for precision value rounding (Default: NULL): NULL or double}
+\item{roundDecimalPlace}{Number of decimal places for precision value rounding (Default: NULL): NULL or numeric}
 }
 \value{
 A data frame representing the target file
 }
 \description{
-Extract investigated m/z data of interest from target file (published to web URL or local TSV document) or in-house method library used at the Australian National Phenome Centre (ANPC).
+Extract target m/z data from a TSV formatted target file (published to web URL or local file path) or an in-house method library used at the Australian National Phenome Centre (ANPC).
 }
 \details{
-To assess MS spectral data acquired using ExfilMS post-targeted spectra filtering, ensure the same target file or in-house method library is defined in TICQ.
+If both target file path and ANPC method library is defined, the target file path will be used as default extraction. If no data is found, ANPC method library is then used.
 
-If both target file and in-house method library is defined, only target file will be checked for. The target file should follow a pre-determined layout used by ExfilMS (https://github.com/vmalnathnambiar/exfilms/blob/main/docs/how-to-create-a-target-file.md).
+When defining a target file path, please ensure the TSV document follows a pre-determined layout used by ExfilMS (https://github.com/vmalnathnambiar/exfilms/blob/main/docs/how-to-create-a-target-file.md).
 }
 \examples{
-# Example 1: Defining a target file with no rounding of precision values
-targetFile <- "https://docs.google.com/spreadsheets/d/e/2PACX-1vSeo31hlruA3QuwoESz5IDJ9Nu6ndSAgLTRn3uc45rOPO4BlksfHzh9xtNB22Oes9JOxhEbI4NK-zxl/pub?gid=0&single=true&output=tsv"
-targetFile <- ticq::extractTargetFile(targetFile = targetFile, anpcMethodLibrary = NULL, roundDecimal = NULL)
+# Example 1: Defining a target file with no rounding of decimal places for precision values
+targetFilePath <- "https://docs.google.com/spreadsheets/d/e/2PACX-1vSeo31hlruA3QuwoESz5IDJ9Nu6ndSAgLTRn3uc45rOPO4BlksfHzh9xtNB22Oes9JOxhEbI4NK-zxl/pub?gid=0&single=true&output=tsv"
+targetFile <- ticq::extractTargetFile(targetFilePath = targetFilePath, anpcMethodLibrary = NULL, roundDecimalPlace = NULL)
 print(targetFile)
 
-# Example 2: Defining an in-house method library with rounding of precision values to 4 decimal places
-targetFile <- ticq::extractTargetFile(targetFile = NULL, anpcMethodLibrary = "MS-AA-POS", roundDecimal = 4)
+# Example 2: Defining an ANPC method library with rounding of precision values up to 4 decimal places
+targetFile <- ticq::extractTargetFile(targetFilePath = NULL, anpcMethodLibrary = "MS-AA-POS", roundDecimalPlace = 4)
 print(targetFile)
 }

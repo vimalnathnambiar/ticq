@@ -4,7 +4,7 @@
 \alias{calculateMassAccuracy}
 \title{Calculate Mass Accuracy}
 \usage{
-calculateMassAccuracy(data, mzArray, targetMZ, roundDecimal = NULL)
+calculateMassAccuracy(data, mzArray, targetMZ, roundDecimalPlace = NULL)
 }
 \arguments{
 \item{data}{A data frame containing spectral data: data frame}
@@ -13,7 +13,7 @@ calculateMassAccuracy(data, mzArray, targetMZ, roundDecimal = NULL)
 
 \item{targetMZ}{Target m/z values (Must be unique, sorted, and equal length and correspond to the values stored within intensity array): character vector}
 
-\item{roundDecimal}{Number of decimal places for precision value rounding (Default: NULL): NULL or double}
+\item{roundDecimalPlace}{Number of decimal places for precision value rounding (Default: NULL): NULL or double}
 
 \item{commonColumn}{Column names of data common for each sample: character vector}
 }

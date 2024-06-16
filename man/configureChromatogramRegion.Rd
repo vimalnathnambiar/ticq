@@ -27,7 +27,7 @@ configureChromatogramRegion(
 \item{massCalEnd}{End of mass calibration cycle: double}
 }
 \value{
-A list containing the start and end time points of the different chromatogram regions of interest (prewash, mass calibration, analyte, and wash)
+A list containing the start and end time points of the different chromatogram regions of interest
 }
 \description{
 Configure the start and end time points of the different chromatogram regions of interest:
