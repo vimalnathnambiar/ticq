@@ -7,14 +7,27 @@
 #' @import dplyr
 #'
 #' @export
-#' @param input ANPC sample file name or path: character
-#' @param matrix Associated matrix type: character
+#' @param input ANPC sample file name or path: character or character vector
+#' @param matrix Associated matrix type (Default: NA_character_): NA_character_ or character or character vector
 #' @returns Sample type
 #'
 #' @examples
 #' sampleType <- ticq::extractSampleType(input = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29.json", matrix = "Serum")
 #' print(sampleType)
 extractSampleType <- function(input, matrix = NA_character_) {
+  # Validate parameters
+    # Input
+  if (is.null(input) || !is.character(input)) {
+    message("Invalid 'input': Must not be a non-NULL character string or vector (Setting default to empty character string)")
+    input <- ""
+  }
+    
+    # Matrix type
+    if (is.null(matrix) || !is.character(matrix)) {
+      message("Invalid 'matrix': Must be a NA_character or character string or vector (Setting default to NA_character)")
+      matrix <- NA_character_
+    }
+  
   # Extract sample type
   return(
     dplyr::case_when(

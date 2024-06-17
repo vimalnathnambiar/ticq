@@ -8,7 +8,7 @@
 #' @import stringr
 #'
 #' @export
-#' @param input ANPC sample file name or path: character
+#' @param input ANPC sample file name or path: character or character vector
 #' @returns Plate number
 #'
 #' @examples
@@ -18,17 +18,18 @@ extractPlate <- function(input) {
   # Check plate number patterns
   pattern <- c("[pP][0-9]+", "PLATE[0-9]+", "PLASMA[0-9]+")
   
-  # Loop through patterns
-  for (p in pattern) {
-    # Check pattern
-    if (grepl(p, input)) {
-      # Extract plate number
-      plate <- stringr::str_extract(input, p) %>%
-        stringr::str_replace_all("^[a-zA-Z0]+", "")
-      
-      return(if (plate == "") "0" else plate)
-    }
+  # Validate parameters
+  if (is.null(input) || !is.character(input)) {
+    message("Invalid 'input': Must not be a non-NULL character string or vector (Setting default to empty character string)")
+    input <- ""
   }
   
-  return(NA_character_)
+  # Extract plate number
+  pattern <- paste(pattern, collapse = "|")
+  plate <- stringr::str_extract(input, pattern) %>%
+    stringr::str_replace_all("^[a-zA-Z0]+", "")
+  
+  plate[is.na(plate) | plate == ""] <-  "0"
+  
+  return(plate)
 }

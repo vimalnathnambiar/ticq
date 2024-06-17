@@ -7,7 +7,7 @@
 extractPlate(input)
 }
 \arguments{
-\item{input}{ANPC sample file name or path: character}
+\item{input}{ANPC sample file name or path: character or character vector}
 }
 \value{
 Plate number

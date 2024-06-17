@@ -5,13 +5,19 @@
 #' Applicable only to data acquired at the Australian National Phenome Centre (ANPC).
 #'
 #' @export
-#' @param input ANPC sample file name or path: character
-#' @returns List containing the metadata associated to the data
+#' @param input ANPC sample file name or path: character or character vector
+#' @returns List containing the associated metadata associated of the input
 #'
 #' @examples
 #' metadata <- ticq::extractMetadata(input = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29.json")
 #' print(metadata)
 extractMetadata <- function(input) {
+  # Validate parameters
+  if (is.null(input) || !is.character(input)) {
+    message("Invalid 'input': Must not be a non-NULL character string or vector (Setting default to empty character string")
+    input <- ""
+  }
+  
   # Extract metadata components
   project <- ticq::extractProject(input = input)
   cohort <- ticq::extractCohort(input = input)

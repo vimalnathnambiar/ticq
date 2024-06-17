@@ -9,7 +9,7 @@ checkUndefinedSampleType(data, commonColumn, sampleType, spectrumCount)
 \arguments{
 \item{data}{A data frame containing spectral data: data frame}
 
-\item{commonColumn}{Column names of data common for each sample: character vector}
+\item{commonColumn}{Column names of data common for each sample: character or character vector}
 
 \item{sampleType}{Sample type column name: character}
 

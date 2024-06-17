@@ -11,7 +11,7 @@
 #' @param sampleID Sample ID column name: character
 #' @param project Project column name: character
 #' @param cohort Cohort column name: character
-#' @param projectCohort Combined project and cohort variable column name: character
+#' @param projectCohort Project + Cohort column name: character
 #' @param method Method column name: character
 #' @param instrument Instrument column name: character
 #' @param plate Plate number column name: character
@@ -24,6 +24,29 @@
 #'                                 method = "method", instrument = "instrument", plate = "plate")
 #' print(data)
 anonymiseMetadata <- function(data, sampleID, project, cohort, projectCohort, method, instrument, plate) {
+  # Validate parameters
+    # Data
+    if (!is.data.frame(data)) {
+      stop("Invalid 'data': Must be a data frame")
+    }
+  
+    # Column names
+    columnName <- list(sampleID = sampleID, project = project, cohort = cohort, projectCohort = projectCohort, method = method, instrument = instrument, plate = plate)
+    for (column in names(columnName)) {
+      if (is.null(columnName[[column]]) || !is.character(columnName[[column]]) || length(columnName[[column]]) != 1 || columnName[[column]] == "") {
+        stop(paste0("Invalid column name for ", column, ": Must be a non-NULL and non-empty character string"))
+      }
+    }
+  
+    columnName <- c(sampleID, project, cohort, projectCohort, method, instrument, plate)
+    if (!all(columnName %in% colnames(data))) {
+      stop(paste0(
+        "Unable to anonymise metadata: Missing one or more data columns (",
+        paste(columnName[!columnName %in% colnames(data)], collapse = ", "),
+        ")"
+      ))
+    }
+  
   # Anonymise (and replace NA) metadata values
   return(
     data %>%

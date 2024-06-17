@@ -17,8 +17,8 @@ output:
 params:
     title: "test"
     inputPath: "/run/media/vimalnathnambiar/WD/data/JSON/test/"
-    outputPath: NULL
-    historicalDataPath: "/run/media/vimalnathnambiar/WD/data/historical/test.rds"
+    outputDirectoryPath: "/home/vimalnathnambiar/git/github/vmalnathnambiar/ticq/inst/notebooks/output/"
+    historicalDataPath: NULL
     targetFilePath: NULL
     anpcMethodLibrary: "MS-AA-POS"
     chromatogramRegion: NULL
@@ -37,7 +37,7 @@ ticq::loadPackage(packageName = c("DT", "dplyr"))
   inputPath <- params$inputPath
   
   # Output path
-  outputPath <- params$outputPath
+  outputDirectoryPath <- params$outputDirectoryPath
   
   # Historical data path
   historicalDataPath <- params$historicalDataPath
@@ -75,37 +75,30 @@ rm(inputFiles)
 
 ## Output
 ```{r, echo = FALSE, warning = FALSE}
-# Check output path
-if (is.null(outputPath) || !is.character(outputPath) || outputPath == "") {
-  message("Invalid output path: Setting default")
-  outputPath <- paste0(getwd(), "/output/")
+# Check output directory path
+if (is.null(outputDirectoryPath) || !is.character(outputDirectoryPath) || length(outputDirectoryPath) != 1 || outputDirectoryPath == "") {
+  stop("Invalid 'outputDirectoryPath': Must be a non-NULL and non-empty character string")
 }
 
-if (!dir.exists(outputPath)) {
-  dir.create(outputPath, recursive = TRUE)
+print(paste("Output directory path:", outputDirectoryPath))
+if (!dir.exists(outputDirectoryPath)) {
+  dir.create(outputDirectoryPath, recursive = TRUE)
 }
-
-# Display output
-print(paste("Output path:", outputPath))
 ```
 
 ## Historical Data
 ```{r, echo = FALSE, warning = FALSE}
-# Check historical data path and update historical data status
-if (!is.null(historicalDataPath) || !is.character(historicalDataPath)) {
-  message("Invalid historical data path: Setting default (NULL)")
-  historicalDataPath <- NULL
-} else if (!file.exists(historicalDataPath)) {
-  message("Historical data path does not exist: Setting default (NULL)")
-  historicalDataPath <- NULL
-} else if (!grepl("\\.rds$", historicalDataPath, ignore.case = TRUE)) {
-  message("Invalid historical data format: Setting default (NULL)")
-  historicalDataPath <- NULL
+# Check historical data path
+if (!is.null(historicalDataPath)) {
+  if (!is.character(historicalDataPath) || length(historicalDataPath) != 1 || historicalDataPath == "") {
+    stop("Invalid 'historicalDataPath': Must be NULL or a non-empty character string path of a RDS file path")
+  } else if (!file.exists(historicalDataPath) || !grepl("\\.rds$", historicalDataPath, ignore.case = TRUE)) {
+    stop("Invalid 'historicalDataPath': Must be an existing RDS file")
+  }
 }
 
+# Update historical data status
 historicalDataStatus <- !is.null(historicalDataPath)
-
-# Display historical data
 if (historicalDataStatus) {
   print(paste("Historical data path:", historicalDataPath))
 } else {
@@ -143,38 +136,33 @@ rm(targetFilePath)
 
 ## Chromatogram Region
 ```{r, echo = FALSE, warning = FALSE}
-# Check chromatogram region data
+# Chromatogram region data patterns and associated ANPC method library representation
 pattern <- c("prewash", "massCalibration", "analyte", "wash")
+anpcChromatogramRegionData <- list(
+  "MS-AA-POS" = list(massCalibrationStart = 0, massCalibrationEnd = 0.3, washStart = 5),
+  "MS-HIL-POS" = list(massCalibrationStart = 0, massCalibrationEnd = 0.7, washStart = 11),
+  "MS-HIL-NEG" = list(massCalibrationStart = 0, massCalibrationEnd = 0.7, washStart = 11),
+  "MS-RP-POS" = list(massCalibrationStart = 0, massCalibrationEnd = 0.7, washStart = 11),
+  "MS-RP-NEG" = list(massCalibrationStart = 0, massCalibrationEnd = 0.7, washStart = 11)
+)
+
+# Check chromatogram region data
 if (!is.null(chromatogramRegion) && (!is.list(chromatogramRegion) || !all(pattern %in% names(chromatogramRegion)))) {
-  message("Invalid chromatogram region format: Setting default (NULL)")
+  message(
+    "Invalid 'chromatogramRegion': Must be a list containing all required chromatogram region data of interests (Setting default to NULL)"
+  )
   chromatogramRegion <- NULL
 }
 
-if (is.null(chromatogramRegion) && !is.null(anpcMethodLibrary) && is.character(anpcMethodLibrary)) {
-  message("Attempting to use ANPC method library associated chromatogram region data")
-  # ANPC method library chromatogram region data
-  anpcChromatogramRegionData <- list(
-    "MS-AA-POS" = list(massCalibrationStart = 0, massCalibrationEnd = 0.3, washStart = 5),
-    "MS-HIL-POS" = list(massCalibrationStart = 0, massCalibrationEnd = 0.7, washStart = 11),
-    "MS-HIL-NEG" = list(massCalibrationStart = 0, massCalibrationEnd = 0.7, washStart = 11),
-    "MS-RP-POS" = list(massCalibrationStart = 0, massCalibrationEnd = 0.7, washStart = 11),
-    "MS-RP-NEG" = list(massCalibrationStart = 0, massCalibrationEnd = 0.7, washStart = 11)
+# Configure chromatogram region data
+if (is.null(chromatogramRegion) && !is.null(anpcMethodLibrary) && anpcMethodLibrary %in% names(anpcChromatogramRegionData)) {
+  message("Attempting to configure chromatogram region data using 'anpcMethodLibrary'")
+  chromatogramRegion <- ticq::configureChromatogramRegion(
+    massCalibrationStart = anpcChromatogramRegionData[[anpcMethodLibrary]]$massCalibrationStart,
+    massCalibrationEnd = anpcChromatogramRegionData[[anpcMethodLibrary]]$massCalibrationEnd,
+    washStart = anpcChromatogramRegionData[[anpcMethodLibrary]]$washStart
   )
-  
-  # Configure chromatogram region data
-  if ((anpcMethodLibrary %in% names(anpcChromatogramRegionData))) {
-    chromatogramRegion <- ticq::configureChromatogramRegion(
-      massCalibrationStart = anpcChromatogramRegionData[[anpcMethodLibrary]]$massCalibrationStart,
-      massCalibrationEnd = anpcChromatogramRegionData[[anpcMethodLibrary]]$massCalibrationEnd,
-      washStart = anpcChromatogramRegionData[[anpcMethodLibrary]]$washStart
-    )
-  } else {
-    message("Unable to configure chromatogram region data: No matching ANPC method library chromatogram region data available")
-  }
-  
-  # Clean environment
-  rm(anpcChromatogramRegionData)
-  invisible()
+  message(paste0("'chromatogramRegion': Data configured to ANPC method library (", anpcMethodLibrary, ")"))
 }
 
 # Update chromatogram region status
@@ -186,7 +174,8 @@ if (chromatogramRegionStatus) {
 }
 
 # Clean environment
-rm(anpcMethodLibrary, pattern)
+rm(anpcMethodLibrary, pattern, anpcChromatogramRegionData)
+invisible(gc())
 ```
 
 # Spectral Data Extraction
@@ -201,7 +190,7 @@ if (newSampleStatus) {
   newSampleStatus <- nrow(result$passedData) > 0
   if (newSampleStatus) {
     passedData <- result$passedData
-    saveRDS(passedData, file = paste0(outputPath, gsub("\\.json$", "", basename(inputPath), ignore.case = TRUE), ".rds"))
+    saveRDS(passedData, file = paste0(outputDirectoryPath, params$title, ".rds"))
   }
   
   # Display result
@@ -245,12 +234,11 @@ if (newSampleStatus) {
 
 ```{r, echo = FALSE, warning = FALSE, include = FALSE}
 # Check metadata anonymiser
-if (!is.logical(metadataAnonymiser)) {
-  message("Invalid metadata anonymiser: Setting default (FALSE)")
-  metadataAnonymiser <- FALSE
+if (!is.logical(metadataAnonymiser) || length(metadataAnonymiser) != 1) {
+  stop("Invalid 'metadataAnonymiser': Must be a single logical value")
 }
 
-# Check new sample status and Anonymise metadata
+# Check new sample status and anonymise metadata
 if (newSampleStatus && metadataAnonymiser) {
   passedData <- ticq::anonymiseMetadata(
     data = passedData,
@@ -7627,7 +7615,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
       dplyr::filter(.data[[msLevel]] == 1)
     
     # Check historical data status
-    if (!is.null(historicalDataPath) && file.exists(historicalDataPath)) {
+    if (historicalDataStatus) {
       # Append historical data
       historicalData <- readRDS(historicalDataPath)
       if (ncol(historicalData) == ncol(passedData) &&
@@ -13178,7 +13166,7 @@ if (newSampleStatus && targetFileStatus) {
     invisible(gc())
   }
 
-  rm(params, outputPath, chromatogramRegion, roundDecimalPlace, newSampleStatus, historicalDataStatus, targetFileStatus,
+  rm(params, outputDirectoryPath, chromatogramRegion, roundDecimalPlace, newSampleStatus, historicalDataStatus, targetFileStatus,
      chromatogramRegionStatus)
 
 ```

@@ -24,7 +24,7 @@ anonymiseMetadata(
 
 \item{cohort}{Cohort column name: character}
 
-\item{projectCohort}{Combined project and cohort variable column name: character}
+\item{projectCohort}{Project + Cohort column name: character}
 
 \item{method}{Method column name: character}
 

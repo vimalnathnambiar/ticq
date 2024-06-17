@@ -8,7 +8,7 @@
 #'
 #' @export
 #' @param data A data frame containing spectral data: data frame
-#' @param commonColumn Column names of data common for each sample: character vector
+#' @param commonColumn Column names of data common for each sample: character or character vector
 #' @param sampleType Sample type column name: character
 #' @param spectrumCount Spectrum count column name: character
 #' @returns A list containing two data frames (passed and failed data)

@@ -7,13 +7,19 @@
 #' @import dplyr
 #'
 #' @export
-#' @param input ANPC sample file name or path: character
+#' @param input ANPC sample file name or path: character or character vector
 #' @returns Method name
 #'
 #' @examples
 #' method <- ticq::extractMethod(input = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29.json")
 #' print(method)
 extractMethod <- function(input) {
+  # Validate parameters
+  if (is.null(input) || !is.character(input)) {
+    message("Invalid 'input': Must not be a non-NULL character string or vector (Setting default to empty character string)")
+    input <- ""
+  }
+  
   # Extract method name
   return(
     dplyr::case_when(

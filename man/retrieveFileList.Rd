@@ -12,8 +12,8 @@ retrieveFileList(inputPath, fileExtension = NULL)
 \item{fileExtension}{File extension type (Default: NULL): NULL or character}
 }
 \value{
-A list of file names matching the defined file extension type: character or character vector
+A list of file names matching the specified file extension type
 }
 \description{
-Retrieve a list of file names matching a defined file extension type (i.e., "JSON", "XML").
+Retrieve a list of file names matching a specified file extension type (i.e., "JSON", "XML").
 }

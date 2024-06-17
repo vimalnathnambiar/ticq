@@ -24,17 +24,17 @@ A data frame representing the target file
 Extract target m/z data from a TSV formatted target file (published to web URL or local file path) or an in-house method library used at the Australian National Phenome Centre (ANPC).
 }
 \details{
-If both target file path and ANPC method library is defined, the target file path will be used as default extraction. If no data is found, ANPC method library is then used.
+If both target file path and ANPC method library is specified, the target file path will be used as default extraction. If no data is found, ANPC method library is then used.
 
-When defining a target file path, please ensure the TSV document follows a pre-determined layout used by ExfilMS (https://github.com/vmalnathnambiar/exfilms/blob/main/docs/how-to-create-a-target-file.md).
+When specifying a target file path, please ensure the TSV document follows a pre-determined layout used by ExfilMS (https://github.com/vmalnathnambiar/exfilms/blob/main/docs/how-to-create-a-target-file.md).
 }
 \examples{
-# Example 1: Defining a target file with no rounding of decimal places for precision values
+# Example 1: Specifying a target file with no rounding of decimal places for precision values
 targetFilePath <- "https://docs.google.com/spreadsheets/d/e/2PACX-1vSeo31hlruA3QuwoESz5IDJ9Nu6ndSAgLTRn3uc45rOPO4BlksfHzh9xtNB22Oes9JOxhEbI4NK-zxl/pub?gid=0&single=true&output=tsv"
 targetFile <- ticq::extractTargetFile(targetFilePath = targetFilePath, anpcMethodLibrary = NULL, roundDecimalPlace = NULL)
 print(targetFile)
 
-# Example 2: Defining an ANPC method library with rounding of precision values up to 4 decimal places
+# Example 2: Specifying an ANPC method library with rounding of precision values up to 4 decimal places
 targetFile <- ticq::extractTargetFile(targetFilePath = NULL, anpcMethodLibrary = "MS-AA-POS", roundDecimalPlace = 4)
 print(targetFile)
 }

@@ -1,28 +1,25 @@
 #' Retrieve File List
 #'
-#' Retrieve a list of file names matching a defined file extension type (i.e., "JSON", "XML").
+#' Retrieve a list of file names matching a specified file extension type (i.e., "JSON", "XML").
 #'
 #' @export
 #' @param inputPath Input path: character
 #' @param fileExtension File extension type (Default: NULL): NULL or character
-#' @returns A list of file names matching the defined file extension type: character or character vector
+#' @returns A list of file names matching the specified file extension type
 retrieveFileList <- function(inputPath, fileExtension = NULL) {
   # Validate parameters
     # Input path
-    if (is.null(inputPath) || !is.character(inputPath)) {
-      message("Unable to retrieve file list: Invalid input path")
-      return(character(0))
+    if (is.null(inputPath) || !is.character(inputPath) || length(inputPath) != 1 || inputPath == "") {
+      stop("Invalid 'inputPath': Must be a non-NULL and non-empty character string of a directory or file path")
     }
   
     if (!dir.exists(inputPath) && !file.exists(inputPath)) {
-      message("Unable to retrieve file list: Input path does not exists")
-      return(character(0))
+      stop("Invalid 'inputPath': Must be an existing directory or file")
     }
   
     # File extension
-    if (!is.null(fileExtension) && (!is.character(fileExtension) || length(fileExtension) !=1)) {
-      message("Invalid file extension: Setting default (NULL)")
-      fileExtension <- NULL
+    if (!is.null(fileExtension) && (!is.character(fileExtension) || length(fileExtension) !=1 || fileExtension == "")) {
+      stop("Invalid 'fileExtension': Must be NULL or a non-empty character string of a file extension format")
     }
   
   # Check if directory or file and retrieve file names of matching extension type accordingly
