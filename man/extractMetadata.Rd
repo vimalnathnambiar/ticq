@@ -7,10 +7,10 @@
 extractMetadata(input)
 }
 \arguments{
-\item{input}{ANPC sample file name or path: character or character vector}
+\item{input}{ANPC sample file name or path: character}
 }
 \value{
-List containing the associated metadata associated of the input
+List containing the input associated metadata
 }
 \description{
 Extract sample metadata including project name, cohort name, matrix type, sample type, acquisition method, instrument name, and plate number.

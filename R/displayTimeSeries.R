@@ -1,13 +1,13 @@
 #' Display Time Series
 #'
-#' Display time series data (and perform boundary analysis if defined).
+#' Display time series data (and perform boundary analysis if specified).
 #'
 #' Boundary analysis that can be performed:
 #' - value: Evaluates data by +/- value from 0
 #' - percentage: Evaluates data by +/- value from 100
 #' - sd: Evaluates data using 1st and 2nd standard deviations from average mean of the data or reference data
 #'
-#' To define mean and standard deviation values to be used for "sd" boundary analysis, pass reference data that mirrors the same columns as data.
+#' To specify mean and standard deviation values to be used for "sd" boundary analysis, pass reference data that mirrors the same columns as data.
 #'
 #' @import ggplot2
 #' @import dplyr
@@ -24,16 +24,16 @@
 #' @param xLabel x-axis label (Default: Value used for x): NULL or character
 #' @param yLabel y-axis label (Default: Value used for y): NULL or character
 #' @param colourLabel Colour grouping label (Default: Value used for colour): NULL or character
-#' @param shapeLabel Shape grouping label (Default: Value used for shape)
+#' @param shapeLabel Shape grouping label (Default: Value used for shape): NULL or character
 #' @param boundary Boundary analysis to perform (Default: NULL, Options: "value", "percentage", "sd"): NULL or character.
-#' @param boundaryValue Value used for "value" and "percentage" boundary analysis (Default: 0): double
-#' @param referenceData A data frame with the same column names and data to calculate "sd" boundaries (Default: NULL): NULL or data frame
-#' @param trendlineToggle Toggle to display trendline in the data (Default: TRUE, Options: TRUE or FALSE): boolean
-#' @param xTickToggle Toggle to display ticks on x-axis (Default: TRUE, Options: TRUE or FALSE): boolean
+#' @param boundaryValue Value used for "value" and "percentage" boundary analysis (Default: 0): numeric or double
+#' @param referenceData A data frame of reference sample data with the same column names as data to calculate "sd" boundaries (Default: NULL): NULL or data frame
+#' @param trendlineToggle Toggle to display trendline in the data (Default: TRUE, Options: TRUE or FALSE): logical
+#' @param xTickToggle Toggle to display ticks on x-axis (Default: TRUE, Options: TRUE or FALSE): logical
 #' @param facetWrapBy Column name representing data to be used for facet wrapping (Default: NULL): NULL or character
-#' @param facetColumn Number of columns to use for facet wrapping (Default: NULL): NULL or double
-#' @param facetRow Number of rows to use for facet wrapping (Default: NULL): NULL or double
-#' @returns A data frame containing the result of the boundary analysis performed
+#' @param facetColumn Number of columns to use for facet wrapping (Default: NULL): NULL or numeric
+#' @param facetRow Number of rows to use for facet wrapping (Default: NULL): NULL or numeric
+#' @returns A data frame containing the result of the boundary analysis performed (if specified)
 displayTimeSeries <- function(data,
                               x,
                               y,
@@ -171,9 +171,6 @@ displayTimeSeries <- function(data,
             result <- data %>%
               dplyr::mutate(sampleRange = "Normal")
           }
-        } else {
-          message("Unable to perform boundary analysis: Invalid analysis type")
-          result <- NULL
         }
       },
       warning = function(w) {
@@ -181,7 +178,7 @@ displayTimeSeries <- function(data,
         result <- NULL
       },
       error = function(e) {
-        message(paste("Unable to perform boundary analysis:", e))
+        message(paste("Unable to perform boundary analysis:", w))
         result <- NULL
       })
     }

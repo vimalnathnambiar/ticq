@@ -14,17 +14,17 @@ configureChromatogramRegion(
 )
 }
 \arguments{
-\item{analyteStart}{Start of feature detection cycle (Default: End of mass calibration cycle): double}
+\item{analyteStart}{Start of feature detection cycle (Default: End of mass calibration cycle): numeric}
 
-\item{analyteEnd}{End of feature detection cycle (Default: Start of wash cycle): double}
+\item{analyteEnd}{End of feature detection cycle (Default: Start of wash cycle): numeric}
 
-\item{washStart}{Start of wash cycle: double}
+\item{washStart}{Start of wash cycle: numeric}
 
-\item{washEnd}{End of wash cycle (Default: NULL): NULL or double}
+\item{washEnd}{End of wash cycle (Default: NULL): NULL or numeric}
 
-\item{massCalStart}{Start of mass calibration cycle (Default: 0): double}
+\item{massCalStart}{Start of mass calibration cycle (Default: 0): numeric}
 
-\item{massCalEnd}{End of mass calibration cycle: double}
+\item{massCalEnd}{End of mass calibration cycle: numeric}
 }
 \value{
 A list containing the start and end time points of the different chromatogram regions of interest
@@ -39,11 +39,11 @@ Configure the start and end time points of the different chromatogram regions of
 }
 }
 \examples{
-# Example 1: Using default values for analyteStart, analyteEnd and washEnd
-chromatogramRegion <- ticq::configureChromatogramRegion(massCalibrationStart = 0, massCalibrationEnd = 0.3, washStart = 5)
+# Example 1: Using default values for massCalibrationStart, analyteStart, analyteEnd and washEnd
+chromatogramRegion <- ticq::configureChromatogramRegion(massCalibrationEnd = 0.3, washStart = 5)
 print(chromatogramRegion)
 
-# Example 2: Defining values for analyteStart, analyteEnd and washEnd
+# Example 2: Specifying values for analyteStart, analyteEnd and washEnd
 chromatogramRegion <- ticq::configureChromatogramRegion(massCalibrationStart = 0, massCalibrationEnd = 0.3,
                                                         analyteStart = 2, analyteEnd = 4,
                                                         washStart = 5, washEnd = 6)

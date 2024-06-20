@@ -9,13 +9,13 @@ sumDataColumn(data, commonColumn, sumColumn)
 \arguments{
 \item{data}{A data frame containing spectral data: data frame}
 
-\item{commonColumn}{Column names of data common for each sample: character vector}
+\item{commonColumn}{Column names representing common data to be used for data grouping: character}
 
 \item{sumColumn}{Column name of the data to be summed: character}
 }
 \value{
-A data frame grouped by common columns and the sum value of the data column defined
+A data frame grouped by common columns and the sum value of the data column specified
 }
 \description{
-Sum values of a data column.
+Sum the values of a single data column for each data group.
 }

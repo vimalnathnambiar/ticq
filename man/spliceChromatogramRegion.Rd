@@ -16,22 +16,19 @@ spliceChromatogramRegion(
 \arguments{
 \item{data}{A data frame containing spectral data: data frame}
 
-\item{commonColumn}{Column names of data common for each sample: character vector}
+\item{commonColumn}{Column names representing common data to be used for data grouping: character}
 
 \item{spectrumCount}{Spectrum count column name: character}
 
-\item{chromatogramRegion}{A list containing the start and end time points of the different chromatogram regions of interest (prewash, maass calibration, analyte and wash) (Default: NULL): NULL or list}
+\item{chromatogramRegion}{A list representing the different chromatogram regions of interest (Default: NULL, Options: ticq::configureChromatogramRegion()): NULL or list}
 
 \item{retentionTime}{Retention time column name: character}
 
 \item{sumColumn}{Column name of the data to be summed: character}
 }
 \value{
-A data frame containing the summed values for each chromatogram regions of interest
+A data frame containing spliced spectral data of the different chromatogram regions of interest
 }
 \description{
-Splice chromatogram regions of interest by summing values of a column by the respective start and end time points.
-}
-\details{
-Configure chromatogram region using: ticq::configureChromatogramRegion()
+Splice spectral data by summing the values of a column by the respective start and end time points of the different chromatogram regions of interest.
 }

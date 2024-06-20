@@ -30,9 +30,9 @@ displayMultipleChromatogram(
 
 \item{x}{Column name representing the continuous data series to be used for x-axis: character}
 
-\item{firstColumnIndex}{Index of the first data column containing continuous data series for the y-axis: double}
+\item{firstColumnIndex}{Index of the first data column containing the continuous data series to be used for y-axis: numeric}
 
-\item{lastColumnIndex}{Index of the last data column data containing continuous data series for the y-axis (Default: NULL): NULL or double}
+\item{lastColumnIndex}{Index of the last data column data containing the continuous data series to be used for y-axis (Default: NULL): NULL or numeric}
 
 \item{colour}{Column name representing data to be used for colour grouping (Default: NULL): NULL or character}
 
@@ -48,20 +48,23 @@ displayMultipleChromatogram(
 
 \item{colourLabel}{Colour grouping label (Default: Value used for colour): NULL or character}
 
-\item{xTickToggle}{Toggle to display ticks on x-axis (Default: TRUE, Options: TRUE or FALSE): boolean}
+\item{xTickToggle}{Toggle to display ticks on x-axis (Default: TRUE, Options: TRUE or FALSE): logical}
 
 \item{facetWrapBy}{Column name representing data to be used for facet wrapping (Default: NULL): NULL or character}
 
-\item{facetColumn}{Number of columns to use for facet wrapping (Default: NULL): NULL or double}
+\item{facetColumn}{Number of columns to use for facet wrapping (Default: NULL): NULL or numeric}
 
-\item{facetRow}{Number of rows to use for facet wrapping (Default: NULL): NULL or double}
+\item{facetRow}{Number of rows to use for facet wrapping (Default: NULL): NULL or numeric}
 
-\item{plotColumn}{Number of columns to use for plotting (Default: 1): double}
+\item{plotColumn}{Number of columns to use for plotting (Default: 1): numeric}
 
-\item{plotRow}{Number of rows to use for plotting (Default: 1): double}
+\item{plotRow}{Number of rows to use for plotting (Default: 1): numeric}
 
-\item{chromatogramRegion}{A list representing the different chromatogram regions of interest to be plotted (Default: NULL, Options: ticq::configureChromatogramRegion()): NULL or list}
+\item{chromatogramRegion}{A list representing the different chromatogram regions of interest (Default: NULL, Options: ticq::configureChromatogramRegion()): NULL or list}
 }
 \description{
 Display multiple chromatogram data.
+}
+\details{
+Chromatogram region can be configured using ticq::configureChromatogramRegion().
 }

@@ -23,15 +23,15 @@ displayPCA(
 )
 }
 \arguments{
-\item{data}{A data frame containing data to perform PCA (Must be equal sized and do not contain NA values): data frame}
+\item{data}{A data frame containing data to perform PCA on (Must be equal sized and should not contain NA values): data frame}
 
-\item{firstColumnIndex}{Index of the first data column to perform PCA on: double}
+\item{firstColumnIndex}{Index of the first data column to perform PCA on: numeric}
 
-\item{lastColumnIndex}{Index of the last data column data to perform PCA on (Default: NULL): NULL or double}
+\item{lastColumnIndex}{Index of the last data column data to perform PCA on (Default: NULL): NULL or numeric}
 
-\item{scale}{PCA scaling (Default: TRUE, Options: TRUE or FALSE): boolean}
+\item{scale}{PCA scaling (Default: TRUE, Options: TRUE or FALSE): logical}
 
-\item{confidence}{Data confidence \% (Default: 95): double}
+\item{confidence}{Data confidence \% (Default: 95, Options: 95 or 99): numeric}
 
 \item{distribution}{Data distribution to be drawn on scores plot and biplot (Default: NULL, Options: "normal" or "t"): NULL or character}
 
@@ -45,17 +45,14 @@ displayPCA(
 
 \item{shapeLabel}{Shape grouping label (Default: Value used for shape): NULL or character}
 
-\item{screePlotToggle}{Toggle to display scree plot (Default: TRUE, Options: TRUE or FALSE): boolean}
+\item{screePlotToggle}{Toggle to display scree plot (Default: TRUE, Options: TRUE or FALSE): logical}
 
-\item{scoresPlotToggle}{Toggle to display scores plot (Default: TRUE, Options: TRUE or FALSE): boolean}
+\item{scoresPlotToggle}{Toggle to display scores plot (Default: TRUE, Options: TRUE or FALSE): logical}
 
-\item{loadingsPlotToggle}{Toggle to display loadings plot (Default: TRUE, Options: TRUE or FALSE): boolean}
+\item{loadingsPlotToggle}{Toggle to display loadings plot (Default: TRUE, Options: TRUE or FALSE): logical}
 
-\item{biPlotToggle}{Toggle to display biplot (Default: TRUE, Options: TRUE or FALSE): boolean}
+\item{biPlotToggle}{Toggle to display biplot (Default: TRUE, Options: TRUE or FALSE): logical}
 }
 \description{
 Perform Principle Component Analysis (PCA) and display analysis outcomes (scree plot, scores plot, loadings plot and/or biplot).
-}
-\details{
-Data used for PCA must be equal sized and must not contain NA values.
 }

@@ -50,29 +50,29 @@ displayTimeSeries(
 
 \item{colourLabel}{Colour grouping label (Default: Value used for colour): NULL or character}
 
-\item{shapeLabel}{Shape grouping label (Default: Value used for shape)}
+\item{shapeLabel}{Shape grouping label (Default: Value used for shape): NULL or character}
 
 \item{boundary}{Boundary analysis to perform (Default: NULL, Options: "value", "percentage", "sd"): NULL or character.}
 
-\item{boundaryValue}{Value used for "value" and "percentage" boundary analysis (Default: 0): double}
+\item{boundaryValue}{Value used for "value" and "percentage" boundary analysis (Default: 0): numeric or double}
 
-\item{referenceData}{A data frame with the same column names and data to calculate "sd" boundaries (Default: NULL): NULL or data frame}
+\item{referenceData}{A data frame of reference sample data with the same column names as data to calculate "sd" boundaries (Default: NULL): NULL or data frame}
 
-\item{trendlineToggle}{Toggle to display trendline in the data (Default: TRUE, Options: TRUE or FALSE): boolean}
+\item{trendlineToggle}{Toggle to display trendline in the data (Default: TRUE, Options: TRUE or FALSE): logical}
 
-\item{xTickToggle}{Toggle to display ticks on x-axis (Default: TRUE, Options: TRUE or FALSE): boolean}
+\item{xTickToggle}{Toggle to display ticks on x-axis (Default: TRUE, Options: TRUE or FALSE): logical}
 
 \item{facetWrapBy}{Column name representing data to be used for facet wrapping (Default: NULL): NULL or character}
 
-\item{facetColumn}{Number of columns to use for facet wrapping (Default: NULL): NULL or double}
+\item{facetColumn}{Number of columns to use for facet wrapping (Default: NULL): NULL or numeric}
 
-\item{facetRow}{Number of rows to use for facet wrapping (Default: NULL): NULL or double}
+\item{facetRow}{Number of rows to use for facet wrapping (Default: NULL): NULL or numeric}
 }
 \value{
-A data frame containing the result of the boundary analysis performed
+A data frame containing the result of the boundary analysis performed (if specified)
 }
 \description{
-Display time series data (and perform boundary analysis if defined).
+Display time series data (and perform boundary analysis if specified).
 }
 \details{
 Boundary analysis that can be performed:
@@ -82,5 +82,5 @@ Boundary analysis that can be performed:
 \item sd: Evaluates data using 1st and 2nd standard deviations from average mean of the data or reference data
 }
 
-To define mean and standard deviation values to be used for "sd" boundary analysis, pass reference data that mirrors the same columns as data.
+To specify mean and standard deviation values to be used for "sd" boundary analysis, pass reference data that mirrors the same columns as data.
 }

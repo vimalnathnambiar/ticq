@@ -4,27 +4,22 @@
 \alias{displayChromatogramRegion}
 \title{Display Chromatogram Region}
 \usage{
-displayChromatogramRegion(plot, maxX, maxY, chromatogramRegion, label)
+displayChromatogramRegion(plot, maxX, maxY, regionOfInterest, label = NULL)
 }
 \arguments{
 \item{plot}{A ggplot object of a chromatogram: ggplot}
 
-\item{maxX}{x-axis maximum value: double}
+\item{maxX}{x-axis maximum value: numeric}
 
-\item{maxY}{y-axis maximum value: double}
+\item{maxY}{y-axis maximum value: numeric}
 
-\item{chromatogramRegion}{Chromatogram region to be displayed: list}
+\item{regionOfInterest}{A list representing the start and end time points of a chromatogram region (Options: ticq::configureChromatogram()$region): list}
 
-\item{label}{Chromatogram region label: character}
+\item{label}{Chromatogram region label (Default: NULL): NULL or character}
 }
 \value{
-A ggplot object with the added vertical lines displaying the chromatogram region start and end time points
+A ggplot object with the added vertical lines representing the chromatogram region start and end time points
 }
 \description{
-Display vertical lines highlighting the start and end time points of a chromatogram region on a chromatogram plot.
-}
-\details{
-This function is not exported as it is only used by:
-ticq::displayChromatogram()
-ticq::displayMultipleChromatogram()
+Display vertical lines representing the start and end time points of a chromatogram region.
 }

@@ -5,28 +5,22 @@
 #' Applicable only to data acquired at the Australian National Phenome Centre (ANPC).
 #'
 #' @export
-#' @param input ANPC sample file name or path: character or character vector
-#' @returns List containing the associated metadata associated of the input
+#' @param input ANPC sample file name or path: character
+#' @returns List containing the input associated metadata
 #'
 #' @examples
 #' metadata <- ticq::extractMetadata(input = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29.json")
 #' print(metadata)
 extractMetadata <- function(input) {
-  # Validate parameters
-  if (is.null(input) || !is.character(input)) {
-    message("Invalid 'input': Must not be a non-NULL character string or vector (Setting default to empty character string")
-    input <- ""
-  }
-  
-  # Extract metadata components
-  project <- ticq::extractProject(input = input)
-  cohort <- ticq::extractCohort(input = input)
+  # Metadata components
+  project <- extractProject(input = input)
+  cohort <- extractCohort(input = input)
   projectCohort <- ifelse(is.na(project), ifelse(is.na(cohort), NA_character_, cohort), ifelse(is.na(cohort), project, paste(project, cohort)))
-  matrix <- ticq::extractMatrix(input = input)
-  sampleType <- ticq::extractSampleType(input = input, matrix = matrix)
-  method <- ticq::extractMethod(input = input)
-  instrument <- ticq::extractInstrument(input = input)
-  plate <- ticq::extractPlate(input = input)
+  matrix <- extractMatrix(input = input)
+  sampleType <- extractSampleType(input = input, matrix = matrix)
+  method <- extractMethod(input = input)
+  instrument <- extractInstrument(input = input)
+  plate <- extractPlate(input = input)
   
   return(
     list(

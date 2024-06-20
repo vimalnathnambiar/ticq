@@ -24,30 +24,7 @@
 #'                                 method = "method", instrument = "instrument", plate = "plate")
 #' print(data)
 anonymiseMetadata <- function(data, sampleID, project, cohort, projectCohort, method, instrument, plate) {
-  # Validate parameters
-    # Data
-    if (!is.data.frame(data)) {
-      stop("Invalid 'data': Must be a data frame")
-    }
-  
-    # Column names
-    columnName <- list(sampleID = sampleID, project = project, cohort = cohort, projectCohort = projectCohort, method = method, instrument = instrument, plate = plate)
-    for (column in names(columnName)) {
-      if (is.null(columnName[[column]]) || !is.character(columnName[[column]]) || length(columnName[[column]]) != 1 || columnName[[column]] == "") {
-        stop(paste0("Invalid column name for ", column, ": Must be a non-NULL and non-empty character string"))
-      }
-    }
-  
-    columnName <- c(sampleID, project, cohort, projectCohort, method, instrument, plate)
-    if (!all(columnName %in% colnames(data))) {
-      stop(paste0(
-        "Unable to anonymise metadata: Missing one or more data columns (",
-        paste(columnName[!columnName %in% colnames(data)], collapse = ", "),
-        ")"
-      ))
-    }
-  
-  # Anonymise (and replace NA) metadata values
+  # Anonymise metadata (and replace NA) values
   return(
     data %>%
       dplyr::mutate(
@@ -88,7 +65,7 @@ anonymiseMetadata <- function(data, sampleID, project, cohort, projectCohort, me
           .data[[project]] == "Student Projects" ~ "P32",
         ),
         !!cohort := dplyr::case_when(
-          is.na(.data[[cohort]]) ~ "C0",
+          is.na(.data[[cohort]]) ~ "C1",
           .data[[cohort]] == "System Suitability" ~ "C9",
           .data[[cohort]] == "Cambridge Follow Up Part 2" ~ "C10",
           .data[[cohort]] == "Cambridge Follow Up" ~ "C11",

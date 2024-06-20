@@ -7,7 +7,7 @@
 extractPlate(input)
 }
 \arguments{
-\item{input}{ANPC sample file name or path: character or character vector}
+\item{input}{ANPC sample file name or path: character}
 }
 \value{
 Plate number
@@ -17,8 +17,4 @@ Extract plate number.
 }
 \details{
 Only applicable to data acquired at the Australian National Phenome Centre (ANPC).
-}
-\examples{
-plate <- ticq::extractPlate(input = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29.json")
-print(plate)
 }

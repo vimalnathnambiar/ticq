@@ -7,15 +7,16 @@
 generateStat(data)
 }
 \arguments{
-\item{data}{A continuous data series of numerical values (Must have a minimum of 2 data points and do not contain NA values): numerical vector}
+\item{data}{A continuous data series of numerical values (Must have a minimum of 2 data points and should not contain any NA values): numeric}
 }
 \value{
-A list of all generated statistics
+A list of generated statistical information
 }
 \description{
 Generate statistical information of a dataset including:
 \itemize{
 \item Sample size (n)
+\item Sum (sum)
 \item Minimum (min)
 \item Mean (mean)
 \item Maximum (max)
@@ -31,9 +32,6 @@ Generate statistical information of a dataset including:
 \item Confidence interval (CI) - 95\% and 99\% (Lower and upper)
 \item Confidence quantile range (CQ) - 95\% and 99\% (Lower and upper)
 }
-}
-\details{
-Data must have a minimum of 2 data points and must not contain any NA values.
 }
 \examples{
 stats <- ticq::generateStat(data = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))

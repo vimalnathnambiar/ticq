@@ -17,7 +17,7 @@ output:
 params:
     title: "test"
     inputPath: "/run/media/vimalnathnambiar/WD/data/JSON/test/"
-    outputDirectoryPath: "/home/vimalnathnambiar/git/github/vmalnathnambiar/ticq/inst/notebooks/output/"
+    outputDirectoryPath: NULL
     historicalDataPath: NULL
     targetFilePath: NULL
     anpcMethodLibrary: "MS-AA-POS"
@@ -33,67 +33,61 @@ Parameters configured for TICQ assessment.
 ticq::loadPackage(packageName = c("DT", "dplyr"))
 
 # Configuration parameters
-  # Input path
-  inputPath <- params$inputPath
-  
-  # Output path
-  outputDirectoryPath <- params$outputDirectoryPath
-  
-  # Historical data path
-  historicalDataPath <- params$historicalDataPath
-  
-  # Target file path / ANPC method library
-  targetFilePath <- params$targetFilePath
-  anpcMethodLibrary <- params$anpcMethodLibrary
-  
-  # Chromatogram regions
-  chromatogramRegion <- params$chromatogramRegion
-  
-  # Number of decimal places for precision value rounding
-  roundDecimalPlace <- params$roundDecimalPlace
-  
-  # Sample anonymiser
-  metadataAnonymiser <- params$metadataAnonymiser
+inputPath <- params$inputPath
+outputDirectoryPath <- params$outputDirectoryPath
+historicalDataPath <- params$historicalDataPath
+targetFilePath <- params$targetFilePath
+anpcMethodLibrary <- params$anpcMethodLibrary
+chromatogramRegion <- params$chromatogramRegion
+roundDecimalPlace <- params$roundDecimalPlace
+metadataAnonymiser <- params$metadataAnonymiser
 ```
 
 ## Input
 ```{r, echo = FALSE, warning = FALSE}
-# Check input path and update new sample status
-inputFiles <- ticq::retrieveFileList(inputPath = inputPath, fileExtension = "JSON")
-newSampleStatus <- length(inputFiles) > 0
+# Validate input path
+jsonFileCount <- length(ticq::retrieveFileList(inputPath = inputPath, fileExtension = "JSON"))
+if (jsonFileCount == 0) {
+  stop("Invalid 'inputPath': No available JSON files")
+} 
 
-# Display input
+# Update new sample status
 print(paste("Input path:", inputPath))
-print(paste("Available JSON files:", length(inputFiles)))
+print(paste("Available JSON files:", jsonFileCount))
+newSampleStatus <- TRUE
 
 # Clean environment
-if (!newSampleStatus) {
-  rm(inputPath)
-}
-rm(inputFiles)
+rm(jsonFileCount)
 ```
 
 ## Output
 ```{r, echo = FALSE, warning = FALSE}
-# Check output directory path
-if (is.null(outputDirectoryPath) || !is.character(outputDirectoryPath) || length(outputDirectoryPath) != 1 || outputDirectoryPath == "") {
-  stop("Invalid 'outputDirectoryPath': Must be a non-NULL and non-empty character string")
+# Validate output directory path
+if (is.null(outputDirectoryPath) || length(outputDirectoryPath) == 0) {
+  outputDirectoryPath <- paste0(getwd(), "/output/")
+  message(paste0("Setting default path (", outputDirectoryPath, ")"))
+} else if (length(outputDirectoryPath) != 1 || !is.character(outputDirectoryPath) || is.na(outputDirectoryPath) || outputDirectoryPath == "") {
+  stop("Invalid 'outputDirectoryPath': Must be non-empty character string of length 1 representing a directory path")
+} else if (substring(outputDirectoryPath, nchar(outputDirectoryPath)) != "/") {
+  outputDirectoryPath <- paste0(outputDirectoryPath, "/")
 }
 
-print(paste("Output directory path:", outputDirectoryPath))
 if (!dir.exists(outputDirectoryPath)) {
   dir.create(outputDirectoryPath, recursive = TRUE)
 }
+
+# Display output directory path
+print(paste("Output directory path:", outputDirectoryPath))
 ```
 
 ## Historical Data
 ```{r, echo = FALSE, warning = FALSE}
-# Check historical data path
+# Validate historical data path
 if (!is.null(historicalDataPath)) {
-  if (!is.character(historicalDataPath) || length(historicalDataPath) != 1 || historicalDataPath == "") {
-    stop("Invalid 'historicalDataPath': Must be NULL or a non-empty character string path of a RDS file path")
-  } else if (!file.exists(historicalDataPath) || !grepl("\\.rds$", historicalDataPath, ignore.case = TRUE)) {
-    stop("Invalid 'historicalDataPath': Must be an existing RDS file")
+  if (length(historicalDataPath) != 1 || !is.character(historicalDataPath) || !grepl("\\.rds$", historicalDataPath, ignore.case = TRUE)) {
+    stop("Invalid 'historicalDataPath': Must be NULL or non-empty character string of length 1 representing a RDS file path")
+  } else if (!file.exists(historicalDataPath)) {
+    stop("Invalid 'historicalDataPath': No available RDS file")
   }
 }
 
@@ -111,16 +105,15 @@ if (historicalDataStatus) {
 
 ## Target File
 ```{r, echo = FALSE, warning = FALSE}
-# Check target file and update target file status
+# Validate target file path and ANPC method library
 targetFile <- ticq::extractTargetFile(
   targetFilePath = targetFilePath,
   anpcMethodLibrary = anpcMethodLibrary,
   roundDecimalPlace = roundDecimalPlace
 )
 
+# Update target file status
 targetFileStatus <- !is.null(targetFile)
-
-# Display target file data
 if (targetFileStatus) {
   DT::datatable(data = targetFile, filter = "top", options = list(scrollX = TRUE))
 } else {
@@ -136,33 +129,36 @@ rm(targetFilePath)
 
 ## Chromatogram Region
 ```{r, echo = FALSE, warning = FALSE}
-# Chromatogram region data patterns and associated ANPC method library representation
+# Validate chromatogram region data
 pattern <- c("prewash", "massCalibration", "analyte", "wash")
 anpcChromatogramRegionData <- list(
-  "MS-AA-POS" = list(massCalibrationStart = 0, massCalibrationEnd = 0.3, washStart = 5),
-  "MS-HIL-POS" = list(massCalibrationStart = 0, massCalibrationEnd = 0.7, washStart = 11),
-  "MS-HIL-NEG" = list(massCalibrationStart = 0, massCalibrationEnd = 0.7, washStart = 11),
-  "MS-RP-POS" = list(massCalibrationStart = 0, massCalibrationEnd = 0.7, washStart = 11),
-  "MS-RP-NEG" = list(massCalibrationStart = 0, massCalibrationEnd = 0.7, washStart = 11)
+  "MS-AA-POS" = list(massCalibrationEnd = 0.3, washStart = 5),
+  "MS-HIL-POS" = list(massCalibrationEnd = 0.7, washStart = 11),
+  "MS-HIL-NEG" = list(massCalibrationEnd = 0.7, washStart = 11),
+  "MS-RP-POS" = list(massCalibrationEnd = 0.7, washStart = 11),
+  "MS-RP-NEG" = list(massCalibrationEnd = 0.7, washStart = 11)
 )
 
-# Check chromatogram region data
-if (!is.null(chromatogramRegion) && (!is.list(chromatogramRegion) || !all(pattern %in% names(chromatogramRegion)))) {
-  message(
-    "Invalid 'chromatogramRegion': Must be a list containing all required chromatogram region data of interests (Setting default to NULL)"
-  )
+if (!is.null(chromatogramRegion) &&
+    (length(chromatogramRegion) != 4 || !is.list(chromatogramRegion) || !all(pattern %in% names(chromatogramRegion)))) {
+  message("Invalid 'chromatogramRegion': Must be a list containing the start and end time points of 4 required region data")
+  if (!all(pattern %in% names(chromatogramRegion))) {
+    message(paste0(
+      "Invalid 'chromatogramRegion': Missing data (",
+      paste(pattern[!pattern %in% names(chromatogramRegion)], collapse = ", "),
+      ")"
+    ))
+  }
+  message("Setting default value (NULL)")
   chromatogramRegion <- NULL
 }
 
-# Configure chromatogram region data
 if (is.null(chromatogramRegion) && !is.null(anpcMethodLibrary) && anpcMethodLibrary %in% names(anpcChromatogramRegionData)) {
-  message("Attempting to configure chromatogram region data using 'anpcMethodLibrary'")
+  message(paste("Setting new region data (based on ANPC", anpcMethodLibrary, "method library)"))
   chromatogramRegion <- ticq::configureChromatogramRegion(
-    massCalibrationStart = anpcChromatogramRegionData[[anpcMethodLibrary]]$massCalibrationStart,
     massCalibrationEnd = anpcChromatogramRegionData[[anpcMethodLibrary]]$massCalibrationEnd,
     washStart = anpcChromatogramRegionData[[anpcMethodLibrary]]$washStart
   )
-  message(paste0("'chromatogramRegion': Data configured to ANPC method library (", anpcMethodLibrary, ")"))
 }
 
 # Update chromatogram region status
@@ -183,7 +179,7 @@ Spectral data is extracted from ExfilMS generated JSON files located at input pa
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample status
 if (newSampleStatus) {
-  # Extract spectral data and sample metadata from ExfilMS generated JSON files
+  # Extract spectral data and sample metadata
   result <- ticq::extractExfilMS(inputPath = inputPath)
   
   # Update new sample status
@@ -211,7 +207,7 @@ if (newSampleStatus) {
 ```{r, echo = FALSE, warning = FALSE, include = FALSE}
 # Check new sample status
 if (newSampleStatus) {
-  # Column names of extracted spectral data used for assessment
+  # Column names of extracted spectral data
   sampleID <- "sampleID"
   project <- "project"
   cohort <- "cohort"
@@ -233,9 +229,9 @@ if (newSampleStatus) {
 ```
 
 ```{r, echo = FALSE, warning = FALSE, include = FALSE}
-# Check metadata anonymiser
-if (!is.logical(metadataAnonymiser) || length(metadataAnonymiser) != 1) {
-  stop("Invalid 'metadataAnonymiser': Must be a single logical value")
+# Validate metadata anonymiser
+if (length(metadataAnonymiser) != 1 || !is.logical(metadataAnonymiser) || is.na(metadataAnonymiser)) {
+  stop("Invalid 'metadataAnonymiser': Must be logical value of length 1 (TRUE or FALSE)")
 }
 
 # Check new sample status and anonymise metadata
@@ -297,13 +293,12 @@ if (newSampleStatus) {
 ```
 
 ## Spectrum Count Check
-Spectrum count of samples are checked against a threshold limit below the average spectrum count of all samples (mean).
+The total number of spectral data (spectrum count) of each sample is checked against a threshold limit below the average mean of all samples.
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample status
 if (newSampleStatus) {
   # Check historical data status
   if (historicalDataStatus) {
-    # Append historical data
     historicalData <- readRDS(historicalDataPath)
     if (ncol(historicalData) == ncol(passedData) && all(colnames(historicalData) == colnames(passedData))) {
       passedData <- rbind(historicalData, passedData)
@@ -331,7 +326,7 @@ if (newSampleStatus) {
   
   # Check result
   if (!is.null(result)) {
-    # Remove historical data from passed and failed results
+    # Remove historical data
     result$passedData <- result$passedData %>%
       dplyr::filter(.data[[projectCohort]] != "Historical")
     
@@ -350,11 +345,11 @@ if (newSampleStatus) {
     }
     
     # Display result
-    print(paste("Sample size:", result$sampleSize))
-    print(paste("Spectrum count (TOTAL):", result$total))
+    print(paste("Sample size (n):", result$n))
+    print(paste("Spectrum count (SUM):", result$sum))
     print(paste("Spectrum count (MEAN):", result$mean))
     print(paste("Accepted threshold limit (%):", result$threshold))
-    print(paste("Number of samples with a spectrum count outside the accepted threshold limit:", nrow(result$failedData)))
+    print(paste("Samples with a spectrum count outside the accepted threshold limit:", nrow(result$failedData)))
     if (nrow(result$failedData) != 0) {
       print(DT::datatable(data = result$failedData, filter = "top", options = list(scrollX = TRUE)) %>%
               DT::formatStyle("spectrumCount", target = "row", backgroundColor = "pink"))
@@ -371,9 +366,8 @@ if (newSampleStatus) {
 
 # Available Sample Types
 ```{r, echo = FALSE, warning = FALSE}
-# Check new sample status
+# Check new sample status and display available sample type list
 if (newSampleStatus) {
-  # Display sample types to assess
   sampleTypeList <- unique(passedData[[sampleType]])
   print(sampleTypeList)
 } else {
@@ -399,7 +393,6 @@ if (newSampleStatus) {
     
     # Check historical data status
     if (historicalDataStatus) {
-      # Append historical data
       historicalData <- readRDS(historicalDataPath)
       if (ncol(historicalData) == ncol(passedData) && all(colnames(historicalData) == colnames(passedData))) {
         plotData <- historicalData %>%
@@ -762,10 +755,11 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
     sumColumn = totalIonCurrent
   )
 
-  # Column names of spliced chromatogram regions used for statistical analysis
+  # Column names of spliced chromatogram regions
   prewashRegion <- "prewashRegion"
   massCalibrationRegion <- "massCalibrationRegion"
   analyteRegion <- "analyteRegion"
+  washRegion <- "washRegion"
 
   # Plot variables and labels
   shape <- sampleType
@@ -2882,8 +2876,8 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   }
   
   # Clean environment
-  rm(plotData, prewashRegion, massCalibrationRegion, analyteRegion, shape, shapeLabel, colour, colourLabel, x, title, xLabel, boundary,
-     boxWidth, y, yLabel, pattern, i)
+  rm(plotData, prewashRegion, massCalibrationRegion, analyteRegion, washRegion, shape, shapeLabel, colour, colourLabel, x, title, xLabel,
+     boundary, boxWidth, y, yLabel, pattern, i)
   invisible(gc())
 }
 ```

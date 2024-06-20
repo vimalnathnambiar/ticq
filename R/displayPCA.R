@@ -2,28 +2,26 @@
 #'
 #' Perform Principle Component Analysis (PCA) and display analysis outcomes (scree plot, scores plot, loadings plot and/or biplot).
 #'
-#' Data used for PCA must be equal sized and must not contain NA values.
-#'
 #' @import ggplot2
 #' @import HotellingEllipse
 #' @import ggforce
 #'
 #' @export
-#' @param data A data frame containing data to perform PCA (Must be equal sized and do not contain NA values): data frame
-#' @param firstColumnIndex Index of the first data column to perform PCA on: double
-#' @param lastColumnIndex Index of the last data column data to perform PCA on (Default: NULL): NULL or double
-#' @param scale PCA scaling (Default: TRUE, Options: TRUE or FALSE): boolean
-#' @param confidence Data confidence % (Default: 95): double
+#' @param data A data frame containing data to perform PCA on (Must be equal sized and should not contain NA values): data frame
+#' @param firstColumnIndex Index of the first data column to perform PCA on: numeric
+#' @param lastColumnIndex Index of the last data column data to perform PCA on (Default: NULL): NULL or numeric
+#' @param scale PCA scaling (Default: TRUE, Options: TRUE or FALSE): logical
+#' @param confidence Data confidence % (Default: 95, Options: 95 or 99): numeric
 #' @param distribution Data distribution to be drawn on scores plot and biplot (Default: NULL, Options: "normal" or "t"): NULL or character
 #' @param colour Column name representing data to be used for colour grouping (Default: NULL): NULL or character
 #' @param shape Column name representing data to be used for shape grouping (Default: NULL): NULL or character
 #' @param subtitle Plot subtitle (Default: NULL): NULL or character
 #' @param colourLabel Colour grouping label (Default: Value used for colour): NULL or character
 #' @param shapeLabel Shape grouping label (Default: Value used for shape): NULL or character
-#' @param screePlotToggle Toggle to display scree plot (Default: TRUE, Options: TRUE or FALSE): boolean
-#' @param scoresPlotToggle Toggle to display scores plot (Default: TRUE, Options: TRUE or FALSE): boolean
-#' @param loadingsPlotToggle Toggle to display loadings plot (Default: TRUE, Options: TRUE or FALSE): boolean
-#' @param biPlotToggle Toggle to display biplot (Default: TRUE, Options: TRUE or FALSE): boolean
+#' @param screePlotToggle Toggle to display scree plot (Default: TRUE, Options: TRUE or FALSE): logical
+#' @param scoresPlotToggle Toggle to display scores plot (Default: TRUE, Options: TRUE or FALSE): logical
+#' @param loadingsPlotToggle Toggle to display loadings plot (Default: TRUE, Options: TRUE or FALSE): logical
+#' @param biPlotToggle Toggle to display biplot (Default: TRUE, Options: TRUE or FALSE): logical
 displayPCA <- function(data,
                        firstColumnIndex,
                        lastColumnIndex = NULL,
@@ -39,8 +37,17 @@ displayPCA <- function(data,
                        scoresPlotToggle = TRUE,
                        loadingsPlotToggle = TRUE,
                        biPlotToggle = TRUE) {
+  # Validate parameters
+  if (length(confidence) != 1 || !is.numeric(confidence) || !(confidence == 95 || confidence == 99)) {
+    stop("Invalid 'confidence': Must be numerical value of length 1 (95 or 99")
+  }
+  
+  if (!is.null(distribution) && (length(distribution) != 1 || !is.character(distribution) || !distribution %in% c("normal", "t"))) {
+    stop("Invalid 'distribution': Must be character string of length 1 (\"normal\" or \"t\"")
+  }
+  
+  # Perform PCA
   tryCatch({
-    # Perform PCA
     pca <- summary(prcomp(if (is.null(lastColumnIndex)) data[, firstColumnIndex:ncol(data)] else data[, firstColumnIndex:lastColumnIndex], scale = scale))
     
     # Identify variances
@@ -125,7 +132,7 @@ displayPCA <- function(data,
               )
               
               # Data distribution
-              if (!is.null(distribution) && distribution %in% c("normal", "t")) {
+              if (!is.null(distribution)) {
                 scoresPlot <- scoresPlot +
                   ggplot2::stat_ellipse(type = distribution, level = confidence / 100, linewidth = 0.25)
               }

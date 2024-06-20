@@ -43,19 +43,16 @@ displayChromatogram(
 
 \item{colourLabel}{Colour grouping label (Default: Value used for colour): NULL or character}
 
-\item{xTickToggle}{Toggle to display ticks on x-axis (Default: TRUE, Options: TRUE or FALSE): boolean}
+\item{xTickToggle}{Toggle to display ticks on x-axis (Default: TRUE, Options: TRUE or FALSE): logical}
 
 \item{facetWrapBy}{Column name representing data to be used for facet wrapping (Default: NULL): NULL or character}
 
-\item{facetColumn}{Number of columns to use for facet wrapping (Default: NULL): NULL or double}
+\item{facetColumn}{Number of columns to use for facet wrapping (Default: NULL): NULL or numeric}
 
-\item{facetRow}{Number of rows to use for facet wrapping (Default: NULL): NULL or double}
+\item{facetRow}{Number of rows to use for facet wrapping (Default: NULL): NULL or numeric}
 
-\item{chromatogramRegion}{A list representing the different chromatogram regions of interest to be plotted (Default: NULL, Options: ticq::configureChromatogramRegion()): NULL or list}
+\item{chromatogramRegion}{A list representing the different chromatogram regions of interest (Default: NULL, Options: ticq::configureChromatogramRegion()): NULL or list}
 }
 \description{
 Display chromatogram data.
-}
-\details{
-Configure chromatogram region using: ticq::configureChromatogramRegion()
 }

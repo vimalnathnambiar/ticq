@@ -5,10 +5,11 @@ version: 0.0.0
 abstract: 'TICQ is a R package to assess mass spectrometry spectral data for sample quality and instrument performance using total ion current.'
 keywords:
   - 'mass spectrometry'
-  - 'data assessment'
+  - 'spectral data assessment'
+  - 'total ion current'
+  - 'statistical analysis'
   - 'sample quality'
   - 'instrument performance'
-  - 'total ion current'
   - 'package'
 license: 'MIT'
 repository-code: 'https://github.com/vmalnathnambiar/ticq'

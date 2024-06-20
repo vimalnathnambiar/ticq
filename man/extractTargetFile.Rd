@@ -11,7 +11,7 @@ extractTargetFile(
 )
 }
 \arguments{
-\item{targetFilePath}{Published to web URL or local path of the TSV formatted target file (Default: NULL, Options: Published to web URL or local file path): NULL or character}
+\item{targetFilePath}{Target file path (Default: NULL, Options: Published to web URL or local file path of a TSV file): NULL or character}
 
 \item{anpcMethodLibrary}{ANPC method library (Default: NULL, Options: "MS-AA-POS", "MS-HIL-POS", "MS-HIL-NEG", "MS-RP-POS" or "MS-RP-NEG"): NULL or character}
 
@@ -21,12 +21,12 @@ extractTargetFile(
 A data frame representing the target file
 }
 \description{
-Extract target m/z data from a TSV formatted target file (published to web URL or local file path) or an in-house method library used at the Australian National Phenome Centre (ANPC).
+Extract target m/z data using a TSV formatted target file (published to web URL or local file path) or an in-house method library used at the Australian National Phenome Centre (ANPC).
 }
 \details{
-If both target file path and ANPC method library is specified, the target file path will be used as default extraction. If no data is found, ANPC method library is then used.
+Target file specified should follow a pre-determined layout used by \href{https://github.com/vmalnathnambiar/exfilms/blob/main/docs/how-to-create-a-target-file.md}{ExfilMS}.
 
-When specifying a target file path, please ensure the TSV document follows a pre-determined layout used by ExfilMS (https://github.com/vmalnathnambiar/exfilms/blob/main/docs/how-to-create-a-target-file.md).
+If both target file path and ANPC method library is specified, the target file path will be used as the first point of extraction. If no data is found, ANPC method library is then used.
 }
 \examples{
 # Example 1: Specifying a target file with no rounding of decimal places for precision values

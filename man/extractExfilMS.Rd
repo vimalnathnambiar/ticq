@@ -13,7 +13,8 @@ extractExfilMS(inputPath)
 A list containing two data frames (passed and failed data)
 }
 \description{
-Extract spectral data from JSON files generated using ExfilMS (https://github.com/vmalnathnambiar/exfilms). Also includes retrievable metadata from sample name or file path.
+Extract spectral data from JSON files generated using \href{https://github.com/vmalnathnambiar/exfilms#readme}{ExfilMS}.
+Also includes retrievable metadata from sample name or file path.
 }
 \details{
 Metadata extraction only applicable to data acquired at the Australian National Phenome Centre (ANPC).

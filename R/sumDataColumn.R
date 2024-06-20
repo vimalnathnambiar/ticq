@@ -1,16 +1,16 @@
 #' Sum Data Column
 #'
-#' Sum values of a data column.
+#' Sum the values of a single data column for each data group.
 #'
 #' @import dplyr
 #'
 #' @export
 #' @param data A data frame containing spectral data: data frame
-#' @param commonColumn Column names of data common for each sample: character vector
+#' @param commonColumn Column names representing common data to be used for data grouping: character
 #' @param sumColumn Column name of the data to be summed: character
-#' @returns A data frame grouped by common columns and the sum value of the data column defined
+#' @returns A data frame grouped by common columns and the sum value of the data column specified
 sumDataColumn <- function(data, commonColumn, sumColumn) {
-  # Sum the values within a data column
+  # Sum values of the data column for each data group
   return(
     data %>%
       dplyr::group_by(across(all_of(commonColumn))) %>%

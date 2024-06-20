@@ -2,8 +2,6 @@
 #'
 #' Display chromatogram data.
 #'
-#' Configure chromatogram region using: ticq::configureChromatogramRegion()
-#'
 #' @import ggplot2
 #'
 #' @export
@@ -17,11 +15,11 @@
 #' @param xLabel x-axis label (Default: Column name used for x): NULL or character
 #' @param yLabel y-axis label (Default:Column name used for y): NULL or character
 #' @param colourLabel Colour grouping label (Default: Value used for colour): NULL or character
-#' @param xTickToggle Toggle to display ticks on x-axis (Default: TRUE, Options: TRUE or FALSE): boolean
+#' @param xTickToggle Toggle to display ticks on x-axis (Default: TRUE, Options: TRUE or FALSE): logical
 #' @param facetWrapBy Column name representing data to be used for facet wrapping (Default: NULL): NULL or character
-#' @param facetColumn Number of columns to use for facet wrapping (Default: NULL): NULL or double
-#' @param facetRow Number of rows to use for facet wrapping (Default: NULL): NULL or double
-#' @param chromatogramRegion A list representing the different chromatogram regions of interest to be plotted (Default: NULL, Options: ticq::configureChromatogramRegion()): NULL or list
+#' @param facetColumn Number of columns to use for facet wrapping (Default: NULL): NULL or numeric
+#' @param facetRow Number of rows to use for facet wrapping (Default: NULL): NULL or numeric
+#' @param chromatogramRegion A list representing the different chromatogram regions of interest (Default: NULL, Options: ticq::configureChromatogramRegion()): NULL or list
 displayChromatogram <- function(data,
                                 x,
                                 y,
@@ -38,7 +36,7 @@ displayChromatogram <- function(data,
                                 facetRow = NULL,
                                 chromatogramRegion = NULL) {
   tryCatch({
-    # Plot chromatogram data
+    # Plot data
     chromatogram <- ggplot2::ggplot(data = data, aes(x = .data[[x]], y = .data[[y]])) +
       ggplot2::geom_line(
         aes(
@@ -55,40 +53,35 @@ displayChromatogram <- function(data,
       ) + 
       ggplot2::labs(title = title, subtitle = subtitle, caption = caption, x = xLabel, y = yLabel, colour = colourLabel)
     
-      # x-axis ticks
-      if (!xTickToggle) {
-        chromatogram <- chromatogram +
-          ggplot2::theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
-      }
-      
-      # Facet wrap
-      if (!is.null(facetWrapBy)) {
-        chromatogram <- chromatogram +
-          ggplot2::facet_wrap( ~ .data[[facetWrapBy]], ncol = facetColumn, nrow = facetRow)
-      }
-      
-      # Chromatogram regions of interest
-      if (!is.null(chromatogramRegion)) {
-        # Region label
-        regionLabel <- list(massCalibration = "Mass Calibration Region", analyte = "Analyte Region", wash = "Wash Region")
-        
-        # Maximum value of x- and y-axis
-        maxX <- max(data[[x]])
-        maxY <- max(data[[y]])
-        
-        # Display region
-        for (i in names(regionLabel)) {
-          chromatogram <- displayChromatogramRegion(
-            plot = chromatogram,
-            maxX = maxX,
-            maxY = maxY,
-            chromatogramRegion = chromatogramRegion[[i]],
-            label = regionLabel[[i]]
-          )
-        }
-      }
+    # Display x-axis ticks
+    if (!xTickToggle) {
+      chromatogram <- chromatogram +
+        ggplot2::theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
+    }
     
-    # Display chromatogram
+    # Facet wrap
+    if (!is.null(facetWrapBy)) {
+      chromatogram <- chromatogram +
+        ggplot2::facet_wrap( ~ .data[[facetWrapBy]], ncol = facetColumn, nrow = facetRow)
+    }
+      
+    # Display chromatogram regions
+    if (!is.null(chromatogramRegion)) {
+      label <- list(massCalibration = "Mass Calibration Region", analyte = "Analyte Region", wash = "Wash Region")
+      maxX <- max(data[[x]])
+      maxY <- max(data[[y]])
+      
+      for (i in names(label)) {
+        chromatogram <- displayChromatogramRegion(
+          plot = chromatogram,
+          maxX = maxX,
+          maxY = maxY,
+          regionOfInterest = chromatogramRegion[[i]],
+          label = label[[i]]
+        )
+      }
+    }
+    
     print(chromatogram)
   },
   warning = function(w) message(paste0("Unable to display ", title, ": ", w)),

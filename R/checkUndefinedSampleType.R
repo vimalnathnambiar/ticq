@@ -2,13 +2,11 @@
 #'
 #' Check for samples that have an undefined sample type.
 #'
-#' Only applicable to data acquired at the Australian National Phenome Centre (ANPC).
-#'
 #' @import dplyr
 #'
 #' @export
 #' @param data A data frame containing spectral data: data frame
-#' @param commonColumn Column names of data common for each sample: character or character vector
+#' @param commonColumn Column names representing common data to be used for data grouping: character
 #' @param sampleType Sample type column name: character
 #' @param spectrumCount Spectrum count column name: character
 #' @returns A list containing two data frames (passed and failed data)

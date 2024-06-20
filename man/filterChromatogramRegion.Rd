@@ -9,13 +9,13 @@ filterChromatogramRegion(data, regionOfInterest = NULL, retentionTime)
 \arguments{
 \item{data}{A data frame containing spectral data: data frame}
 
-\item{regionOfInterest}{A list representing the start and end time points of a chromatogram region (Default: NULL): NULL or list}
+\item{regionOfInterest}{A list representing the start and end time points of a chromatogram region (Default: NULL, Options: Options: ticq::configureChromatogram()$region): NULL or list}
 
 \item{retentionTime}{Retention time column name: character}
 }
 \value{
-A data frame containing spectral data that falls between the start and end time point of the chromatogram region of interest
+A data frame containing spectral data that falls between the start and end time point of a specific chromatogram region of interest
 }
 \description{
-Filter data for a specific chromatogram region of interest by the respective start and end time points.
+Filter spectral data that falls between the respective start and end time points of a chromatogram region of interest.
 }
