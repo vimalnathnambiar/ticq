@@ -51,6 +51,8 @@ install.packages("remotes")
 remotes::install_github("vmalnathnambiar/ticq")
 ```
 
+<br>
+
 ## Usage
 
 The package primarily works in relation with [ExfilMS], specifically for its functionality in extracting and filtering MS spectral data into a standardised JSON format.
