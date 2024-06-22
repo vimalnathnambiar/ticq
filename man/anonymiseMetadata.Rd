@@ -33,7 +33,7 @@ anonymiseMetadata(
 \item{plate}{Plate number column name: character}
 }
 \value{
-A data frame with anonymised sample metadata and associated spectral data
+A data frame with anonymised sample metadata
 }
 \description{
 Anonymise sample metadata including sample ID, project name, cohort name, method name, instrument name, and plate number.

@@ -38,16 +38,11 @@ displayPCA <- function(data,
                        loadingsPlotToggle = TRUE,
                        biPlotToggle = TRUE) {
   # Validate parameters
-  if (length(confidence) != 1 || !is.numeric(confidence) || !(confidence == 95 || confidence == 99)) {
-    stop("Invalid 'confidence': Must be numerical value of length 1 (95 or 99")
-  }
   
-  if (!is.null(distribution) && (length(distribution) != 1 || !is.character(distribution) || !distribution %in% c("normal", "t"))) {
-    stop("Invalid 'distribution': Must be character string of length 1 (\"normal\" or \"t\"")
-  }
   
   # Perform PCA
   tryCatch({
+    # PCA summary
     pca <- summary(prcomp(if (is.null(lastColumnIndex)) data[, firstColumnIndex:ncol(data)] else data[, firstColumnIndex:lastColumnIndex], scale = scale))
     
     # Identify variances
@@ -94,9 +89,6 @@ displayPCA <- function(data,
         # Loop through PCs that passes the threshold
         for (i in 1:(threshold - 1)) {
           for (j in (i+1):threshold) {
-            # Hotelling Ellipse
-            hotelling <- HotellingEllipse::ellipseParam(data = scores, k = 2, pcx = i, pcy = j)
-            
             # Plot scores
             scoresPlot <- ggplot2::ggplot(data = scores, aes(x = .data[[paste0("PC", i)]], y = .data[[paste0("PC", j)]])) +
               ggplot2::geom_point(
@@ -109,12 +101,6 @@ displayPCA <- function(data,
               ) +
               ggplot2::geom_vline(xintercept = 0, linetype = "solid", colour = "grey", linewidth = 0.2) +
               ggplot2::geom_hline(yintercept = 0,  linetype = "solid", colour = "grey", linewidth = 0.2) +
-              ggforce::geom_ellipse(
-                aes(x0 = 0, y0 = 0, a = hotelling$Ellipse$a.95pct, b = hotelling$Ellipse$b.95pct, angle = 0), linetype = "dashed", colour = "blue"
-              ) +
-              ggforce::geom_ellipse(
-                aes(x0 = 0, y0 = 0, a = hotelling$Ellipse$a.99pct, b = hotelling$Ellipse$b.99pct, angle = 0), linetype = "dashed", colour = "red"
-              ) +
               ggplot2::theme(
                 panel.background = element_blank(),
                 axis.line = element_line(colour = "black"),
@@ -127,9 +113,24 @@ displayPCA <- function(data,
                 x = paste0("PC", i, " [", round(pca$importance[2, i] * 100, 2), "%]"),
                 y = paste0("PC", j, " [", round(pca$importance[2, j] * 100, 2), "%]"),
                 colour = colourLabel,
-                shape = shapeLabel,
-                caption = paste0("Hotelling T² Ellipse (Blue; 95% and Red; 99% Confidence)")
+                shape = shapeLabel
               )
+            
+              # Hotelling Ellipse
+              hotelling <- HotellingEllipse::ellipseParam(data = scores, k = 2, pcx = i, pcy = j)
+              if (confidence == 95) {
+                scoresPlot <- scoresPlot +
+                  ggforce::geom_ellipse(
+                    aes(x0 = 0, y0 = 0, a = hotelling$Ellipse$a.95pct, b = hotelling$Ellipse$b.95pct, angle = 0), linetype = "dashed", colour = "red"
+                  ) +
+                  ggplot2::labs(caption = "Hotelling T² Ellipse (95% Confidence)")
+              } else if (confidence == 99) {
+                scoresPlot <- scoresPlot +
+                  ggforce::geom_ellipse(
+                    aes(x0 = 0, y0 = 0, a = hotelling$Ellipse$a.99pct, b = hotelling$Ellipse$b.99pct, angle = 0), linetype = "dashed", colour = "red"
+                  ) +
+                  ggplot2::labs(caption = "Hotelling T² Ellipse (99% Confidence)")
+              }
               
               # Data distribution
               if (!is.null(distribution)) {

@@ -35,17 +35,17 @@ configureChromatogramRegion <- function(massCalibrationStart = 0,
   parameter <- list(massCalibrationStart = massCalibrationStart, massCalibrationEnd = massCalibrationEnd, analyteStart = analyteStart,
                     analyteEnd = analyteEnd, washStart = washStart, washEnd = washEnd)
   for (i in names(parameter)) {
-    parameterValue <- parameter[[i]]
-    if (i == "washEnd") {
-      if (!is.null(parameterValue) && (length(parameterValue) != 1 || !is.numeric(parameterValue))) {
-        stop(paste0("Invalid '", i, "': Must be NULL or numerical value of length 1"))
+    if ((i != "washEnd" && (length(parameter[[i]]) != 1 || !is.numeric(parameter[[i]]))) ||
+        (i == "washEnd" && (!is.null(parameter[[i]]) && (length(parameter[[i]]) != 1 || !is.numeric(parameter[[i]]))))) {
+      if (i != "washEnd") {
+        stop(paste0("Invalid '", i, "': Must be a numerical value of length 1"))
+      } else {
+        stop(paste0("Invalid '", i, "': Must be NULL or a numerical value of length 1"))
       }
-    } else if (length(parameterValue) != 1 || !is.numeric(parameterValue)) {
-      stop(paste0("Invalid '", i, "': Must be numerical value of length 1"))
     }
   }
   
-  # Configure start and end time points of each region of interest
+  # Configure start and end time points of each chromatogram region of interest
   return(
     list(
       prewash = list(start = 0, end = washStart),

@@ -11,7 +11,7 @@ extractTargetFile(
 )
 }
 \arguments{
-\item{targetFilePath}{Target file path (Default: NULL, Options: Published to web URL or local file path of a TSV file): NULL or character}
+\item{targetFilePath}{Target file path (Default: NULL, Options: Published to web URL or local path of a TSV file): NULL or character}
 
 \item{anpcMethodLibrary}{ANPC method library (Default: NULL, Options: "MS-AA-POS", "MS-HIL-POS", "MS-HIL-NEG", "MS-RP-POS" or "MS-RP-NEG"): NULL or character}
 

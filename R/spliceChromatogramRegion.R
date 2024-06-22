@@ -18,7 +18,6 @@ spliceChromatogramRegion <- function(data, commonColumn, spectrumCount, chromato
   # Splice chromatogram regions
   if (!is.null(chromatogramRegion)) {
     pattern <- c("prewash", "massCalibration", "analyte", "wash")
-    
     for (i in pattern) {
       splicedChromatogramData[[paste0(i, "Region")]] <- (
         ticq::filterChromatogramRegion(data = data, regionOfInterest = chromatogramRegion[[i]], retentionTime = retentionTime) %>%

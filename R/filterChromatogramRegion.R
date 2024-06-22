@@ -23,7 +23,7 @@ filterChromatogramRegion <- function(data, regionOfInterest = NULL, retentionTim
     }
   }
   
-  # Filter data by retention time
+  # Filter spectral data
   return(
     data %>%
       dplyr::filter(.data[[retentionTime]] > regionOfInterest$start & .data[[retentionTime]] <= regionOfInterest$end)

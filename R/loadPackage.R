@@ -1,10 +1,11 @@
 #' Load Package
 #'
-#' Identify, install and load packages to use.
+#' Identify, install, and load packages to use.
 #'
 #' @export
-#' @param packageName Package name: character
-#'
+#' @param packageName A character vector representing the package names to be installed and loaded. Should not contain NA or empty character strings.
+#' @returns A logical vector indicating whether each package specified was successfully loaded.
+#' 
 #' @examples
 #' # Example 1: Loading a single package
 #' ticq::loadPackage(packageName = "DT")
@@ -13,15 +14,13 @@
 #' ticq::loadPackage(packageName = c("DT", "dplyr"))
 loadPackage <- function(packageName) {
   # Validate parameters
-  if (is.null(packageName) || length(packageName) == 0 || !is.character(packageName) || any(is.na(packageName)) || any(packageName == "")) {
-    stop("Invalid 'packageName': Must be non-empty character string of length 1 or more")
-  }
+  validateCharacterVector(parameterName = "packageName", parameterValue = packageName)
   
   # Identify, install and load missing packages
   missingPackage <- packageName[!(packageName %in% installed.packages()[, "Package"])]
   if (length(missingPackage) > 0) {
     install.packages(missingPackage)
   }
-
-  lapply(packageName, require, character.only = TRUE)
+  
+  return(sapply(packageName, require, character.only = TRUE))
 }

@@ -17,20 +17,18 @@ extractExfilMS <- function(inputPath) {
   # Extract spectral data from JSON files
   passedData <- data.frame()
   fileName <- character(0)
-  
   if (length(inputFiles) > 0) {
-    # Loop through input files
     for (i in inputFiles) {
       # Parse JSON file
       filePath <- if (file.info(inputPath)$isdir) paste0(inputPath, i) else inputPath
       sample <- tryCatch(
         jsonlite::fromJSON(filePath),
         warning = function(w) {
-          message(paste0("Unable to extract ExfilMS data (", i, "): ", w))
+          message(paste0("Unable to extract ExfilMS (", i, "): ", w))
           NULL
         },
         error = function(e) {
-          message(paste0("Unable to extract ExfilMS data (", i, "): ", e))
+          message(paste0("Unable to extract ExfilMS (", i, "): ", e))
           NULL
         }
       )
@@ -59,10 +57,10 @@ extractExfilMS <- function(inputPath) {
             )
           )
         }, warning = function(w) {
-          message(paste0("Unable to extract ExfilMS data (", i, "): ", w))
+          message(paste0("Unable to extract ExfilMS (", i, "): ", w))
           sample <- NULL
         }, error = function(e) {
-          message(paste0("Unable to extract ExfilMS data (", i, "): ", e))
+          message(paste0("Unable to extract ExfilMS (", i, "): ", e))
           sample <- NULL
         })
       }
@@ -73,7 +71,7 @@ extractExfilMS <- function(inputPath) {
       }
     }
   } else {
-    message("Unable to extract ExfilMS data: No available JSON files")
+    message("Unable to extract ExfilMS: No available JSON files")
   }
   
   return(list(passedData = passedData, failedData = as.data.frame(fileName)))

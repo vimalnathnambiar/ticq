@@ -7,10 +7,13 @@
 loadPackage(packageName)
 }
 \arguments{
-\item{packageName}{Package name: character}
+\item{packageName}{A character vector representing the package names to be installed and loaded. Should not contain NA or empty character strings.}
+}
+\value{
+A logical vector indicating whether each package specified was successfully loaded.
 }
 \description{
-Identify, install and load packages to use.
+Identify, install, and load packages to use.
 }
 \examples{
 # Example 1: Loading a single package

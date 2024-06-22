@@ -15,7 +15,7 @@
 #' @param method Method column name: character
 #' @param instrument Instrument column name: character
 #' @param plate Plate number column name: character
-#' @returns A data frame with anonymised sample metadata and associated spectral data
+#' @returns A data frame with anonymised sample metadata
 #'
 #' @examples
 #' data <- data.frame(sampleID = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29", project = "COVID-19", cohort = "Heidelberg",
@@ -24,6 +24,27 @@
 #'                                 method = "method", instrument = "instrument", plate = "plate")
 #' print(data)
 anonymiseMetadata <- function(data, sampleID, project, cohort, projectCohort, method, instrument, plate) {
+  # Validate parameters
+  if (nrow(data) == 0 || ncol(data) == 0) {
+    stop("Invalid 'data': Data frame is empty")
+  }
+  
+  parameter <- list(sampleID = sampleID, project = project, cohort = cohort, projectCohort = projectCohort, method = method, instrument = instrument, plate = plate)
+  for (i in names(parameter)) {
+    if (length(parameter[[i]]) != 1 || !is.character(parameter[[i]]) || is.na(parameter[[i]]) || parameter[[i]] == "") {
+      stop(paste0("Invalid '", i, "': Must be a non-NA and non-empty character string of length 1 matching a column name in 'data'"))
+    }
+  }
+  
+  parameter <- c(sampleID, project, cohort, projectCohort, method, instrument, plate)
+  if (!all(parameter %in% colnames(data))) {
+    stop(paste0(
+      "Unable to anonymise metadata: Missing one or more data columns (",
+      paste(parameter[!parameter %in% colnames(data)], collapse = ", "),
+      ")"
+    ))
+  }
+  
   # Anonymise metadata (and replace NA) values
   return(
     data %>%

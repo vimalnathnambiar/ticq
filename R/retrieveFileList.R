@@ -1,21 +1,16 @@
 #' Retrieve File List
 #'
-#' Retrieve a list of file names matching a specified file extension type (i.e., "JSON", "XML").
+#' Retrieve a list of file names matching a specified file extension type.
 #'
 #' @export
-#' @param inputPath Input path: character
-#' @param fileExtension File extension type (Default: NULL): NULL or character
-#' @returns A list of file names matching the specified file extension type
+#' @param inputPath A character string representing an existing directory or file path. Should not be NA or an empty character string.
+#' @param fileExtension A character string representing a file extension type (e.g., "JSON"). (Default: `NULL`)
+#' @returns A list of file names matching the specified file extension type.
 retrieveFileList <- function(inputPath, fileExtension = NULL) {
   # Validate parameters
-  if (length(inputPath) != 1 || !is.character(inputPath) || is.na(inputPath) || inputPath == "") {
-    stop("Invalid 'inputPath': Must be non-empty character string of length 1 representing a directory or file path")
-  } else if (!dir.exists(inputPath) && !file.exists(inputPath)) {
-    stop("Invalid 'inputPath': No available directory or file at the specified path")
-  }
-
-  if (!is.null(fileExtension) && (length(fileExtension) != 1 || !is.character(fileExtension) || is.na(fileExtension) || fileExtension == "")) {
-    stop("Invalid 'fileExtension': Must be NULL or non-empty character string of length 1 representing a file extension format")
+  validateDirectoryFileExist(parameterName = "inputPath", parameterValue = inputPath, pathType = "both")
+  if (!is.null(fileExtension)) {
+    validateCharacterString(parameterName = "fileExtension", parameterValue = fileExtension)
   }
   
   # Retrieve list of file names
@@ -26,7 +21,7 @@ retrieveFileList <- function(inputPath, fileExtension = NULL) {
       ignore.case = TRUE
     )
     return(if (length(fileList) == 0) character(0) else fileList)
-  } else if (!is.null(fileExtension) && !grepl(paste0("\\.", fileExtension, "$"), inputPath, ignore.case = TRUE)) {
+  } else if (!is.null(fileExtension) && !checkFileExtension(parameterName = "inputPath", parameterValue = inputPath, fileExtension = fileExtension)) {
     return(character(0))
   } else {
     return(basename(inputPath))

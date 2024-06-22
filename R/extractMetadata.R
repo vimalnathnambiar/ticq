@@ -12,7 +12,12 @@
 #' metadata <- ticq::extractMetadata(input = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29.json")
 #' print(metadata)
 extractMetadata <- function(input) {
-  # Metadata components
+  # Validate parameters
+  if (length(input) == 0  || !is.character(input)) {
+    stop("Invalid 'input': Must be a character string of length 1 or more")
+  }
+  
+  # Metadata
   project <- extractProject(input = input)
   cohort <- extractCohort(input = input)
   projectCohort <- ifelse(is.na(project), ifelse(is.na(cohort), NA_character_, cohort), ifelse(is.na(cohort), project, paste(project, cohort)))

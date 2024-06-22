@@ -7,13 +7,13 @@
 retrieveFileList(inputPath, fileExtension = NULL)
 }
 \arguments{
-\item{inputPath}{Input path: character}
+\item{inputPath}{A character string representing an existing directory or file path. Should not be NA or an empty character string.}
 
-\item{fileExtension}{File extension type (Default: NULL): NULL or character}
+\item{fileExtension}{A character string representing a file extension type (e.g., "JSON"). (Default: \code{NULL})}
 }
 \value{
-A list of file names matching the specified file extension type
+A list of file names matching the specified file extension type.
 }
 \description{
-Retrieve a list of file names matching a specified file extension type (i.e., "JSON", "XML").
+Retrieve a list of file names matching a specified file extension type.
 }

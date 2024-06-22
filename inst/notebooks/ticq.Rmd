@@ -48,35 +48,25 @@ metadataAnonymiser <- params$metadataAnonymiser
 # Validate input path
 jsonFileCount <- length(ticq::retrieveFileList(inputPath = inputPath, fileExtension = "JSON"))
 if (jsonFileCount == 0) {
-  stop("Invalid 'inputPath': No available JSON files")
+  stop("Invalid 'inputPath': No available JSON file(s) was found at the specified path.")
 } 
 
 # Update new sample status
+newSampleStatus <- TRUE
 print(paste("Input path:", inputPath))
 print(paste("Available JSON files:", jsonFileCount))
-newSampleStatus <- TRUE
 
-# Clean environment
 rm(jsonFileCount)
 ```
 
 ## Output
 ```{r, echo = FALSE, warning = FALSE}
 # Validate output directory path
-if (is.null(outputDirectoryPath) || length(outputDirectoryPath) == 0) {
+if (length(outputDirectoryPath) == 0) {
+  message(paste0("Setting default path"))
   outputDirectoryPath <- paste0(getwd(), "/output/")
-  message(paste0("Setting default path (", outputDirectoryPath, ")"))
-} else if (length(outputDirectoryPath) != 1 || !is.character(outputDirectoryPath) || is.na(outputDirectoryPath) || outputDirectoryPath == "") {
-  stop("Invalid 'outputDirectoryPath': Must be non-empty character string of length 1 representing a directory path")
-} else if (substring(outputDirectoryPath, nchar(outputDirectoryPath)) != "/") {
-  outputDirectoryPath <- paste0(outputDirectoryPath, "/")
 }
-
-if (!dir.exists(outputDirectoryPath)) {
-  dir.create(outputDirectoryPath, recursive = TRUE)
-}
-
-# Display output directory path
+createDirectoryPath(parameterName = 'outputDirectoryPath', parameterValue = outputDirectoryPath)
 print(paste("Output directory path:", outputDirectoryPath))
 ```
 
@@ -84,10 +74,8 @@ print(paste("Output directory path:", outputDirectoryPath))
 ```{r, echo = FALSE, warning = FALSE}
 # Validate historical data path
 if (!is.null(historicalDataPath)) {
-  if (length(historicalDataPath) != 1 || !is.character(historicalDataPath) || !grepl("\\.rds$", historicalDataPath, ignore.case = TRUE)) {
-    stop("Invalid 'historicalDataPath': Must be NULL or non-empty character string of length 1 representing a RDS file path")
-  } else if (!file.exists(historicalDataPath)) {
-    stop("Invalid 'historicalDataPath': No available RDS file")
+  if (!checkFileExtension(parameterName = 'historicalDataPath', parameterValue = historicalDataPath, fileExtension = "RDS")) {
+    stop("Invalid 'historicalDataPath': No available RDS file found at the specified path.")
   }
 }
 
@@ -97,8 +85,6 @@ if (historicalDataStatus) {
   print(paste("Historical data path:", historicalDataPath))
 } else {
   print("No available historical data")
-  
-  # Clean environment
   rm(historicalDataPath)
 }
 ```
@@ -118,19 +104,15 @@ if (targetFileStatus) {
   DT::datatable(data = targetFile, filter = "top", options = list(scrollX = TRUE))
 } else {
   print("No available target file data")
-  
-  # Clean environment
   rm(targetFile)
 }
 
-# Clean environment
 rm(targetFilePath)
 ```
 
 ## Chromatogram Region
 ```{r, echo = FALSE, warning = FALSE}
-# Validate chromatogram region data
-pattern <- c("prewash", "massCalibration", "analyte", "wash")
+# ANPC method library associated chromatogram region data
 anpcChromatogramRegionData <- list(
   "MS-AA-POS" = list(massCalibrationEnd = 0.3, washStart = 5),
   "MS-HIL-POS" = list(massCalibrationEnd = 0.7, washStart = 11),
@@ -139,18 +121,12 @@ anpcChromatogramRegionData <- list(
   "MS-RP-NEG" = list(massCalibrationEnd = 0.7, washStart = 11)
 )
 
-if (!is.null(chromatogramRegion) &&
-    (length(chromatogramRegion) != 4 || !is.list(chromatogramRegion) || !all(pattern %in% names(chromatogramRegion)))) {
-  message("Invalid 'chromatogramRegion': Must be a list containing the start and end time points of 4 required region data")
-  if (!all(pattern %in% names(chromatogramRegion))) {
-    message(paste0(
-      "Invalid 'chromatogramRegion': Missing data (",
-      paste(pattern[!pattern %in% names(chromatogramRegion)], collapse = ", "),
-      ")"
-    ))
+# Validate chromatogram region data
+if (!is.null(chromatogramRegion)) {
+  if (!validateChromatogramRegion(chromatogramRegion = chromatogramRegion)) {
+    message("Setting default value (NULL)")
+    chromatogramRegion <- NULL
   }
-  message("Setting default value (NULL)")
-  chromatogramRegion <- NULL
 }
 
 if (is.null(chromatogramRegion) && !is.null(anpcMethodLibrary) && anpcMethodLibrary %in% names(anpcChromatogramRegionData)) {
@@ -169,8 +145,7 @@ if (chromatogramRegionStatus) {
   print("No available chromatogram region data")
 }
 
-# Clean environment
-rm(anpcMethodLibrary, pattern, anpcChromatogramRegionData)
+rm(anpcMethodLibrary, regionPattern, timePattern, anpcChromatogramRegionData)
 invisible(gc())
 ```
 
@@ -196,7 +171,6 @@ if (newSampleStatus) {
             DT::formatStyle("fileName", target = "row", backgroundColor = "pink"))
   }
   
-  # Clean environment
   rm(inputPath, result)
   invisible(gc())
 } else {
@@ -231,7 +205,7 @@ if (newSampleStatus) {
 ```{r, echo = FALSE, warning = FALSE, include = FALSE}
 # Validate metadata anonymiser
 if (length(metadataAnonymiser) != 1 || !is.logical(metadataAnonymiser) || is.na(metadataAnonymiser)) {
-  stop("Invalid 'metadataAnonymiser': Must be logical value of length 1 (TRUE or FALSE)")
+  stop("Invalid 'metadataAnonymiser': Must be a logical value of length 1 (TRUE or FALSE)")
 }
 
 # Check new sample status and anonymise metadata
@@ -248,7 +222,6 @@ if (newSampleStatus && metadataAnonymiser) {
   )
 }
 
-# Clean environment
 rm(metadataAnonymiser)
 ```
 
@@ -271,7 +244,6 @@ if (newSampleStatus) {
   if (newSampleStatus) {
     passedData <- result$passedData
   } else {
-    # Clean environment
     rm(passedData, sampleID, project, cohort, projectCohort, sampleType, method, instrument, plate, timestamp, spectrumCount, arrayLength,
        msLevel, retentionTime, basePeakIntensity, totalIonCurrent, mzArray, intensityArray)
     invisible(gc())
@@ -284,7 +256,6 @@ if (newSampleStatus) {
             DT::formatStyle("sampleType", target = "row", backgroundColor = "pink"))
   }
   
-  # Clean environment
   rm(result)
   invisible(gc())
 } else {
@@ -306,7 +277,6 @@ if (newSampleStatus) {
       message("Unable to append historical data: Inconsistencies between historical and sample data")
     }
     
-    # Clean environment
     rm(historicalData)
     invisible(gc())
   }
@@ -338,7 +308,6 @@ if (newSampleStatus) {
     if (newSampleStatus) {
       passedData <- result$passedData
     } else {
-      # Clean environment
       rm(passedData, sampleID, project, cohort, projectCohort, sampleType, method, instrument, plate, timestamp, spectrumCount, arrayLength,
          msLevel, retentionTime, basePeakIntensity, totalIonCurrent, mzArray, intensityArray)
       invisible(gc())
@@ -356,7 +325,6 @@ if (newSampleStatus) {
     }
   }
   
-  # Clean environment
   rm(result)
   invisible(gc())
 } else {
@@ -405,8 +373,6 @@ if (newSampleStatus) {
       } else {
         message("Unable to append historical data: Inconsistencies between historical and sample data")
       }
-      
-      # Clean environment
       rm(historicalData)
       invisible(gc())
     }
@@ -431,16 +397,12 @@ if (newSampleStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample and spectral data status
 if (newSampleStatus && spectralDataStatus) {
-  # Check sample type patterns
+  # Display total ion chromatogram
   pattern <- c("sLTR Plasma", "LTR Plasma", "sLTR Serum", "LTR Serum", "sLTR Urine", "LTR Urine")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in unique(sub("sLTR |LTR ", "", pattern))) {
-      # Check pattern
       tmpPattern <- c(paste("sLTR", i), paste("LTR", i))
       if (any(tmpPattern %in% sampleTypeList)) {
-        # Display total ion chromatogram
         ticq::displayChromatogram(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% tmpPattern),
@@ -455,8 +417,6 @@ if (newSampleStatus && spectralDataStatus) {
           chromatogramRegion = chromatogramRegion
         )
       }
-      
-      # Clean environment
       rm(tmpPattern)
     }
   } else {
@@ -469,15 +429,11 @@ if (newSampleStatus && spectralDataStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample and spectral data status
 if (newSampleStatus && spectralDataStatus) {
-  # Check sample type patterns
+  # Display total ion chromatogram
   pattern <- c("dLTR Plasma", "dLTR Serum", "dLTR Urine")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in pattern) {
-      # Check pattern
       if (i %in% sampleTypeList) {
-        # Display total ion chromatogram
         ticq::displayChromatogram(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
@@ -503,15 +459,11 @@ if (newSampleStatus && spectralDataStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample and spectral data status
 if (newSampleStatus && spectralDataStatus) {
-  # Check sample type patterns
+  # Display total ion chromatogram
   pattern <- c("PQC Plasma", "PQC Serum", "PQC Urine")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in pattern) {
-      # Check pattern
       if (i %in% sampleTypeList) {
-        # Display total ion chromatogram
         ticq::displayChromatogram(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
@@ -537,15 +489,11 @@ if (newSampleStatus && spectralDataStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample and spectral data status
 if (newSampleStatus && spectralDataStatus) {
-  # Check sample type patterns
+  # Display total ion chromatogram
   pattern <- c("dPQC Plasma", "dPQC Serum", "dPQC Urine")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in pattern) {
-      # Check pattern
       if (i %in% sampleTypeList) {
-        # Display total ion chromatogram
         ticq::displayChromatogram(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
@@ -571,15 +519,11 @@ if (newSampleStatus && spectralDataStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample and spectral data status
 if (newSampleStatus && spectralDataStatus) {
-  # Check sample type patterns
+  # Display total ion chromatogram
   pattern <- c("QC01", "QC02", "QC03", "QC04")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in pattern) {
-      # Check pattern
       if (i %in% sampleTypeList) {
-        # Display total ion chromatogram
         ticq::displayChromatogram(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
@@ -605,15 +549,11 @@ if (newSampleStatus && spectralDataStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample and spectral data status
 if (newSampleStatus && spectralDataStatus) {
-  # Check sample type patterns
+  # Display total ion chromatogram
   pattern <- c("CAL01", "CAL02", "CAL03", "CAL04", "CAL05", "CAL06", "CAL07", "CAL08")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in pattern) {
-      # Check pattern
       if (i %in% sampleTypeList) {
-        # Display total ion chromatogram
         ticq::displayChromatogram(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
@@ -639,15 +579,11 @@ if (newSampleStatus && spectralDataStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample and spectral data status
 if (newSampleStatus && spectralDataStatus) {
-  # Check sample type patterns
+  # Display total ion chromatogram
   pattern <- c("Single Blank", "Double Blank")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in pattern) {
-      # Check pattern
       if (i %in% sampleTypeList) {
-        # Display total ion chromatogram
         ticq::displayChromatogram(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
@@ -673,15 +609,11 @@ if (newSampleStatus && spectralDataStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample and spectral data status
 if (newSampleStatus && spectralDataStatus) {
-  # Check sample type patterns
+  # Display total ion chromatogram
   pattern <- c("Sample Plasma", "Sample Serum", "Sample Urine")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in pattern) {
-      # Check pattern
       if (i %in% sampleTypeList) {
-        # Display total ion chromatogram
         ticq::displayChromatogram(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
@@ -707,15 +639,11 @@ if (newSampleStatus && spectralDataStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample and spectral data status
 if (newSampleStatus && spectralDataStatus) {
-  # Check sample type patterns
+  # Display total ion chromatogram
   pattern <- c("dSample Plasma", "dSample Serum", "dSample Urine")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in pattern) {
-      # Check pattern
       if (i %in% sampleTypeList) {
-        # Display total ion chromatogram
         ticq::displayChromatogram(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
@@ -735,7 +663,6 @@ if (newSampleStatus && spectralDataStatus) {
     print("No available data")
   }
   
-  # Clean environment
   rm(x, y, title, xLabel, yLabel, colour, colourLabel, pattern, i)
 }
 ```
@@ -755,7 +682,6 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
     sumColumn = totalIonCurrent
   )
 
-  # Column names of spliced chromatogram regions
   prewashRegion <- "prewashRegion"
   massCalibrationRegion <- "massCalibrationRegion"
   analyteRegion <- "analyteRegion"
@@ -767,7 +693,6 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   colour <- if (length(unique(plotData[[projectCohort]])) > 1) projectCohort else plate
   colourLabel <- if (length(unique(plotData[[projectCohort]])) > 1) "Project" else "Plate"
 } else if (!chromatogramRegionStatus) {
-  # Clean environment
   rm(plotData)
   invisible(gc())
 }
@@ -796,11 +721,9 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample, spectral data and chromatogram region status
 if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
-  # Check sample type patterns
+  # Display principal component analysis
   pattern <- c("sLTR Plasma", "LTR Plasma")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Display principal component analysis
     ticq::displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
@@ -3051,7 +2974,6 @@ if (newSampleStatus) {
     
     # Check historical data status
     if (historicalDataStatus) {
-      # Append historical data
       historicalData <- readRDS(historicalDataPath)
       if (ncol(historicalData) == ncol(passedData) && all(colnames(historicalData) == colnames(passedData))) {
         plotData <- historicalData %>%
@@ -3458,7 +3380,6 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     
     # Check historical data status
     if (historicalDataStatus) {
-      # Append historical data
       historicalData <- readRDS(historicalDataPath)
       if (ncol(historicalData) == ncol(passedData) &&
           all(colnames(historicalData) == colnames(passedData)) &&
@@ -6519,7 +6440,6 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     
     # Check historical data status
     if (historicalDataStatus) {
-      # Append historical data
       historicalData <- readRDS(historicalDataPath)
       if (ncol(historicalData) == ncol(passedData) &&
           all(colnames(historicalData) == colnames(passedData)) &&
@@ -7610,7 +7530,6 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     
     # Check historical data status
     if (historicalDataStatus) {
-      # Append historical data
       historicalData <- readRDS(historicalDataPath)
       if (ncol(historicalData) == ncol(passedData) &&
           all(colnames(historicalData) == colnames(passedData)) &&
@@ -11437,7 +11356,6 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     
     # Check historical data status
     if (historicalDataStatus) {
-      # Append historical data
       historicalData <- readRDS(historicalDataPath)
       if (ncol(historicalData) == ncol(passedData) &&
           all(colnames(historicalData) == colnames(passedData)) &&
@@ -12752,7 +12670,6 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus) {
   # Check historical data status
   massAccuracyData <- passedData
   if (historicalDataStatus) {
-    # Append historical data
     historicalData <- readRDS(historicalDataPath)
     if (ncol(historicalData) == ncol(passedData) &&
         all(colnames(historicalData) == colnames(passedData)) &&

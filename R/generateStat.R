@@ -28,13 +28,13 @@
 generateStat <- function(data) {
   # Validate parameters
   if (length(data) <= 1 || !is.numeric(data) || any(is.na(data))) {
-    stop("Invalid 'data': Must be numerical value of length 2 or more with no NA values")
+    stop("Invalid 'data': Must be a numerical value of length 2 or more with no NA values")
   }
   
   # Sample size (n)
   n <- length(data)
   
-  # Sum, Min, Mean, Max
+  # Sum, Minimum, Mean, Maximum
   sum <- sum(data)
   min <- min(data)
   mean <- mean(data)

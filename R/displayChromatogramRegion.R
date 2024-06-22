@@ -11,7 +11,7 @@
 #' @param label Chromatogram region label (Default: NULL): NULL or character
 #' @returns A ggplot object with the added vertical lines representing the chromatogram region start and end time points
 displayChromatogramRegion <- function(plot, maxX, maxY, regionOfInterest, label = NULL) {
-  # Check region endpoint
+  # Check region end time point
   if (is.null(regionOfInterest$end)) {
     regionOfInterest$end <- maxX
   }

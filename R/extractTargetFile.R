@@ -10,7 +10,7 @@
 #' @import readr
 #'
 #' @export
-#' @param targetFilePath Target file path (Default: NULL, Options: Published to web URL or local file path of a TSV file): NULL or character
+#' @param targetFilePath Target file path (Default: NULL, Options: Published to web URL or local path of a TSV file): NULL or character
 #' @param anpcMethodLibrary ANPC method library (Default: NULL, Options: "MS-AA-POS", "MS-HIL-POS", "MS-HIL-NEG", "MS-RP-POS" or "MS-RP-NEG"): NULL or character
 #' @param roundDecimalPlace Number of decimal places for precision value rounding (Default: NULL): NULL or numeric
 #' @returns A data frame representing the target file
@@ -25,7 +25,7 @@
 #' targetFile <- ticq::extractTargetFile(targetFilePath = NULL, anpcMethodLibrary = "MS-AA-POS", roundDecimalPlace = 4)
 #' print(targetFile)
 extractTargetFile <- function(targetFilePath = NULL, anpcMethodLibrary = NULL, roundDecimalPlace = NULL) {
-  # Validate parameters
+  # ANPC method library and associated URL paths
   anpcMethodLibraryURL <- list(
     "MS-AA-POS" = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSeo31hlruA3QuwoESz5IDJ9Nu6ndSAgLTRn3uc45rOPO4BlksfHzh9xtNB22Oes9JOxhEbI4NK-zxl/pub?gid=0&single=true&output=tsv",
     "MS-HIL-POS" = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSeo31hlruA3QuwoESz5IDJ9Nu6ndSAgLTRn3uc45rOPO4BlksfHzh9xtNB22Oes9JOxhEbI4NK-zxl/pub?gid=1628071829&single=true&output=tsv",
@@ -34,25 +34,28 @@ extractTargetFile <- function(targetFilePath = NULL, anpcMethodLibrary = NULL, r
     "MS-RP-NEG" = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSeo31hlruA3QuwoESz5IDJ9Nu6ndSAgLTRn3uc45rOPO4BlksfHzh9xtNB22Oes9JOxhEbI4NK-zxl/pub?gid=311622861&single=true&output=tsv"
   )
   
-  if (!is.null(targetFilePath)) {
-    if (length(targetFilePath) != 1 || !is.character(targetFilePath) ||
-        !grepl("^(?:http|https)://[^ \"]+&output=tsv$|\\.tsv$", targetFilePath, ignore.case = TRUE)) {
-      stop("Invalid 'targetFilePath': Must be NULL or non-empty character string of length 1 representing a published to web URL or local TSV file path")
-    } else if (grepl("\\.tsv$", targetFilePath, ignore.case = TRUE) && !file.exists(targetFilePath)) {
-      stop("Invalid 'targetFilePath': No available TSV file")
+  # Validate parameters
+  if (!is.null(targetFilePath) && validateCharacterString(parameterName = "targetFilePath", parameterValue = targetFilePath)) {
+    if (grepl("\\.tsv$", targetFilePath, ignore.case = TRUE) &&
+        validateDirectoryFileExist(parameterName = "targetFilePath", parameterValue = targetFilePath, pathType = "file")) {
+      isPathURL <- FALSE
+    } else if (grepl("^(?:http|https)://[^ \"]+&output=tsv$", targetFilePath, ignore.case = TRUE)) {
+      isPathURL <- TRUE
+    } else {
+      stop("Invalid 'targetFilePath': No available TSV file found at the specified path.")
     }
   }
-
-  if (!is.null(anpcMethodLibrary) &&
-      (length(anpcMethodLibrary) != 1 || !is.character(anpcMethodLibrary) || !anpcMethodLibrary %in% names(anpcMethodLibraryURL))) {
-    stop("Invalid 'anpcMethodLibrary': Must be NULL or non-empty character string of length 1 matching one of the ANPC method libraries")
+  
+  if (!is.null(anpcMethodLibrary) && validateCharacterString(parameterName = "anpcMethodLibrary", parameterValue = anpcMethodLibrary) &&
+      !anpcMethodLibrary %in% names(anpcMethodLibraryURL)) {
+    stop("Invalid 'anpcMethodLibrary': Must either be NULL, 'MS-AA-POS', 'MS-HIL-POS', 'MS-HIL-NEG', 'MS-RP-POS', or 'MS-RP-NEG'")
   }
 
-  if (!is.null(roundDecimalPlace) && (length(roundDecimalPlace) != 1 || !is.numeric(roundDecimalPlace))) {
-    stop("Invalid 'roundDecimalPlace': Must be NULL or numerical value of length 1")
+  if (!is.null(roundDecimalPlace)) {
+    validateNumericValue(parameterName = "roundDecimalPlace", parameterValue = roundDecimalPlace)
   }
   
-  # Check availability of both target file path / method library
+  # Check availability of target file path and method library
   if (!is.null(targetFilePath) && !is.null(anpcMethodLibrary)) {
     message("Both target file path and ANPC method library specified: Using target file path as first point of extraction")
   } else if (is.null(targetFilePath) && is.null(anpcMethodLibrary)) {
@@ -63,7 +66,7 @@ extractTargetFile <- function(targetFilePath = NULL, anpcMethodLibrary = NULL, r
   # Extract target file
   targetFile <- if (!is.null(targetFilePath)) {
     tryCatch({
-      if (grepl("^(?:http|https)://[^ \"]+&output=tsv$", targetFilePath, ignore.case = TRUE)) {
+      if (isPathURL) {
         response <- httr::GET(targetFilePath)
         statusCode <- httr::status_code(response)
         if (statusCode == 200) {
@@ -72,7 +75,7 @@ extractTargetFile <- function(targetFilePath = NULL, anpcMethodLibrary = NULL, r
           message(paste0("Unable to extract target file: Unsuccessful HTTP request (Status code: ", statusCode, ")"))
           NULL
         }
-      } else if (grepl("\\.tsv$", targetFilePath, ignore.case = TRUE)) {
+      } else {
         readr::read_tsv(targetFilePath, show_col_types = FALSE)
       }
     }, warning = function(w) {

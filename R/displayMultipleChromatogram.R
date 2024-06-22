@@ -45,7 +45,7 @@ displayMultipleChromatogram <- function(data,
                                         plotRow = 1,
                                         chromatogramRegion = NULL) {
   tryCatch({
-    # Defaults
+    # Initialise plot grid variables
     plotList <- list()
     isFirstPlot <- TRUE
     nPlotData <- plotColumn * plotRow
@@ -56,12 +56,10 @@ displayMultipleChromatogram <- function(data,
       lastColumnIndex <- ncol(data)
     }
     
-    # Loop through data columns
+    # Display multiple chromatogram
     for (i in firstColumnIndex:lastColumnIndex) {
-      # Data column name
-      y <- colnames(data)[i]
-      
       # Plot data
+      y <- colnames(data)[i]
       chromatogram <- ggplot2::ggplot(data = data, aes(x = .data[[x]], y = .data[[y]])) +
         ggplot2::geom_line(
           aes(
@@ -93,24 +91,19 @@ displayMultipleChromatogram <- function(data,
       # Display chromatogram regions
       if (!is.null(chromatogramRegion)) {
         label <- list(massCalibration = "Mass Calibration Region", analyte = "Analyte Region", wash = "Wash Region")
-        maxX <- max(data[[x]])
-        maxY <- max(data[[y]])
-
         for (i in names(label)) {
           chromatogram <- displayChromatogramRegion(
             plot = chromatogram,
-            maxX = maxX,
-            maxY = maxY,
+            maxX = max(data[[x]]),
+            maxY = max(data[[y]]),
             regionOfInterest = chromatogramRegion[[i]],
             label = label[[i]]
           )
         }
       }
       
-      # Append plot to plot list
-      plotList[[y]] <- chromatogram
-      
       # Display chromatogram
+      plotList[[y]] <- chromatogram
       if (length(plotList) %% nPlotData == 0 || i == lastColumnIndex) {
         # Arrange plots into grid
         plotGrid <- ggpubr::ggarrange(
@@ -128,7 +121,7 @@ displayMultipleChromatogram <- function(data,
         
         print(plotGrid)
         
-        # Reset
+        # Reset grid
         plotList <- list()
         isFirstPlot <- FALSE
       }
