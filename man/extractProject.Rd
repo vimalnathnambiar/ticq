@@ -7,10 +7,10 @@
 extractProject(input)
 }
 \arguments{
-\item{input}{ANPC sample file name or path: character}
+\item{input}{A character vector representing ANPC sample file names or paths.}
 }
 \value{
-Project name
+A character vector representing project names.
 }
 \description{
 Extract project name.

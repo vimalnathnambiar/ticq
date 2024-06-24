@@ -16,24 +16,22 @@ renderTICQ(
 )
 }
 \arguments{
-\item{inputPath}{A character string representing an existing directory or file path. Should not be NA or an empty character string.}
+\item{inputPath}{A character string representing an existing directory or file path.}
 
-\item{outputDirectoryPath}{A character string representing a directory path to store output files (HTML report and RDS formatted spectral data). (Default: "/home/vimalnathnambiar/git/github/vmalnathnambiar/ticq/output/").}
+\item{outputDirectoryPath}{A character string representing a directory path to store output files (HTML report and RDS formatted spectral data). (Default: "/home/vimalnathnambiar/git/github/vmalnathnambiar/ticq/output/")}
 
 \item{historicalDataPath}{A character string representing a RDS file containing historical spectral data associated to the current spectral data being assessed. (Default: \code{NULL}; Options: \code{"/path/to/local/file.rds"})}
 
 \item{targetFilePath}{A character string representing an existing TSV target file path. (Default: \code{NULL}; Options: \code{"https://published-to-web-URL&output=tsv"} or \code{"/path/to/local/file.tsv"})}
 
-\item{anpcMethodLibrary}{ANPC method library (Default: NULL, Options: "MS-AA-POS", "MS-HIL-POS", "MS-HIL-NEG", "MS-RP-POS" or "MS-RP-NEG"): NULL or character}
+\item{anpcMethodLibrary}{A character string representing an ANPC method library. (Default: \code{NULL}; Options: \code{"MS-AA-POS"}, \code{"MS-HIL-POS"}, \code{"MS-HIL-NEG"}, \code{"MS-RP-POS"}, or \code{"MS-RP-NEG"})}
 
-\item{chromatogramRegion}{A list containing the start and end time points of the different chromatogram regions of interest (Default: NULL, Options: ticq::configureChromatogramRegion()): NULL or list}
+\item{chromatogramRegion}{A list of lists representing the different chromatogram regions of interest and their respective start and end time points. (Default: \code{NULL}; Options: Use \code{ticq::configureChromatogramRegion()})}
 
-\item{roundDecimalPlace}{Number of decimal places for precision value rounding (Default: NULL): NULL or numeric}
-
-\item{metadataAnonymiser}{Toggle to anonymise metadata (Default: FALSE, Options: TRUE or FALSE): logical}
+\item{metadataAnonymiser}{A logical value representing the metadata anonymiser status to anonymising metadata acquired from sample data. (Default: \code{FALSE}; Options: \code{TRUE} or \code{FALSE})}
 }
 \value{
-Path to the rendered output file.
+A character string representing the rendered HTML output file path.
 }
 \description{
 Generate a HTML report of TICQ assessment performed on MS spectral data acquired from JSON files generated using \href{https://github.com/vmalnathnambiar/exfilms}{ExfilMS}.

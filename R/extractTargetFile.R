@@ -2,28 +2,27 @@
 #'
 #' Extract target m/z data using a TSV formatted target file (published to web URL or local file path) or an in-house method library used at the Australian National Phenome Centre (ANPC).
 #' 
-#' Target file specified should follow a pre-determined layout used by \href{https://github.com/vmalnathnambiar/exfilms/blob/main/docs/how-to-create-a-target-file.md}{ExfilMS}.
+#' 1. Target file specified should follow a pre-determined layout used by
+#' \href{https://github.com/vmalnathnambiar/exfilms/blob/main/docs/how-to-create-a-target-file.md}{ExfilMS}.
 #'
-#' If both target file path and ANPC method library is specified, the target file path will be used as the first point of extraction. If no data is found, ANPC method library is then used.
+#' 2. If both target file path and ANPC method library is specified, the target file path will be used as the first point of extraction.
+#' If no data is found, the ANPC method library specified is then used.
 #'
 #' @import httr
 #' @import readr
 #'
 #' @export
-#' @param targetFilePath Target file path (Default: NULL, Options: Published to web URL or local path of a TSV file): NULL or character
-#' @param anpcMethodLibrary ANPC method library (Default: NULL, Options: "MS-AA-POS", "MS-HIL-POS", "MS-HIL-NEG", "MS-RP-POS" or "MS-RP-NEG"): NULL or character
-#' @param roundDecimalPlace Number of decimal places for precision value rounding (Default: NULL): NULL or numeric
-#' @returns A data frame representing the target file
+#' @param targetFilePath A character string representing an existing TSV target file path. (Default: `NULL`; Options: `"https://published-to-web-URL&output=tsv"` or `"/path/to/local/file.tsv"`)
+#' @param anpcMethodLibrary A character string representing an ANPC method library. (Default: `NULL`; Options: `"MS-AA-POS"`, `"MS-HIL-POS"`, `"MS-HIL-NEG"`, `"MS-RP-POS"`, or `"MS-RP-NEG"`)
+#' @param roundDecimalPlace A numeric value representing the number of decimals places for precision value rounding. (Default: `NULL`)
+#' @returns A data frame representing the target file to be used for extracted ion (target m/z) assessment.
 #'
 #' @examples
-#' # Example 1: Specifying a target file with no rounding of decimal places for precision values
-#' targetFilePath <- "https://docs.google.com/spreadsheets/d/e/2PACX-1vSeo31hlruA3QuwoESz5IDJ9Nu6ndSAgLTRn3uc45rOPO4BlksfHzh9xtNB22Oes9JOxhEbI4NK-zxl/pub?gid=0&single=true&output=tsv"
-#' targetFile <- ticq::extractTargetFile(targetFilePath = targetFilePath, anpcMethodLibrary = NULL, roundDecimalPlace = NULL)
-#' print(targetFile)
+#' # Example 1: Specifying a target file
+#' extractTargetFile(targetFilePath = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSeo31hlruA3QuwoESz5IDJ9Nu6ndSAgLTRn3uc45rOPO4BlksfHzh9xtNB22Oes9JOxhEbI4NK-zxl/pub?gid=0&single=true&output=tsv")
 #'
-#' # Example 2: Specifying an ANPC method library with rounding of precision values up to 4 decimal places
-#' targetFile <- ticq::extractTargetFile(targetFilePath = NULL, anpcMethodLibrary = "MS-AA-POS", roundDecimalPlace = 4)
-#' print(targetFile)
+#' # Example 2: Specifying an ANPC method library
+#' extractTargetFile(anpcMethodLibrary = "MS-AA-POS")
 extractTargetFile <- function(targetFilePath = NULL, anpcMethodLibrary = NULL, roundDecimalPlace = NULL) {
   # ANPC method library and associated URL paths
   anpcMethodLibraryURL <- list(
@@ -35,24 +34,26 @@ extractTargetFile <- function(targetFilePath = NULL, anpcMethodLibrary = NULL, r
   )
   
   # Validate parameters
-  if (!is.null(targetFilePath) && validateCharacterString(parameterName = "targetFilePath", parameterValue = targetFilePath)) {
-    if (grepl("\\.tsv$", targetFilePath, ignore.case = TRUE) &&
-        validateDirectoryFileExist(parameterName = "targetFilePath", parameterValue = targetFilePath, pathType = "file")) {
-      isPathURL <- FALSE
+  if (!is.null(targetFilePath)) {
+    if (length(targetFilePath) != 1 || !is.character(targetFilePath) || is.na(targetFilePath) || targetFilePath == "") {
+      stop(paste0("Invalid 'targetFilePath': Must either be NULL or a non-NA, non-empty character string of length 1"))
+    }
+    
+    isPathURL <- if (grepl("\\.tsv$", targetFilePath, ignore.case = TRUE) && validateDirectoryFileExist(parameterName = "targetFilePath", parameterValue = targetFilePath, pathType = "file")) {
+      FALSE
     } else if (grepl("^(?:http|https)://[^ \"]+&output=tsv$", targetFilePath, ignore.case = TRUE)) {
-      isPathURL <- TRUE
+      TRUE
     } else {
-      stop("Invalid 'targetFilePath': No available TSV file found at the specified path.")
+      stop("Invalid 'targetFilePath': No available TSV file found at the specified path")
     }
   }
   
-  if (!is.null(anpcMethodLibrary) && validateCharacterString(parameterName = "anpcMethodLibrary", parameterValue = anpcMethodLibrary) &&
-      !anpcMethodLibrary %in% names(anpcMethodLibraryURL)) {
-    stop("Invalid 'anpcMethodLibrary': Must either be NULL, 'MS-AA-POS', 'MS-HIL-POS', 'MS-HIL-NEG', 'MS-RP-POS', or 'MS-RP-NEG'")
+  if (!is.null(anpcMethodLibrary) && (length(anpcMethodLibrary) != 1 || !is.character(anpcMethodLibrary) || !anpcMethodLibrary %in% names(anpcMethodLibraryURL))) {
+      stop("Invalid 'anpcMethodLibrary': Must either be NULL, 'MS-AA-POS', 'MS-HIL-POS', 'MS-HIL-NEG', 'MS-RP-POS', or 'MS-RP-NEG'")
   }
 
-  if (!is.null(roundDecimalPlace)) {
-    validateNumericValue(parameterName = "roundDecimalPlace", parameterValue = roundDecimalPlace)
+  if (!is.null(roundDecimalPlace) && (length(roundDecimalPlace) != 1 || !is.numeric(roundDecimalPlace))) {
+    stop(paste0("Invalid 'roundDecimalPlace': Must either be NULL or a numeric value of length 1"))
   }
   
   # Check availability of target file path and method library
@@ -78,10 +79,12 @@ extractTargetFile <- function(targetFilePath = NULL, anpcMethodLibrary = NULL, r
       } else {
         readr::read_tsv(targetFilePath, show_col_types = FALSE)
       }
-    }, warning = function(w) {
+    },
+    warning = function(w) {
       message(paste("Unable to extract target file:", w))
       NULL
-    }, error = function(e) {
+    },
+    error = function(e) {
       message(paste("Unable to extract target file:", e))
       NULL
     })
@@ -99,10 +102,12 @@ extractTargetFile <- function(targetFilePath = NULL, anpcMethodLibrary = NULL, r
         message(paste0("Unable to extract target file: Unsuccessful HTTP request (Status code: ", statusCode, ")"))
         NULL
       }
-    }, warning = function(w) {
+    },
+    warning = function(w) {
       message(paste("Unable to extract target file:", w))
       NULL
-    }, error = function(e) {
+    },
+    error = function(e) {
       message(paste("Unable to extract target file:", e))
       NULL
     })
@@ -113,11 +118,7 @@ extractTargetFile <- function(targetFilePath = NULL, anpcMethodLibrary = NULL, r
   # Validate target file
   pattern <- c("compoundName", "compoundType", "mzValue", "retentionTime", "msLevel", "internalStandard", "product")
   if (!is.null(targetFile) && !all(pattern %in% colnames(targetFile))) {
-    message(paste0(
-      "Unable to extract target file: Missing one or more data columns (",
-      paste(pattern[!pattern %in% colnames(targetFile)], collapse = ", "),
-      ")"
-    ))
+    message(paste0("Unable to extract target file: Missing one or more data column (", paste(pattern[!pattern %in% colnames(targetFile)], collapse = ", "), ")"))
     targetFile <- NULL
   }
   

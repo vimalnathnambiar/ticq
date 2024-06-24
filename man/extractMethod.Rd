@@ -7,10 +7,10 @@
 extractMethod(input)
 }
 \arguments{
-\item{input}{ANPC sample file name or path: character}
+\item{input}{A character vector representing ANPC sample file names or paths.}
 }
 \value{
-Method name
+A character vector representing method names.
 }
 \description{
 Extract method name.

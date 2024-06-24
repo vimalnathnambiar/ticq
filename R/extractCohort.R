@@ -6,10 +6,9 @@
 #'
 #' @import dplyr
 #'
-#' @param input ANPC sample file name or path: character
-#' @returns Cohort name
+#' @param input A character vector representing ANPC sample file names or paths.
+#' @returns A character vector representing cohort names.
 extractCohort <- function(input) {
-  # Cohort name patterns
   return(
     dplyr::case_when(
       grepl("System_Suitability|System|SS", input) ~ "System Suitability",

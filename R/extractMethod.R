@@ -6,10 +6,9 @@
 #'
 #' @import dplyr
 #'
-#' @param input ANPC sample file name or path: character
-#' @returns Method name
+#' @param input A character vector representing ANPC sample file names or paths.
+#' @returns A character vector representing method names.
 extractMethod <- function(input) {
-  # Method name patterns
   return(
     dplyr::case_when(
       grepl("MS-AA-POS|MS-AApos|MS-AA|MS_AA|AAA|AA", input) ~ "MS-AA-POS",

@@ -7,24 +7,20 @@
 #' - Wash region
 #'
 #' @export
-#' @param massCalStart Start of mass calibration cycle (Default: 0): numeric
-#' @param massCalEnd End of mass calibration cycle: numeric
-#' @param analyteStart Start of feature detection cycle (Default: End of mass calibration cycle): numeric
-#' @param analyteEnd End of feature detection cycle (Default: Start of wash cycle): numeric
-#' @param washStart Start of wash cycle: numeric
-#' @param washEnd End of wash cycle (Default: NULL): NULL or numeric
-#' @returns A list containing the start and end time points of the different chromatogram regions of interest
+#' @param massCalStart A numeric value that represents the starting time point of the mass calibration region. (Default: `0`)
+#' @param massCalEnd A numeric value that represents the end time point of the mass calibration region.
+#' @param analyteStart A numeric value that represents the starting time point of the analyte region. (Default: Value used for `massCalEnd`)
+#' @param analyteEnd A numeric value that represents the end time point of the analyte region. (Default: Value used for `washStart`)
+#' @param washStart A numeric value that represents the starting time point of the wash region.
+#' @param washEnd A numeric value that represents the end time point of the wash region. (Default: `NULL`)
+#' @returns A list of lists representing the different chromatogram regions of interest and their respective start and end time points.
 #'
 #' @examples
 #' # Example 1: Using default values for massCalibrationStart, analyteStart, analyteEnd and washEnd
-#' chromatogramRegion <- ticq::configureChromatogramRegion(massCalibrationEnd = 0.3, washStart = 5)
-#' print(chromatogramRegion)
+#' configureChromatogramRegion(massCalibrationEnd = 0.3, washStart = 5)
 #'
 #' # Example 2: Specifying values for analyteStart, analyteEnd and washEnd
-#' chromatogramRegion <- ticq::configureChromatogramRegion(massCalibrationStart = 0, massCalibrationEnd = 0.3,
-#'                                                         analyteStart = 2, analyteEnd = 4,
-#'                                                         washStart = 5, washEnd = 6)
-#' print(chromatogramRegion)
+#' configureChromatogramRegion(massCalibrationStart = 0, massCalibrationEnd = 0.3, analyteStart = 2, analyteEnd = 4, washStart = 5, washEnd = 6)
 configureChromatogramRegion <- function(massCalibrationStart = 0,
                                         massCalibrationEnd,
                                         analyteStart = massCalibrationEnd,
@@ -32,16 +28,13 @@ configureChromatogramRegion <- function(massCalibrationStart = 0,
                                         washStart,
                                         washEnd = NULL) {
   # Validate parameters
-  parameter <- list(massCalibrationStart = massCalibrationStart, massCalibrationEnd = massCalibrationEnd, analyteStart = analyteStart,
-                    analyteEnd = analyteEnd, washStart = washStart, washEnd = washEnd)
+  parameter <- list(massCalibrationStart = massCalibrationStart, massCalibrationEnd = massCalibrationEnd, analyteStart = analyteStart, analyteEnd = analyteEnd,
+                    washStart = washStart, washEnd = washEnd)
   for (i in names(parameter)) {
-    if ((i != "washEnd" && (length(parameter[[i]]) != 1 || !is.numeric(parameter[[i]]))) ||
-        (i == "washEnd" && (!is.null(parameter[[i]]) && (length(parameter[[i]]) != 1 || !is.numeric(parameter[[i]]))))) {
-      if (i != "washEnd") {
-        stop(paste0("Invalid '", i, "': Must be a numerical value of length 1"))
-      } else {
-        stop(paste0("Invalid '", i, "': Must be NULL or a numerical value of length 1"))
-      }
+    if (i == "washEnd" && !is.null(parameter[[i]]) && (length(parameter[[i]]) != 1 || !is.numeric(parameter[[i]]))) {
+      stop(paste0("Invalid '", i, "': Must either be NULL or a numeric value of length 1"))
+    } else if (i != "washEnd") {
+      validateNumericValue(parameterName = i, parameterValue = parameter[[i]])
     }
   }
   

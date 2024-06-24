@@ -1,20 +1,26 @@
 #' Extract Metadata
 #'
-#' Extract sample metadata including project name, cohort name, matrix type, sample type, acquisition method, instrument name, and plate number.
+#' Extract metadata from ANPC sample file names or paths including:
+#' - Project name
+#' - Cohort name
+#' - Matrix type
+#' - Sample type
+#' - Method name
+#' - Instrument name
+#' - Plate number
 #'
 #' Applicable only to data acquired at the Australian National Phenome Centre (ANPC).
 #'
 #' @export
-#' @param input ANPC sample file name or path: character
-#' @returns List containing the input associated metadata
+#' @param input A character vector representing ANPC sample file names or paths.
+#' @returns A list containing lists of character vectors representing different metadata.
 #'
 #' @examples
-#' metadata <- ticq::extractMetadata(input = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29.json")
-#' print(metadata)
+#' extractMetadata(input = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29.json")
 extractMetadata <- function(input) {
   # Validate parameters
   if (length(input) == 0  || !is.character(input)) {
-    stop("Invalid 'input': Must be a character string of length 1 or more")
+    stop("Invalid 'input': Must be a character vector with a minimum length of 1")
   }
   
   # Metadata

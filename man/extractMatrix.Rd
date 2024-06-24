@@ -7,10 +7,10 @@
 extractMatrix(input)
 }
 \arguments{
-\item{input}{ANPC sample file name or path: character}
+\item{input}{A character vector representing ANPC sample file names or paths.}
 }
 \value{
-Matrix type
+A character vector of matrix types.
 }
 \description{
 Extract matrix type.

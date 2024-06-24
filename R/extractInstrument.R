@@ -6,10 +6,9 @@
 #'
 #' @import dplyr
 #'
-#' @param input ANPC sample file name or path: character
-#' @returns Instrument name
+#' @param input A character vector representing ANPC sample file names or paths.
+#' @returns A character vector representing instrument names.
 extractInstrument <- function(input) {
-  # Instrument name patterns
   return(
     dplyr::case_when(
       grepl("PAI01|PAI-01", input) ~ "PAI01",

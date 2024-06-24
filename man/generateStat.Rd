@@ -7,10 +7,10 @@
 generateStat(data)
 }
 \arguments{
-\item{data}{A continuous data series of numerical values (Must have a minimum of 2 data points and should not contain any NA values): numeric}
+\item{data}{A numeric vector representing values to be used to generate statistical analysis.}
 }
 \value{
-A list of generated statistical information
+A list containing statistical information generated using the numeric vector provided.
 }
 \description{
 Generate statistical information of a dataset including:
@@ -34,6 +34,5 @@ Generate statistical information of a dataset including:
 }
 }
 \examples{
-stats <- ticq::generateStat(data = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
-print(stats)
+generateStat(data = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
 }

@@ -7,7 +7,7 @@
 loadPackage(packageName)
 }
 \arguments{
-\item{packageName}{A character vector representing the package names to be installed and loaded. Should not contain NA or empty character strings.}
+\item{packageName}{A character vector representing the package names to be installed and loaded.}
 }
 \value{
 A logical vector indicating whether each package specified was successfully loaded.
@@ -17,8 +17,8 @@ Identify, install, and load packages to use.
 }
 \examples{
 # Example 1: Loading a single package
-ticq::loadPackage(packageName = "DT")
+loadPackage(packageName = "DT")
 
 # Example 2: Loading multiple packages
-ticq::loadPackage(packageName = c("DT", "dplyr"))
+loadPackage(packageName = c("DT", "dplyr"))
 }

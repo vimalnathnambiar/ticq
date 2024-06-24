@@ -7,12 +7,12 @@
 extractSampleType(input, matrix = NA_character_)
 }
 \arguments{
-\item{input}{ANPC sample file name or path: character}
+\item{input}{A character vector representing ANPC sample file names or paths.}
 
-\item{matrix}{Associated matrix type (Default: NA_character_): NA_character_ or character}
+\item{matrix}{A character vector representing matrix types. (Default: \code{NA_character_})}
 }
 \value{
-Sample type
+A character vector representing sample types.
 }
 \description{
 Extract sample type.

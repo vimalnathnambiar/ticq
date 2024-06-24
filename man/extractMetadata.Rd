@@ -7,18 +7,26 @@
 extractMetadata(input)
 }
 \arguments{
-\item{input}{ANPC sample file name or path: character}
+\item{input}{A character vector representing ANPC sample file names or paths.}
 }
 \value{
-List containing the input associated metadata
+A list containing lists of character vectors representing different metadata.
 }
 \description{
-Extract sample metadata including project name, cohort name, matrix type, sample type, acquisition method, instrument name, and plate number.
+Extract metadata from ANPC sample file names or paths including:
+\itemize{
+\item Project name
+\item Cohort name
+\item Matrix type
+\item Sample type
+\item Method name
+\item Instrument name
+\item Plate number
+}
 }
 \details{
 Applicable only to data acquired at the Australian National Phenome Centre (ANPC).
 }
 \examples{
-metadata <- ticq::extractMetadata(input = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29.json")
-print(metadata)
+extractMetadata(input = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29.json")
 }

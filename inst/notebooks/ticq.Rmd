@@ -30,7 +30,7 @@ params:
 Parameters configured for TICQ assessment.
 ```{r, echo = FALSE, warning = FALSE, include = FALSE}
 # Load packages
-ticq::loadPackage(packageName = c("DT", "dplyr"))
+loadPackage(packageName = c("DT", "dplyr"))
 
 # Configuration parameters
 inputPath <- params$inputPath
@@ -46,9 +46,9 @@ metadataAnonymiser <- params$metadataAnonymiser
 ## Input
 ```{r, echo = FALSE, warning = FALSE}
 # Validate input path
-jsonFileCount <- length(ticq::retrieveFileList(inputPath = inputPath, fileExtension = "JSON"))
+jsonFileCount <- length(retrieveFileName(inputPath = inputPath, fileExtension = "JSON"))
 if (jsonFileCount == 0) {
-  stop("Invalid 'inputPath': No available JSON file(s) was found at the specified path.")
+  stop("Invalid 'inputPath': No available JSON file(s) was found at the specified path")
 } 
 
 # Update new sample status
@@ -74,8 +74,10 @@ print(paste("Output directory path:", outputDirectoryPath))
 ```{r, echo = FALSE, warning = FALSE}
 # Validate historical data path
 if (!is.null(historicalDataPath)) {
-  if (!checkFileExtension(parameterName = 'historicalDataPath', parameterValue = historicalDataPath, fileExtension = "RDS")) {
-    stop("Invalid 'historicalDataPath': No available RDS file found at the specified path.")
+  if (length(parameterValue) != 1 || !is.character(parameterValue) || is.na(parameterValue) || parameterValue == "") {
+    stop("Invalid 'historicalDataPath: Must either be NULL or a non-NA, non-empty character string of length 1")
+  } else if (!checkFileExtension(parameterName = 'historicalDataPath', parameterValue = historicalDataPath, fileExtension = "RDS")) {
+    stop("Invalid 'historicalDataPath': No available RDS file found at the specified path")
   }
 }
 
@@ -92,7 +94,7 @@ if (historicalDataStatus) {
 ## Target File
 ```{r, echo = FALSE, warning = FALSE}
 # Validate target file path and ANPC method library
-targetFile <- ticq::extractTargetFile(
+targetFile <- extractTargetFile(
   targetFilePath = targetFilePath,
   anpcMethodLibrary = anpcMethodLibrary,
   roundDecimalPlace = roundDecimalPlace
@@ -123,15 +125,15 @@ anpcChromatogramRegionData <- list(
 
 # Validate chromatogram region data
 if (!is.null(chromatogramRegion)) {
-  if (!validateChromatogramRegion(chromatogramRegion = chromatogramRegion)) {
-    message("Setting default value (NULL)")
+  if (!validateChromatogramRegion(parameterName = "chromatogramRegion", parameterValue = chromatogramRegion)) {
+    message("Setting default value")
     chromatogramRegion <- NULL
   }
 }
 
 if (is.null(chromatogramRegion) && !is.null(anpcMethodLibrary) && anpcMethodLibrary %in% names(anpcChromatogramRegionData)) {
   message(paste("Setting new region data (based on ANPC", anpcMethodLibrary, "method library)"))
-  chromatogramRegion <- ticq::configureChromatogramRegion(
+  chromatogramRegion <- configureChromatogramRegion(
     massCalibrationEnd = anpcChromatogramRegionData[[anpcMethodLibrary]]$massCalibrationEnd,
     washStart = anpcChromatogramRegionData[[anpcMethodLibrary]]$washStart
   )
@@ -155,7 +157,7 @@ Spectral data is extracted from ExfilMS generated JSON files located at input pa
 # Check new sample status
 if (newSampleStatus) {
   # Extract spectral data and sample metadata
-  result <- ticq::extractExfilMS(inputPath = inputPath)
+  result <- extractExfilMS(inputPath = inputPath)
   
   # Update new sample status
   newSampleStatus <- nrow(result$passedData) > 0
@@ -204,13 +206,11 @@ if (newSampleStatus) {
 
 ```{r, echo = FALSE, warning = FALSE, include = FALSE}
 # Validate metadata anonymiser
-if (length(metadataAnonymiser) != 1 || !is.logical(metadataAnonymiser) || is.na(metadataAnonymiser)) {
-  stop("Invalid 'metadataAnonymiser': Must be a logical value of length 1 (TRUE or FALSE)")
-}
+validateLogicalValue(parameterName = "metadataAnonymiser", parameterValue = metadataAnonymiser)
 
 # Check new sample status and anonymise metadata
 if (newSampleStatus && metadataAnonymiser) {
-  passedData <- ticq::anonymiseMetadata(
+  passedData <- anonymiseMetadata(
     data = passedData,
     sampleID = sampleID,
     project = project,
@@ -232,7 +232,7 @@ Extracted samples are checked for the presence of undefined sample type (based o
 # Check new sample status
 if (newSampleStatus) {
   # Check undefined sample types
-  result <- ticq::checkUndefinedSampleType(
+  result <- checkUndefinedSampleType(
     data = passedData,
     commonColumn = colnames(passedData)[which(colnames(passedData) == sampleID):which(colnames(passedData) == spectrumCount)],
     sampleType = sampleType,
@@ -283,7 +283,7 @@ if (newSampleStatus) {
   
   # Check spectrum count
   result <- if (length(unique(passedData[[sampleID]])) > 1) {
-    ticq::checkSpectrumCount(
+    checkSpectrumCount(
       data = passedData,
       commonColumn = colnames(passedData)[which(colnames(passedData) == sampleID):which(colnames(passedData) == spectrumCount)],
       sampleID = sampleID,
@@ -403,7 +403,7 @@ if (newSampleStatus && spectralDataStatus) {
     for (i in unique(sub("sLTR |LTR ", "", pattern))) {
       tmpPattern <- c(paste("sLTR", i), paste("LTR", i))
       if (any(tmpPattern %in% sampleTypeList)) {
-        ticq::displayChromatogram(
+        displayChromatogram(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% tmpPattern),
           x = x,
@@ -434,7 +434,7 @@ if (newSampleStatus && spectralDataStatus) {
   if (any(pattern %in% sampleTypeList)) {
     for (i in pattern) {
       if (i %in% sampleTypeList) {
-        ticq::displayChromatogram(
+        displayChromatogram(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
           x = x,
@@ -464,7 +464,7 @@ if (newSampleStatus && spectralDataStatus) {
   if (any(pattern %in% sampleTypeList)) {
     for (i in pattern) {
       if (i %in% sampleTypeList) {
-        ticq::displayChromatogram(
+        displayChromatogram(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
           x = x,
@@ -494,7 +494,7 @@ if (newSampleStatus && spectralDataStatus) {
   if (any(pattern %in% sampleTypeList)) {
     for (i in pattern) {
       if (i %in% sampleTypeList) {
-        ticq::displayChromatogram(
+        displayChromatogram(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
           x = x,
@@ -524,7 +524,7 @@ if (newSampleStatus && spectralDataStatus) {
   if (any(pattern %in% sampleTypeList)) {
     for (i in pattern) {
       if (i %in% sampleTypeList) {
-        ticq::displayChromatogram(
+        displayChromatogram(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
           x = x,
@@ -554,7 +554,7 @@ if (newSampleStatus && spectralDataStatus) {
   if (any(pattern %in% sampleTypeList)) {
     for (i in pattern) {
       if (i %in% sampleTypeList) {
-        ticq::displayChromatogram(
+        displayChromatogram(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
           x = x,
@@ -584,7 +584,7 @@ if (newSampleStatus && spectralDataStatus) {
   if (any(pattern %in% sampleTypeList)) {
     for (i in pattern) {
       if (i %in% sampleTypeList) {
-        ticq::displayChromatogram(
+        displayChromatogram(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
           x = x,
@@ -614,7 +614,7 @@ if (newSampleStatus && spectralDataStatus) {
   if (any(pattern %in% sampleTypeList)) {
     for (i in pattern) {
       if (i %in% sampleTypeList) {
-        ticq::displayChromatogram(
+        displayChromatogram(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
           x = x,
@@ -644,7 +644,7 @@ if (newSampleStatus && spectralDataStatus) {
   if (any(pattern %in% sampleTypeList)) {
     for (i in pattern) {
       if (i %in% sampleTypeList) {
-        ticq::displayChromatogram(
+        displayChromatogram(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
           x = x,
@@ -673,7 +673,7 @@ The chromatogram regions of interest (mass calibration, analyte, and wash region
 # Check new sample, spectral data and chromatogram region status
 if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   # Splice chromatogram regions
-  plotData <- ticq::spliceChromatogramRegion(
+  plotData <- spliceChromatogramRegion(
     data = plotData,
     commonColumn = colnames(plotData)[which(colnames(plotData) == sampleID):which(colnames(plotData) == spectrumCount)],
     spectrumCount = spectrumCount,
@@ -724,7 +724,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   # Display principal component analysis
   pattern <- c("sLTR Plasma", "LTR Plasma")
   if (any(pattern %in% sampleTypeList)) {
-    ticq::displayPCA(
+    displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       firstColumnIndex = firstColumnIndex,
@@ -751,7 +751,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   
   if (any(pattern %in% sampleTypeList)) {
     # Display principal component analysis
-    ticq::displayPCA(
+    displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       firstColumnIndex = firstColumnIndex,
@@ -778,7 +778,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   
   if (any(pattern %in% sampleTypeList)) {
     # Display principal component analysis
-    ticq::displayPCA(
+    displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       firstColumnIndex = firstColumnIndex,
@@ -806,7 +806,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   
   if (any(pattern %in% sampleTypeList)) {
     # Display principal component analysis
-    ticq::displayPCA(
+    displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       firstColumnIndex = firstColumnIndex,
@@ -833,7 +833,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   
   if (any(pattern %in% sampleTypeList)) {
     # Display principal component analysis
-    ticq::displayPCA(
+    displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       firstColumnIndex = firstColumnIndex,
@@ -860,7 +860,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   
   if (any(pattern %in% sampleTypeList)) {
     # Display principal component analysis
-    ticq::displayPCA(
+    displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       firstColumnIndex = firstColumnIndex,
@@ -888,7 +888,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   
   if (any(pattern %in% sampleTypeList)) {
     # Display principal component analysis
-    ticq::displayPCA(
+    displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       firstColumnIndex = firstColumnIndex,
@@ -915,7 +915,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   
   if (any(pattern %in% sampleTypeList)) {
     # Display principal component analysis
-    ticq::displayPCA(
+    displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       firstColumnIndex = firstColumnIndex,
@@ -942,7 +942,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   
   if (any(pattern %in% sampleTypeList)) {
     # Display principal component analysis
-    ticq::displayPCA(
+    displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       firstColumnIndex = firstColumnIndex,
@@ -970,7 +970,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   
   if (any(pattern %in% sampleTypeList)) {
     # Display principal component analysis
-    ticq::displayPCA(
+    displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       firstColumnIndex = firstColumnIndex,
@@ -997,7 +997,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   
   if (any(pattern %in% sampleTypeList)) {
     # Display principal component analysis
-    ticq::displayPCA(
+    displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       firstColumnIndex = firstColumnIndex,
@@ -1024,7 +1024,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   
   if (any(pattern %in% sampleTypeList)) {
     # Display principal component analysis
-    ticq::displayPCA(
+    displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       firstColumnIndex = firstColumnIndex,
@@ -1052,7 +1052,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   
   if (any(pattern %in% sampleTypeList)) {
     # Display principal component analysis
-    ticq::displayPCA(
+    displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       firstColumnIndex = firstColumnIndex,
@@ -1079,7 +1079,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   
   if (any(pattern %in% sampleTypeList)) {
     # Display principal component analysis
-    ticq::displayPCA(
+    displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       firstColumnIndex = firstColumnIndex,
@@ -1106,7 +1106,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   
   if (any(pattern %in% sampleTypeList)) {
     # Display principal component analysis
-    ticq::displayPCA(
+    displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       firstColumnIndex = firstColumnIndex,
@@ -1133,7 +1133,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   
   if (any(pattern %in% sampleTypeList)) {
     # Display principal component analysis
-    ticq::displayPCA(
+    displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       firstColumnIndex = firstColumnIndex,
@@ -1161,7 +1161,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   
   if (any(pattern %in% sampleTypeList)) {
     # Display principal component analysis
-    ticq::displayPCA(
+    displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       firstColumnIndex = firstColumnIndex,
@@ -1188,7 +1188,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   
   if (any(pattern %in% sampleTypeList)) {
     # Display principal component analysis
-    ticq::displayPCA(
+    displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       firstColumnIndex = firstColumnIndex,
@@ -1215,7 +1215,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   
   if (any(pattern %in% sampleTypeList)) {
     # Display principal component analysis
-    ticq::displayPCA(
+    displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       firstColumnIndex = firstColumnIndex,
@@ -1242,7 +1242,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   
   if (any(pattern %in% sampleTypeList)) {
     # Display principal component analysis
-    ticq::displayPCA(
+    displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       firstColumnIndex = firstColumnIndex,
@@ -1269,7 +1269,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   
   if (any(pattern %in% sampleTypeList)) {
     # Display principal component analysis
-    ticq::displayPCA(
+    displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       firstColumnIndex = firstColumnIndex,
@@ -1296,7 +1296,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   
   if (any(pattern %in% sampleTypeList)) {
     # Display principal component analysis
-    ticq::displayPCA(
+    displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       firstColumnIndex = firstColumnIndex,
@@ -1323,7 +1323,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   
   if (any(pattern %in% sampleTypeList)) {
     # Display principal component analysis
-    ticq::displayPCA(
+    displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       firstColumnIndex = firstColumnIndex,
@@ -1350,7 +1350,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   
   if (any(pattern %in% sampleTypeList)) {
     # Display principal component analysis
-    ticq::displayPCA(
+    displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       firstColumnIndex = firstColumnIndex,
@@ -1378,7 +1378,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   
   if (any(pattern %in% sampleTypeList)) {
     # Display principal component analysis
-    ticq::displayPCA(
+    displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       firstColumnIndex = firstColumnIndex,
@@ -1405,7 +1405,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   
   if (any(pattern %in% sampleTypeList)) {
     # Display principal component analysis
-    ticq::displayPCA(
+    displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       firstColumnIndex = firstColumnIndex,
@@ -1436,7 +1436,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
     tmpPattern <- c("sLTR Plasma", "LTR Plasma")
     
     # Display principal component analysis
-    ticq::displayPCA(
+    displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, pattern)),
       firstColumnIndex = firstColumnIndex,
@@ -1469,7 +1469,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
     tmpPattern <- c("sLTR Serum", "LTR Serum")
     
     # Display principal component analysis
-    ticq::displayPCA(
+    displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, pattern)),
       firstColumnIndex = firstColumnIndex,
@@ -1502,7 +1502,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
     tmpPattern <- c("sLTR Urine", "LTR Urine")
     
     # Display principal component analysis
-    ticq::displayPCA(
+    displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, pattern)),
       firstColumnIndex = firstColumnIndex,
@@ -1536,7 +1536,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
     tmpPattern <- c("dLTR Plasma")
     
     # Display principal component analysis
-    ticq::displayPCA(
+    displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, pattern)),
       firstColumnIndex = firstColumnIndex,
@@ -1569,7 +1569,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
     tmpPattern <- c("dLTR Serum")
     
     # Display principal component analysis
-    ticq::displayPCA(
+    displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, pattern)),
       firstColumnIndex = firstColumnIndex,
@@ -1602,7 +1602,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
     tmpPattern <- c("dLTR Urine")
     
     # Display principal component analysis
-    ticq::displayPCA(
+    displayPCA(
       data = plotData %>%
         dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, pattern)),
       firstColumnIndex = firstColumnIndex,
@@ -1665,7 +1665,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
       tmpPattern <- c(paste("sLTR", i), paste("LTR", i))
       if (any(tmpPattern %in% sampleTypeList)) {
         # Perform time series analysis
-        analysisResult_TS <- ticq::displayTimeSeries(
+        analysisResult_TS <- displayTimeSeries(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% tmpPattern),
           x = x,
@@ -1706,7 +1706,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
       # Check pattern
       if (i %in% sampleTypeList) {
         # Perform time series analysis
-        analysisResult_TS <- ticq::displayTimeSeries(
+        analysisResult_TS <- displayTimeSeries(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
           x = x,
@@ -1744,7 +1744,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
       # Check pattern
       if (i %in% sampleTypeList) {
         # Perform time series analysis
-        analysisResult_TS <- ticq::displayTimeSeries(
+        analysisResult_TS <- displayTimeSeries(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
           x = x,
@@ -1782,7 +1782,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
       # Check pattern
       if (i %in% sampleTypeList) {
         # Perform time series analysis
-        analysisResult_TS <- ticq::displayTimeSeries(
+        analysisResult_TS <- displayTimeSeries(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
           x = x,
@@ -1820,7 +1820,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
       # Check pattern
       if (i %in% sampleTypeList) {
         # Perform time series analysis
-        analysisResult_TS <- ticq::displayTimeSeries(
+        analysisResult_TS <- displayTimeSeries(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
           x = x,
@@ -1858,7 +1858,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
       # Check pattern
       if (i %in% sampleTypeList) {
         # Perform time series analysis
-        analysisResult_TS <- ticq::displayTimeSeries(
+        analysisResult_TS <- displayTimeSeries(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
           x = x,
@@ -1896,7 +1896,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
       # Check pattern
       if (i %in% sampleTypeList) {
         # Perform time series analysis
-        analysisResult_TS <- ticq::displayTimeSeries(
+        analysisResult_TS <- displayTimeSeries(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
           x = x,
@@ -1938,7 +1938,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
         tmpPattern <- c(paste("sLTR", tmpPattern), paste("LTR", tmpPattern))
                 
         # Perform time series analysis
-        analysisResult_TS <- ticq::displayTimeSeries(
+        analysisResult_TS <- displayTimeSeries(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, i)),
           x = x,
@@ -1986,7 +1986,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
         tmpPattern <- c(paste("dLTR", tmpPattern))
                 
         # Perform time series analysis
-        analysisResult_TS <- ticq::displayTimeSeries(
+        analysisResult_TS <- displayTimeSeries(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, i)),
           x = x,
@@ -2068,7 +2068,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
       tmpPattern <- c(paste("sLTR", i), paste("LTR", i))
       if (any(tmpPattern %in% sampleTypeList)) {
         # Perform violin plot analysis
-        analysisResult_VP_massCalibrationRegion <- ticq::displayViolinBox(
+        analysisResult_VP_massCalibrationRegion <- displayViolinBox(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% tmpPattern),
           x = x,
@@ -2109,7 +2109,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
       # Check pattern
       if (i %in% sampleTypeList) {
         # Perform violin plot analysis
-        analysisResult_VP_massCalibrationRegion <- ticq::displayViolinBox(
+        analysisResult_VP_massCalibrationRegion <- displayViolinBox(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
           x = x,
@@ -2147,7 +2147,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
       # Check pattern
       if (i %in% sampleTypeList) {
         # Perform violin plot analysis
-        analysisResult_VP_massCalibrationRegion <- ticq::displayViolinBox(
+        analysisResult_VP_massCalibrationRegion <- displayViolinBox(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
           x = x,
@@ -2185,7 +2185,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
       # Check pattern
       if (i %in% sampleTypeList) {
         # Perform violin plot analysis
-        analysisResult_VP_massCalibrationRegion <- ticq::displayViolinBox(
+        analysisResult_VP_massCalibrationRegion <- displayViolinBox(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
           x = x,
@@ -2223,7 +2223,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
       # Check pattern
       if (i %in% sampleTypeList) {
         # Perform violin plot analysis
-        analysisResult_VP_massCalibrationRegion <- ticq::displayViolinBox(
+        analysisResult_VP_massCalibrationRegion <- displayViolinBox(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
           x = x,
@@ -2261,7 +2261,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
       # Check pattern
       if (i %in% sampleTypeList) {
         # Perform violin plot analysis
-        analysisResult_VP_massCalibrationRegion <- ticq::displayViolinBox(
+        analysisResult_VP_massCalibrationRegion <- displayViolinBox(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
           x = x,
@@ -2299,7 +2299,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
       # Check pattern
       if (i %in% sampleTypeList) {
         # Perform violin plot analysis
-        analysisResult_VP_massCalibrationRegion <- ticq::displayViolinBox(
+        analysisResult_VP_massCalibrationRegion <- displayViolinBox(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
           x = x,
@@ -2341,7 +2341,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
         tmpPattern <- c(paste("sLTR", tmpPattern), paste("LTR", tmpPattern))
         
         # Perform violin plot analysis
-        analysisResult_VP_massCalibrationRegion <- ticq::displayViolinBox(
+        analysisResult_VP_massCalibrationRegion <- displayViolinBox(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, i)),
           x = x,
@@ -2389,7 +2389,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
         tmpPattern <- c(paste("dLTR", tmpPattern))
         
         # Perform violin plot analysis
-        analysisResult_VP_massCalibrationRegion <- ticq::displayViolinBox(
+        analysisResult_VP_massCalibrationRegion <- displayViolinBox(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, i)),
           x = x,
@@ -2448,7 +2448,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
       tmpPattern <- c(paste("sLTR", i), paste("LTR", i))
       if (any(tmpPattern %in% sampleTypeList)) {
         # Perform violin plot analysis
-        analysisResult_VP_analyteRegion <- ticq::displayViolinBox(
+        analysisResult_VP_analyteRegion <- displayViolinBox(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% tmpPattern),
           x = x,
@@ -2489,7 +2489,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
       # Check pattern
       if (i %in% sampleTypeList) {
         # Perform violin plot analysis
-        analysisResult_VP_analyteRegion <- ticq::displayViolinBox(
+        analysisResult_VP_analyteRegion <- displayViolinBox(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
           x = x,
@@ -2527,7 +2527,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
       # Check pattern
       if (i %in% sampleTypeList) {
         # Perform violin plot analysis
-        analysisResult_VP_analyteRegion <- ticq::displayViolinBox(
+        analysisResult_VP_analyteRegion <- displayViolinBox(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
           x = x,
@@ -2565,7 +2565,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
       # Check pattern
       if (i %in% sampleTypeList) {
         # Perform violin plot analysis
-        analysisResult_VP_analyteRegion <- ticq::displayViolinBox(
+        analysisResult_VP_analyteRegion <- displayViolinBox(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
           x = x,
@@ -2603,7 +2603,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
       # Check pattern
       if (i %in% sampleTypeList) {
         # Perform violin plot analysis
-        analysisResult_VP_analyteRegion <- ticq::displayViolinBox(
+        analysisResult_VP_analyteRegion <- displayViolinBox(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
           x = x,
@@ -2641,7 +2641,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
       # Check pattern
       if (i %in% sampleTypeList) {
         # Perform violin plot analysis
-        analysisResult_VP_analyteRegion <- ticq::displayViolinBox(
+        analysisResult_VP_analyteRegion <- displayViolinBox(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
           x = x,
@@ -2679,7 +2679,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
       # Check pattern
       if (i %in% sampleTypeList) {
         # Perform violin plot analysis
-        analysisResult_VP_analyteRegion <- ticq::displayViolinBox(
+        analysisResult_VP_analyteRegion <- displayViolinBox(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
           x = x,
@@ -2721,7 +2721,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
         tmpPattern <- c(paste("sLTR", tmpPattern), paste("LTR", tmpPattern))
         
         # Perform violin plot analysis
-        analysisResult_VP_analyteRegion <- ticq::displayViolinBox(
+        analysisResult_VP_analyteRegion <- displayViolinBox(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, i)),
           x = x,
@@ -2769,7 +2769,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
         tmpPattern <- c(paste("dLTR", tmpPattern))
         
         # Perform violin plot analysis
-        analysisResult_VP_analyteRegion <- ticq::displayViolinBox(
+        analysisResult_VP_analyteRegion <- displayViolinBox(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, i)),
           x = x,
@@ -3022,7 +3022,7 @@ if (newSampleStatus && spectralDataStatus) {
       tmpPattern <- c(paste("sLTR", i), paste("LTR", i))
       if (any(tmpPattern %in% sampleTypeList)) {
         # Display base peak chromatogram
-        ticq::displayChromatogram(
+        displayChromatogram(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% tmpPattern),
           x = x,
@@ -3059,7 +3059,7 @@ if (newSampleStatus && spectralDataStatus) {
       # Check pattern
       if (i %in% sampleTypeList) {
         # Display base peak chromatogram
-        ticq::displayChromatogram(
+        displayChromatogram(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
           x = x,
@@ -3093,7 +3093,7 @@ if (newSampleStatus && spectralDataStatus) {
       # Check pattern
       if (i %in% sampleTypeList) {
         # Display base peak chromatogram
-        ticq::displayChromatogram(
+        displayChromatogram(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
           x = x,
@@ -3127,7 +3127,7 @@ if (newSampleStatus && spectralDataStatus) {
       # Check pattern
       if (i %in% sampleTypeList) {
         # Display base peak chromatogram
-        ticq::displayChromatogram(
+        displayChromatogram(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
           x = x,
@@ -3161,7 +3161,7 @@ if (newSampleStatus && spectralDataStatus) {
       # Check pattern
       if (i %in% sampleTypeList) {
         # Display base peak chromatogram
-        ticq::displayChromatogram(
+        displayChromatogram(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
           x = x,
@@ -3195,7 +3195,7 @@ if (newSampleStatus && spectralDataStatus) {
       # Check pattern
       if (i %in% sampleTypeList) {
         # Display base peak chromatogram
-        ticq::displayChromatogram(
+        displayChromatogram(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
           x = x,
@@ -3229,7 +3229,7 @@ if (newSampleStatus && spectralDataStatus) {
       # Check pattern
       if (i %in% sampleTypeList) {
         # Display base peak chromatogram
-        ticq::displayChromatogram(
+        displayChromatogram(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
           x = x,
@@ -3263,7 +3263,7 @@ if (newSampleStatus && spectralDataStatus) {
       # Check pattern
       if (i %in% sampleTypeList) {
         # Display base peak chromatogram
-        ticq::displayChromatogram(
+        displayChromatogram(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
           x = x,
@@ -3297,7 +3297,7 @@ if (newSampleStatus && spectralDataStatus) {
       # Check pattern
       if (i %in% sampleTypeList) {
         # Display base peak chromatogram
-        ticq::displayChromatogram(
+        displayChromatogram(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
           x = x,
@@ -3402,7 +3402,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     colourLabel <- if (length(unique(plotData[[projectCohort]])) > 1) "Project" else "Plate"
     
     # Extract extracted ion current (EIC)
-    plotData <- ticq::extractEIC(data = plotData, intensityArray = intensityArray, targetMZ = as.character(sort(unique(targetFile$mzValue))))
+    plotData <- extractEIC(data = plotData, intensityArray = intensityArray, targetMZ = as.character(sort(unique(targetFile$mzValue))))
   }
 }
 ```
@@ -3419,7 +3419,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   targetMzStatus <- length(targetMZ) > 0
   if (targetMzStatus) {
     # Extracted ions
-    plotData_filtered <- ticq::filterChromatogramRegion(
+    plotData_filtered <- filterChromatogramRegion(
       data = plotData %>%
         dplyr::select(all_of(commonColumn), retentionTime, all_of(targetMZ)),
       regionOfInterest = chromatogramRegion$massCalibration,
@@ -3449,7 +3449,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -3479,7 +3479,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -3509,7 +3509,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -3540,7 +3540,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -3570,7 +3570,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -3600,7 +3600,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -3631,7 +3631,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -3661,7 +3661,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -3691,7 +3691,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -3722,7 +3722,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -3752,7 +3752,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -3782,7 +3782,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -3813,7 +3813,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -3843,7 +3843,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -3873,7 +3873,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -3903,7 +3903,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -3934,7 +3934,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -3964,7 +3964,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -3994,7 +3994,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -4024,7 +4024,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -4054,7 +4054,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -4084,7 +4084,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -4114,7 +4114,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -4144,7 +4144,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -4175,7 +4175,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -4205,7 +4205,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -4236,7 +4236,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -4266,7 +4266,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -4296,7 +4296,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -4327,7 +4327,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -4357,7 +4357,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -4387,7 +4387,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -4424,7 +4424,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   targetMzStatus <- length(targetMZ) > 0
   if (targetMzStatus) {
     # Extracted ions
-    plotData_filtered <- ticq::filterChromatogramRegion(
+    plotData_filtered <- filterChromatogramRegion(
       data = plotData %>%
         dplyr::select(all_of(commonColumn), retentionTime, all_of(targetMZ)),
       regionOfInterest = chromatogramRegion$analyte,
@@ -4454,7 +4454,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -4484,7 +4484,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -4514,7 +4514,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -4545,7 +4545,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -4575,7 +4575,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -4605,7 +4605,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -4636,7 +4636,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -4666,7 +4666,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -4696,7 +4696,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -4727,7 +4727,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -4757,7 +4757,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -4787,7 +4787,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -4818,7 +4818,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -4848,7 +4848,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -4878,7 +4878,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -4908,7 +4908,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -4939,7 +4939,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -4969,7 +4969,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -4999,7 +4999,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -5029,7 +5029,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -5059,7 +5059,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -5089,7 +5089,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -5119,7 +5119,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -5149,7 +5149,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -5180,7 +5180,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -5210,7 +5210,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -5241,7 +5241,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -5271,7 +5271,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -5301,7 +5301,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -5332,7 +5332,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -5362,7 +5362,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -5392,7 +5392,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -5429,7 +5429,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   targetMzStatus <- length(targetMZ) > 0
   if (targetMzStatus) {
     # Extracted ions
-    plotData_filtered <- ticq::filterChromatogramRegion(
+    plotData_filtered <- filterChromatogramRegion(
       data = plotData %>%
         dplyr::select(all_of(commonColumn), retentionTime, all_of(targetMZ)),
       regionOfInterest = chromatogramRegion$analyte,
@@ -5459,7 +5459,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -5489,7 +5489,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -5519,7 +5519,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -5550,7 +5550,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -5580,7 +5580,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -5610,7 +5610,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -5641,7 +5641,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -5671,7 +5671,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -5701,7 +5701,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -5732,7 +5732,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -5762,7 +5762,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -5792,7 +5792,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -5823,7 +5823,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -5853,7 +5853,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -5883,7 +5883,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -5913,7 +5913,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -5944,7 +5944,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -5974,7 +5974,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -6004,7 +6004,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -6034,7 +6034,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -6064,7 +6064,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -6094,7 +6094,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -6124,7 +6124,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -6154,7 +6154,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -6185,7 +6185,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -6215,7 +6215,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -6246,7 +6246,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -6276,7 +6276,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -6306,7 +6306,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -6337,7 +6337,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -6367,7 +6367,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -6397,7 +6397,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -6462,7 +6462,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     colourLabel <- if (length(unique(plotData[[projectCohort]])) > 1) "Project" else "Plate"
     
     # Extract extracted ion current (EIC)
-    plotData <- ticq::extractEIC(data = plotData, intensityArray = intensityArray, targetMZ = as.character(sort(unique(targetFile$mzValue))))
+    plotData <- extractEIC(data = plotData, intensityArray = intensityArray, targetMZ = as.character(sort(unique(targetFile$mzValue))))
   }
 }
 ```
@@ -6479,7 +6479,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   targetMzStatus <- length(targetMZ) > 0
   if (targetMzStatus) {
     # Extracted ions
-    plotData_filtered <- ticq::filterChromatogramRegion(
+    plotData_filtered <- filterChromatogramRegion(
       data = plotData %>%
         dplyr::select(all_of(commonColumn), retentionTime, all_of(targetMZ)),
       regionOfInterest = chromatogramRegion$analyte,
@@ -6509,7 +6509,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -6539,7 +6539,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -6569,7 +6569,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -6600,7 +6600,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -6630,7 +6630,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -6660,7 +6660,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -6691,7 +6691,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -6721,7 +6721,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -6751,7 +6751,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -6782,7 +6782,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -6812,7 +6812,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -6842,7 +6842,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -6873,7 +6873,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -6903,7 +6903,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -6933,7 +6933,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -6963,7 +6963,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -6994,7 +6994,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -7024,7 +7024,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -7054,7 +7054,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -7084,7 +7084,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -7114,7 +7114,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -7144,7 +7144,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -7174,7 +7174,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -7204,7 +7204,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -7235,7 +7235,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -7265,7 +7265,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -7296,7 +7296,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -7326,7 +7326,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -7356,7 +7356,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -7387,7 +7387,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -7417,7 +7417,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -7447,7 +7447,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Display extracted ion chromatogram
-    ticq::displayMultipleChromatogram(
+    displayMultipleChromatogram(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       x = x,
@@ -7552,7 +7552,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     colourLabel <- if (length(unique(plotData[[projectCohort]])) > 1) "Project" else "Plate"
     
     # Extract extracted ion current (EIC)
-    plotData <- ticq::extractEIC(data = plotData, intensityArray = intensityArray, targetMZ = as.character(sort(unique(targetFile$mzValue))))
+    plotData <- extractEIC(data = plotData, intensityArray = intensityArray, targetMZ = as.character(sort(unique(targetFile$mzValue))))
   }
 }
 ```
@@ -7569,13 +7569,13 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   targetMzStatus <- length(targetMZ) > 0
   if (targetMzStatus) {
     # Summed extracted ion current
-    plotData_filtered <- ticq::filterChromatogramRegion(
+    plotData_filtered <- filterChromatogramRegion(
       data = plotData %>%
         dplyr::select(all_of(commonColumn), retentionTime, all_of(targetMZ)),
       regionOfInterest = chromatogramRegion$massCalibration,
       retentionTime = retentionTime
     ) %>%
-      ticq::sumEIC(
+      sumEIC(
         data = .,
         commonColumn = commonColumn,
         spectrumCount = spectrumCount,
@@ -7608,7 +7608,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_massCalibrationReference <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_massCalibrationReference <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -7644,7 +7644,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_massCalibrationReference <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_massCalibrationReference <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -7680,7 +7680,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_massCalibrationReference <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_massCalibrationReference <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -7717,7 +7717,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_massCalibrationReference <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_massCalibrationReference <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -7753,7 +7753,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_massCalibrationReference <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_massCalibrationReference <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -7789,7 +7789,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_massCalibrationReference <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_massCalibrationReference <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -7826,7 +7826,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_massCalibrationReference <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_massCalibrationReference <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -7862,7 +7862,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_massCalibrationReference <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_massCalibrationReference <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -7898,7 +7898,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_massCalibrationReference <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_massCalibrationReference <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -7935,7 +7935,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_massCalibrationReference <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_massCalibrationReference <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -7971,7 +7971,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_massCalibrationReference <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_massCalibrationReference <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -8007,7 +8007,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_massCalibrationReference <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_massCalibrationReference <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -8044,7 +8044,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_massCalibrationReference <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_massCalibrationReference <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -8080,7 +8080,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_massCalibrationReference <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_massCalibrationReference <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -8116,7 +8116,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_massCalibrationReference <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_massCalibrationReference <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -8152,7 +8152,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_massCalibrationReference <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_massCalibrationReference <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -8189,7 +8189,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_massCalibrationReference <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_massCalibrationReference <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -8225,7 +8225,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_massCalibrationReference <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_massCalibrationReference <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -8261,7 +8261,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_massCalibrationReference <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_massCalibrationReference <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -8297,7 +8297,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_massCalibrationReference <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_massCalibrationReference <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -8333,7 +8333,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_massCalibrationReference <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_massCalibrationReference <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -8369,7 +8369,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_massCalibrationReference <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_massCalibrationReference <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -8405,7 +8405,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_massCalibrationReference <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_massCalibrationReference <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -8441,7 +8441,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_massCalibrationReference <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_massCalibrationReference <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -8478,7 +8478,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_massCalibrationReference <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_massCalibrationReference <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -8514,7 +8514,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_massCalibrationReference <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_massCalibrationReference <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -8554,7 +8554,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     tmpPattern <- c("sLTR Plasma", "LTR Plasma")
     
     # Perform time series analysis
-    analysisResult_TS_massCalibrationReference <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_massCalibrationReference <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, pattern)),
       commonColumn = commonColumn,
@@ -8599,7 +8599,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     tmpPattern <- c("sLTR Serum", "LTR Serum")
     
     # Perform time series analysis
-    analysisResult_TS_massCalibrationReference <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_massCalibrationReference <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, pattern)),
       commonColumn = commonColumn,
@@ -8644,7 +8644,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     tmpPattern <- c("sLTR Urine", "LTR Urine")
     
     # Perform time series analysis
-    analysisResult_TS_massCalibrationReference <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_massCalibrationReference <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, pattern)),
       commonColumn = commonColumn,
@@ -8690,7 +8690,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     tmpPattern <- c("dLTR Plasma")
     
     # Perform time series analysis
-    analysisResult_TS_massCalibrationReference <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_massCalibrationReference <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, pattern)),
       commonColumn = commonColumn,
@@ -8735,7 +8735,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     tmpPattern <- c("dLTR Serum")
     
     # Perform time series analysis
-    analysisResult_TS_massCalibrationReference <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_massCalibrationReference <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, pattern)),
       commonColumn = commonColumn,
@@ -8780,7 +8780,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     tmpPattern <- c("dLTR Urine")
     
     # Perform time series analysis
-    analysisResult_TS_massCalibrationReference <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_massCalibrationReference <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, pattern)),
       commonColumn = commonColumn,
@@ -8829,13 +8829,13 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   targetMzStatus <- length(targetMZ) > 0
   if (targetMzStatus) {
     # Summed extracted ion current
-    plotData_filtered <- ticq::filterChromatogramRegion(
+    plotData_filtered <- filterChromatogramRegion(
       data = plotData %>%
         dplyr::select(all_of(commonColumn), retentionTime, all_of(targetMZ)),
       regionOfInterest = chromatogramRegion$analyte,
       retentionTime = retentionTime
     ) %>%
-      ticq::sumEIC(
+      sumEIC(
         data = .,
         commonColumn = commonColumn,
         spectrumCount = spectrumCount,
@@ -8868,7 +8868,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_internalStandard <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_internalStandard <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -8904,7 +8904,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_internalStandard <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_internalStandard <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -8940,7 +8940,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_internalStandard <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_internalStandard <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -8977,7 +8977,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_internalStandard <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_internalStandard <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -9013,7 +9013,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_internalStandard <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_internalStandard <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -9049,7 +9049,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_internalStandard <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_internalStandard <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -9086,7 +9086,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_internalStandard <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_internalStandard <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -9122,7 +9122,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_internalStandard <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_internalStandard <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -9158,7 +9158,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_internalStandard <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_internalStandard <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -9195,7 +9195,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_internalStandard <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_internalStandard <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -9231,7 +9231,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_internalStandard <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_internalStandard <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -9267,7 +9267,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_internalStandard <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_internalStandard <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -9304,7 +9304,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_internalStandard <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_internalStandard <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -9340,7 +9340,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_internalStandard <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_internalStandard <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -9376,7 +9376,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_internalStandard <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_internalStandard <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -9412,7 +9412,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_internalStandard <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_internalStandard <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -9449,7 +9449,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_internalStandard <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_internalStandard <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -9485,7 +9485,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_internalStandard <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_internalStandard <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -9521,7 +9521,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_internalStandard <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_internalStandard <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -9557,7 +9557,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_internalStandard <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_internalStandard <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -9593,7 +9593,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_internalStandard <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_internalStandard <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -9629,7 +9629,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_internalStandard <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_internalStandard <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -9665,7 +9665,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_internalStandard <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_internalStandard <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -9701,7 +9701,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_internalStandard <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_internalStandard <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -9738,7 +9738,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_internalStandard <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_internalStandard <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -9774,7 +9774,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_internalStandard <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_internalStandard <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -9814,7 +9814,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     tmpPattern <- c("sLTR Plasma", "LTR Plasma")
     
     # Perform time series analysis
-    analysisResult_TS_internalStandard <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_internalStandard <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, pattern)),
       commonColumn = commonColumn,
@@ -9859,7 +9859,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     tmpPattern <- c("sLTR Serum", "LTR Serum")
     
     # Perform time series analysis
-    analysisResult_TS_internalStandard <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_internalStandard <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, pattern)),
       commonColumn = commonColumn,
@@ -9904,7 +9904,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     tmpPattern <- c("sLTR Urine", "LTR Urine")
     
     # Perform time series analysis
-    analysisResult_TS_internalStandard <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_internalStandard <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, pattern)),
       commonColumn = commonColumn,
@@ -9950,7 +9950,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     tmpPattern <- c("dLTR Plasma")
     
     # Perform time series analysis
-    analysisResult_TS_internalStandard <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_internalStandard <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, pattern)),
       commonColumn = commonColumn,
@@ -9995,7 +9995,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     tmpPattern <- c("dLTR Serum")
     
     # Perform time series analysis
-    analysisResult_TS_internalStandard <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_internalStandard <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, pattern)),
       commonColumn = commonColumn,
@@ -10040,7 +10040,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     tmpPattern <- c("dLTR Urine")
     
     # Perform time series analysis
-    analysisResult_TS_internalStandard <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_internalStandard <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, pattern)),
       commonColumn = commonColumn,
@@ -10089,13 +10089,13 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   targetMzStatus <- length(targetMZ) > 0
   if (targetMzStatus) {
     # Summed extracted ion current
-    plotData_filtered <- ticq::filterChromatogramRegion(
+    plotData_filtered <- filterChromatogramRegion(
       data = plotData %>%
         dplyr::select(all_of(commonColumn), retentionTime, all_of(targetMZ)),
       regionOfInterest = chromatogramRegion$analyte,
       retentionTime = retentionTime
     ) %>%
-      ticq::sumEIC(
+      sumEIC(
         data = .,
         commonColumn = commonColumn,
         spectrumCount = spectrumCount,
@@ -10128,7 +10128,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_endogenousAnalyte <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_endogenousAnalyte <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -10164,7 +10164,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_endogenousAnalyte <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_endogenousAnalyte <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -10200,7 +10200,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_endogenousAnalyte <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_endogenousAnalyte <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -10237,7 +10237,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_endogenousAnalyte <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_endogenousAnalyte <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -10273,7 +10273,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_endogenousAnalyte <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_endogenousAnalyte <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -10309,7 +10309,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_endogenousAnalyte <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_endogenousAnalyte <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -10346,7 +10346,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_endogenousAnalyte <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_endogenousAnalyte <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -10382,7 +10382,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_endogenousAnalyte <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_endogenousAnalyte <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -10418,7 +10418,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_endogenousAnalyte <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_endogenousAnalyte <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -10455,7 +10455,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_endogenousAnalyte <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_endogenousAnalyte <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -10491,7 +10491,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_endogenousAnalyte <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_endogenousAnalyte <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -10527,7 +10527,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_endogenousAnalyte <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_endogenousAnalyte <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -10564,7 +10564,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_endogenousAnalyte <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_endogenousAnalyte <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -10600,7 +10600,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_endogenousAnalyte <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_endogenousAnalyte <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -10636,7 +10636,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_endogenousAnalyte <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_endogenousAnalyte <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -10672,7 +10672,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_endogenousAnalyte <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_endogenousAnalyte <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -10709,7 +10709,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_endogenousAnalyte <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_endogenousAnalyte <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -10745,7 +10745,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_endogenousAnalyte <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_endogenousAnalyte <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -10781,7 +10781,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_endogenousAnalyte <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_endogenousAnalyte <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -10817,7 +10817,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_endogenousAnalyte <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_endogenousAnalyte <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -10853,7 +10853,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_endogenousAnalyte <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_endogenousAnalyte <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -10889,7 +10889,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_endogenousAnalyte <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_endogenousAnalyte <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -10925,7 +10925,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_endogenousAnalyte <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_endogenousAnalyte <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -10961,7 +10961,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_endogenousAnalyte <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_endogenousAnalyte <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -10998,7 +10998,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_endogenousAnalyte <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_endogenousAnalyte <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -11034,7 +11034,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_endogenousAnalyte <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_endogenousAnalyte <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -11074,7 +11074,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     tmpPattern <- c("sLTR Plasma", "LTR Plasma")
     
     # Perform time series analysis
-    analysisResult_TS_endogenousAnalyte <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_endogenousAnalyte <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, pattern)),
       commonColumn = commonColumn,
@@ -11119,7 +11119,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     tmpPattern <- c("sLTR Serum", "LTR Serum")
     
     # Perform time series analysis
-    analysisResult_TS_endogenousAnalyte <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_endogenousAnalyte <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, pattern)),
       commonColumn = commonColumn,
@@ -11164,7 +11164,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     tmpPattern <- c("sLTR Urine", "LTR Urine")
     
     # Perform time series analysis
-    analysisResult_TS_endogenousAnalyte <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_endogenousAnalyte <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, pattern)),
       commonColumn = commonColumn,
@@ -11210,7 +11210,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     tmpPattern <- c("dLTR Plasma")
     
     # Perform time series analysis
-    analysisResult_TS_endogenousAnalyte <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_endogenousAnalyte <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, pattern)),
       commonColumn = commonColumn,
@@ -11255,7 +11255,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     tmpPattern <- c("dLTR Serum")
     
     # Perform time series analysis
-    analysisResult_TS_endogenousAnalyte <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_endogenousAnalyte <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, pattern)),
       commonColumn = commonColumn,
@@ -11300,7 +11300,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     tmpPattern <- c("dLTR Urine")
     
     # Perform time series analysis
-    analysisResult_TS_endogenousAnalyte <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_endogenousAnalyte <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, pattern)),
       commonColumn = commonColumn,
@@ -11378,7 +11378,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     colourLabel <- if (length(unique(plotData[[projectCohort]])) > 1) "Project" else "Plate"
     
     # Extract extracted ion current (EIC)
-    plotData <- ticq::extractEIC(data = plotData, intensityArray = intensityArray, targetMZ = as.character(sort(unique(targetFile$mzValue))))
+    plotData <- extractEIC(data = plotData, intensityArray = intensityArray, targetMZ = as.character(sort(unique(targetFile$mzValue))))
   }
 }
 ```
@@ -11395,13 +11395,13 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   targetMzStatus <- length(targetMZ) > 0
   if (targetMzStatus) {
     # Summed extracted ion current
-    plotData_filtered <- ticq::filterChromatogramRegion(
+    plotData_filtered <- filterChromatogramRegion(
       data = plotData %>%
         dplyr::select(all_of(commonColumn), retentionTime, all_of(targetMZ)),
       regionOfInterest = chromatogramRegion$analyte,
       retentionTime = retentionTime
     ) %>%
-      ticq::sumEIC(
+      sumEIC(
         data = .,
         commonColumn = commonColumn,
         spectrumCount = spectrumCount,
@@ -11434,7 +11434,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_product <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_product <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -11470,7 +11470,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_product <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_product <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -11506,7 +11506,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_product <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_product <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -11543,7 +11543,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_product <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_product <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -11579,7 +11579,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_product <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_product <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -11615,7 +11615,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_product <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_product <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -11652,7 +11652,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_product <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_product <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -11688,7 +11688,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_product <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_product <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -11724,7 +11724,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_product <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_product <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -11761,7 +11761,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_product <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_product <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -11797,7 +11797,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_product <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_product <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -11833,7 +11833,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_product <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_product <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -11870,7 +11870,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_product <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_product <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -11906,7 +11906,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_product <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_product <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -11942,7 +11942,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_product <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_product <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -11978,7 +11978,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_product <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_product <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -12015,7 +12015,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_product <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_product <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -12051,7 +12051,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_product <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_product <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -12087,7 +12087,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_product <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_product <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -12123,7 +12123,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_product <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_product <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -12159,7 +12159,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_product <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_product <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -12195,7 +12195,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_product <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_product <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -12231,7 +12231,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_product <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_product <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -12267,7 +12267,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_product <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_product <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -12304,7 +12304,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_product <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_product <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -12340,7 +12340,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
   
   if (any(pattern %in% sampleTypeList)) {
     # Perform time series analysis
-    analysisResult_TS_product <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_product <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% pattern),
       commonColumn = commonColumn,
@@ -12380,7 +12380,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     tmpPattern <- c("sLTR Plasma", "LTR Plasma")
     
     # Perform time series analysis
-    analysisResult_TS_product <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_product <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, pattern)),
       commonColumn = commonColumn,
@@ -12425,7 +12425,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     tmpPattern <- c("sLTR Serum", "LTR Serum")
     
     # Perform time series analysis
-    analysisResult_TS_product <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_product <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, pattern)),
       commonColumn = commonColumn,
@@ -12470,7 +12470,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     tmpPattern <- c("sLTR Urine", "LTR Urine")
     
     # Perform time series analysis
-    analysisResult_TS_product <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_product <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, pattern)),
       commonColumn = commonColumn,
@@ -12516,7 +12516,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     tmpPattern <- c("dLTR Plasma")
     
     # Perform time series analysis
-    analysisResult_TS_product <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_product <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, pattern)),
       commonColumn = commonColumn,
@@ -12561,7 +12561,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     tmpPattern <- c("dLTR Serum")
     
     # Perform time series analysis
-    analysisResult_TS_product <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_product <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, pattern)),
       commonColumn = commonColumn,
@@ -12606,7 +12606,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus && chromatogramReg
     tmpPattern <- c("dLTR Urine")
     
     # Perform time series analysis
-    analysisResult_TS_product <- ticq::displayMultipleTimeSeries(
+    analysisResult_TS_product <- displayMultipleTimeSeries(
       data = plotData_filtered %>%
         dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, pattern)),
       commonColumn = commonColumn,
@@ -12686,8 +12686,8 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus) {
   }
   
   # Calculate average mass accuracy (in ppm)
-  plotData <- ticq::countSpectrum(data = massAccuracyData, commonColumn = commonColumn, spectrumCount)
-  massAccuracyData <- ticq::calculateMassAccuracy(
+  plotData <- countSpectrum(data = massAccuracyData, commonColumn = commonColumn, spectrumCount)
+  massAccuracyData <- calculateMassAccuracy(
     data = massAccuracyData,
     mzArray = mzArray,
     targetMZ = targetMZ,
@@ -12705,7 +12705,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus) {
         plotData <- massAccuracyData %>%
           dplyr::filter(.data[[msLevel]] == uniqueMsLevel[i]) %>%
           dplyr::select(all_of(commonColumn), all_of(as.character(targetMZ_filtered))) %>%
-          ticq::calculateAverageMassAccuracy(
+          calculateAverageMassAccuracy(
             data = .,
             commonColumn = commonColumn,
             spectrumCount = spectrumCount,
@@ -12746,7 +12746,7 @@ if (newSampleStatus && targetFileStatus && extractedIonStatus) {
   colourLabel <- if (length(unique(plotData[[projectCohort]])) > 1) "Project" else "Plate"
   
   # Perform mass accuracy analysis
-  analysisResult_MA <- ticq::displayMultipleTimeSeries(
+  analysisResult_MA <- displayMultipleTimeSeries(
     data = plotData,
     commonColumn = commonColumn,
     x = x,

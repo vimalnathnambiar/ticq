@@ -7,16 +7,16 @@
 checkUndefinedSampleType(data, commonColumn, sampleType, spectrumCount)
 }
 \arguments{
-\item{data}{A data frame containing spectral data: data frame}
+\item{data}{A data frame containing spectral data.}
 
-\item{commonColumn}{Column names representing common data to be used for data grouping: character}
+\item{commonColumn}{A character vector representing names of the common data columns to be used for data grouping.}
 
-\item{sampleType}{Sample type column name: character}
+\item{sampleType}{A character string representing the name of the sample type column.}
 
-\item{spectrumCount}{Spectrum count column name: character}
+\item{spectrumCount}{A character string representing the name of the spectrum count column.}
 }
 \value{
-A list containing two data frames (passed and failed data)
+A list containing two data frames (\code{passedData} containing spectral data of samples with a defined sample type and \code{failedData} containing a summarised listing of samples with an undefined sample type).
 }
 \description{
 Check for samples that have an undefined sample type.

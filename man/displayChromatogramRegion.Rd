@@ -7,15 +7,15 @@
 displayChromatogramRegion(plot, maxX, maxY, regionOfInterest, label = NULL)
 }
 \arguments{
-\item{plot}{A ggplot object of a chromatogram: ggplot}
+\item{plot}{A ggplot object of a chromatogram.}
 
-\item{maxX}{x-axis maximum value: numeric}
+\item{maxX}{A numeric value representing the maximum value on the x-axis.}
 
-\item{maxY}{y-axis maximum value: numeric}
+\item{maxY}{A numeric value representing the maximum value on the y-axis.}
 
-\item{regionOfInterest}{A list representing the start and end time points of a chromatogram region (Options: ticq::configureChromatogram()$region): list}
+\item{regionOfInterest}{A list representing the start and end time points of a chromatogram region. (Options: Use \code{ticq::configureChromatogram()$regionOfInterest})}
 
-\item{label}{Chromatogram region label (Default: NULL): NULL or character}
+\item{label}{A character string representing the chromatogram region label, (Default: \code{NULL})}
 }
 \value{
 A ggplot object with the added vertical lines representing the chromatogram region start and end time points

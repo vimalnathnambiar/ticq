@@ -6,10 +6,9 @@
 #'
 #' @import dplyr
 #'
-#' @param input ANPC sample file name or path: character
-#' @returns Matrix type
+#' @param input A character vector representing ANPC sample file names or paths.
+#' @returns A character vector of matrix types.
 extractMatrix <- function(input) {
-  # Matrix type patterns
   return(
     dplyr::case_when(
       grepl("PLASMA|PLA", input) ~ "Plasma",

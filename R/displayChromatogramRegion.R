@@ -4,11 +4,11 @@
 #'
 #' @import ggplot2
 #'
-#' @param plot A ggplot object of a chromatogram: ggplot
-#' @param maxX x-axis maximum value: numeric
-#' @param maxY y-axis maximum value: numeric
-#' @param regionOfInterest A list representing the start and end time points of a chromatogram region (Options: ticq::configureChromatogram()$region): list
-#' @param label Chromatogram region label (Default: NULL): NULL or character
+#' @param plot A ggplot object of a chromatogram.
+#' @param maxX A numeric value representing the maximum value on the x-axis.
+#' @param maxY A numeric value representing the maximum value on the y-axis.
+#' @param regionOfInterest A list representing the start and end time points of a chromatogram region. (Options: Use `ticq::configureChromatogram()$regionOfInterest`)
+#' @param label A character string representing the chromatogram region label, (Default: `NULL`)
 #' @returns A ggplot object with the added vertical lines representing the chromatogram region start and end time points
 displayChromatogramRegion <- function(plot, maxX, maxY, regionOfInterest, label = NULL) {
   # Check region end time point

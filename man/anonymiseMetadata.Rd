@@ -16,24 +16,24 @@ anonymiseMetadata(
 )
 }
 \arguments{
-\item{data}{A data frame containing spectral data: data frame}
+\item{data}{A data frame containing spectral data.}
 
-\item{sampleID}{Sample ID column name: character}
+\item{sampleID}{A character string representing the name of the sample ID column.}
 
-\item{project}{Project column name: character}
+\item{project}{A character string representing the name of the project column.}
 
-\item{cohort}{Cohort column name: character}
+\item{cohort}{A character string representing the name of the cohort column.}
 
-\item{projectCohort}{Project + Cohort column name: character}
+\item{projectCohort}{A character string representing the name of the combined project and cohort column.}
 
-\item{method}{Method column name: character}
+\item{method}{A character string representing the name of the method column.}
 
-\item{instrument}{Instrument column name: character}
+\item{instrument}{A character string representing the name of the instrument column.}
 
-\item{plate}{Plate number column name: character}
+\item{plate}{Acharacter string representing the name of the plate column.}
 }
 \value{
-A data frame with anonymised sample metadata
+A data frame with anonymised sample metadata in their respective columns.
 }
 \description{
 Anonymise sample metadata including sample ID, project name, cohort name, method name, instrument name, and plate number.
@@ -44,7 +44,6 @@ Only applicable to data acquired at the Australian National Phenome Centre (ANPC
 \examples{
 data <- data.frame(sampleID = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29", project = "COVID-19", cohort = "Heidelberg",
                    projectCohort = "COVID-19 Heidelberg", method = "MS-AA-POS", instrument = "PAI05", plate = "88")
-data <- ticq::anonymiseMetadata(data = data, sampleID = "sampleID", project = "project", cohort = "cohort", projectCohort = "projectCohort",
-                                method = "method", instrument = "instrument", plate = "plate")
-print(data)
+anonymiseMetadata(data = data, sampleID = "sampleID", project = "project", cohort = "cohort", projectCohort = "projectCohort",
+                  method = "method", instrument = "instrument", plate = "plate")
 }

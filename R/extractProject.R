@@ -6,10 +6,9 @@
 #'
 #' @import dplyr
 #'
-#' @param input ANPC sample file name or path: character
-#' @returns Project name
+#' @param input A character vector representing ANPC sample file names or paths.
+#' @returns A character vector representing project names.
 extractProject <- function(input) {
-  # Project name patterns
   return(
     dplyr::case_when(
       grepl("covid19|covid|COV", input) ~ "COVID-19",

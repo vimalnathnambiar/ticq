@@ -13,15 +13,14 @@
 #' @import rmarkdown
 #' 
 #' @export
-#' @param inputPath A character string representing an existing directory or file path. Should not be NA or an empty character string.
-#' @param outputDirectoryPath A character string representing a directory path to store output files (HTML report and RDS formatted spectral data). (Default: "`r paste0(getwd(), "/output/")`").
+#' @param inputPath A character string representing an existing directory or file path.
+#' @param outputDirectoryPath A character string representing a directory path to store output files (HTML report and RDS formatted spectral data). (Default: "`r paste0(getwd(), "/output/")`")
 #' @param historicalDataPath A character string representing a RDS file containing historical spectral data associated to the current spectral data being assessed. (Default: `NULL`; Options: `"/path/to/local/file.rds"`)
 #' @param targetFilePath A character string representing an existing TSV target file path. (Default: `NULL`; Options: `"https://published-to-web-URL&output=tsv"` or `"/path/to/local/file.tsv"`)
-#' @param anpcMethodLibrary ANPC method library (Default: NULL, Options: "MS-AA-POS", "MS-HIL-POS", "MS-HIL-NEG", "MS-RP-POS" or "MS-RP-NEG"): NULL or character
-#' @param chromatogramRegion A list containing the start and end time points of the different chromatogram regions of interest (Default: NULL, Options: ticq::configureChromatogramRegion()): NULL or list
-#' @param roundDecimalPlace Number of decimal places for precision value rounding (Default: NULL): NULL or numeric
-#' @param metadataAnonymiser Toggle to anonymise metadata (Default: FALSE, Options: TRUE or FALSE): logical
-#' @returns Path to the rendered output file.
+#' @param anpcMethodLibrary A character string representing an ANPC method library. (Default: `NULL`; Options: `"MS-AA-POS"`, `"MS-HIL-POS"`, `"MS-HIL-NEG"`, `"MS-RP-POS"`, or `"MS-RP-NEG"`)
+#' @param chromatogramRegion A list of lists representing the different chromatogram regions of interest and their respective start and end time points. (Default: `NULL`; Options: Use `ticq::configureChromatogramRegion()`)
+#' @param metadataAnonymiser A logical value representing the metadata anonymiser status to anonymising metadata acquired from sample data. (Default: `FALSE`; Options: `TRUE` or `FALSE`)
+#' @returns A character string representing the rendered HTML output file path.
 renderTICQ <- function(inputPath, outputDirectoryPath = paste0(getwd(), "/output/"), historicalDataPath = NULL, targetFilePath = NULL, anpcMethodLibrary = NULL, chromatogramRegion = NULL, roundDecimalPlace = NULL, metadataAnonymiser = FALSE) {
   # ANPC method library associated chromatogram region data
   anpcChromatogramRegionData <- list(
@@ -36,10 +35,10 @@ renderTICQ <- function(inputPath, outputDirectoryPath = paste0(getwd(), "/output
   message("\nValidating rendering parameters")
   message("---")
   message("1. Input path")
-  if (length(ticq::retrieveFileList(inputPath = inputPath, fileExtension = "JSON")) == 0) {
-    stop("Invalid 'inputPath': No available JSON file(s) was found at the specified path.")
+  if (length(retrieveFileName(inputPath = inputPath, fileExtension = "JSON")) == 0) {
+    stop("Invalid 'inputPath': No available JSON file was found at the specified path")
   }
-  inputMetadata <- ticq::extractMetadata(input = inputPath)
+  inputMetadata <- extractMetadata(input = inputPath)
   print(inputPath)
   
   # Validate output path
@@ -54,15 +53,17 @@ renderTICQ <- function(inputPath, outputDirectoryPath = paste0(getwd(), "/output
   # Validate historical data path
   message("\n3. Historical data path")
   if (!is.null(historicalDataPath)) {
-    if (!checkFileExtension(parameterName = "historicalDataPath", parameterValue = historicalDataPath, fileExtension = "RDS")) {
-      stop("Invalid 'historicalDataPath': No available RDS file found at the specified path.")
+    if (length(parameterValue) != 1 || !is.character(parameterValue) || is.na(parameterValue) || parameterValue == "") {
+      stop("Invalid 'historicalDataPath: Must either be NULL or a non-NA, non-empty character string of length 1")
+    } else if (!checkFileExtension(parameterName = 'historicalDataPath', parameterValue = historicalDataPath, fileExtension = "RDS")) {
+      stop("Invalid 'historicalDataPath': No available RDS file found at the specified path")
     }
   }
   print(historicalDataPath)
   
   # Validate target file path
   message("\n4. Target file path")
-  if (!is.null(targetFilePath) && is.null(ticq::extractTargetFile(targetFilePath = targetFilePath))) {
+  if (!is.null(targetFilePath) && is.null(extractTargetFile(targetFilePath = targetFilePath))) {
     stop("Invalid 'targetFilePath': No available target file data")
   }
   print(targetFilePath)
@@ -72,14 +73,14 @@ renderTICQ <- function(inputPath, outputDirectoryPath = paste0(getwd(), "/output
   if (is.null(anpcMethodLibrary)) {
     if (inputMetadata$method %in% names(anpcChromatogramRegionData)) {
       message("Attempting to set method library based on input metadata")
-      if (!is.null(ticq::extractTargetFile(anpcMethodLibrary = inputMetadata$method))) {
-        message(paste0("Setting new value (", inputMetadata$metadata, ")"))
+      if (!is.null(extractTargetFile(anpcMethodLibrary = inputMetadata$method))) {
+        message("Setting new value")
         anpcMethodLibrary <- inputMetadata$method
       } else {
         message("Unsuccessful attempt: No available target file data")
       }
     }
-  } else if (!is.null(anpcMethodLibrary) && is.null(ticq::extractTargetFile(anpcMethodLibrary = anpcMethodLibrary))) {
+  } else if (!is.null(anpcMethodLibrary) && is.null(extractTargetFile(anpcMethodLibrary = anpcMethodLibrary))) {
     stop("Invalid 'anpcMethodLibrary': No available target file data")
   }
   print(anpcMethodLibrary)
@@ -87,15 +88,15 @@ renderTICQ <- function(inputPath, outputDirectoryPath = paste0(getwd(), "/output
   # Validate chromatogram region data
   message("\n6. Chromatogram region")
   if (!is.null(chromatogramRegion)) {
-    if (!validateChromatogramRegion(chromatogramRegion = chromatogramRegion)) {
-      message("Setting default value (NULL)")
+    if (!validateChromatogramRegion(parameterName = "chromatogramRegion", parameterValue = chromatogramRegion)) {
+      message("Setting default value")
       chromatogramRegion <- NULL
     }
   }
   
   if (is.null(chromatogramRegion) && !is.null(anpcMethodLibrary) && anpcMethodLibrary %in% names(anpcChromatogramRegionData)) {
     message(paste("Setting new region data (based on ANPC", anpcMethodLibrary, "method library)"))
-    chromatogramRegion <- ticq::configureChromatogramRegion(
+    chromatogramRegion <- configureChromatogramRegion(
       massCalibrationEnd = anpcChromatogramRegionData[[anpcMethodLibrary]]$massCalibrationEnd,
       washStart = anpcChromatogramRegionData[[anpcMethodLibrary]]$washStart
     )
@@ -104,8 +105,8 @@ renderTICQ <- function(inputPath, outputDirectoryPath = paste0(getwd(), "/output
   
   # Validate round decimal place value
   message("\n7. Round decimal place")
-  if (!is.null(roundDecimalPlace)) {
-    validateNumericValue(parameterName = "roundDecimalPlace", parameterValue = roundDecimalPlace)
+  if (!is.null(roundDecimalPlace) && (length(roundDecimalPlace) != 1 || !is.numeric(roundDecimalPlace))) {
+    stop(paste0("Invalid 'roundDecimalPlace': Must either be NULL or a numeric value of length 1"))
   }
   print(roundDecimalPlace)
   

@@ -7,42 +7,35 @@
 #' @import dplyr
 #'
 #' @export
-#' @param data A data frame containing spectral data: data frame
-#' @param sampleID Sample ID column name: character
-#' @param project Project column name: character
-#' @param cohort Cohort column name: character
-#' @param projectCohort Project + Cohort column name: character
-#' @param method Method column name: character
-#' @param instrument Instrument column name: character
-#' @param plate Plate number column name: character
-#' @returns A data frame with anonymised sample metadata
+#' @param data A data frame containing spectral data.
+#' @param sampleID A character string representing the name of the sample ID column.
+#' @param project A character string representing the name of the project column.
+#' @param cohort A character string representing the name of the cohort column.
+#' @param projectCohort A character string representing the name of the combined project and cohort column.
+#' @param method A character string representing the name of the method column.
+#' @param instrument A character string representing the name of the instrument column.
+#' @param plate Acharacter string representing the name of the plate column.
+#' @returns A data frame with anonymised sample metadata in their respective columns.
 #'
 #' @examples
 #' data <- data.frame(sampleID = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29", project = "COVID-19", cohort = "Heidelberg",
 #'                    projectCohort = "COVID-19 Heidelberg", method = "MS-AA-POS", instrument = "PAI05", plate = "88")
-#' data <- ticq::anonymiseMetadata(data = data, sampleID = "sampleID", project = "project", cohort = "cohort", projectCohort = "projectCohort",
-#'                                 method = "method", instrument = "instrument", plate = "plate")
-#' print(data)
+#' anonymiseMetadata(data = data, sampleID = "sampleID", project = "project", cohort = "cohort", projectCohort = "projectCohort",
+#'                   method = "method", instrument = "instrument", plate = "plate")
 anonymiseMetadata <- function(data, sampleID, project, cohort, projectCohort, method, instrument, plate) {
   # Validate parameters
   if (nrow(data) == 0 || ncol(data) == 0) {
-    stop("Invalid 'data': Data frame is empty")
+    stop("Invalid 'data': Empty data frame")
   }
   
   parameter <- list(sampleID = sampleID, project = project, cohort = cohort, projectCohort = projectCohort, method = method, instrument = instrument, plate = plate)
   for (i in names(parameter)) {
-    if (length(parameter[[i]]) != 1 || !is.character(parameter[[i]]) || is.na(parameter[[i]]) || parameter[[i]] == "") {
-      stop(paste0("Invalid '", i, "': Must be a non-NA and non-empty character string of length 1 matching a column name in 'data'"))
-    }
+    validateCharacterString(parameterName = i, parameterValue = parameter[[i]])
   }
   
   parameter <- c(sampleID, project, cohort, projectCohort, method, instrument, plate)
   if (!all(parameter %in% colnames(data))) {
-    stop(paste0(
-      "Unable to anonymise metadata: Missing one or more data columns (",
-      paste(parameter[!parameter %in% colnames(data)], collapse = ", "),
-      ")"
-    ))
+    stop(paste0("Unable to anonymise metadata: Missing one or more data column (", paste(parameter[!parameter %in% colnames(data)], collapse = ", "), ")"))
   }
   
   # Anonymise metadata (and replace NA) values

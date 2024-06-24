@@ -11,30 +11,30 @@ extractTargetFile(
 )
 }
 \arguments{
-\item{targetFilePath}{Target file path (Default: NULL, Options: Published to web URL or local path of a TSV file): NULL or character}
+\item{targetFilePath}{A character string representing an existing TSV target file path. (Default: \code{NULL}; Options: \code{"https://published-to-web-URL&output=tsv"} or \code{"/path/to/local/file.tsv"})}
 
-\item{anpcMethodLibrary}{ANPC method library (Default: NULL, Options: "MS-AA-POS", "MS-HIL-POS", "MS-HIL-NEG", "MS-RP-POS" or "MS-RP-NEG"): NULL or character}
+\item{anpcMethodLibrary}{A character string representing an ANPC method library. (Default: \code{NULL}; Options: \code{"MS-AA-POS"}, \code{"MS-HIL-POS"}, \code{"MS-HIL-NEG"}, \code{"MS-RP-POS"}, or \code{"MS-RP-NEG"})}
 
-\item{roundDecimalPlace}{Number of decimal places for precision value rounding (Default: NULL): NULL or numeric}
+\item{roundDecimalPlace}{A numeric value representing the number of decimals places for precision value rounding. (Default: \code{NULL})}
 }
 \value{
-A data frame representing the target file
+A data frame representing the target file to be used for extracted ion (target m/z) assessment.
 }
 \description{
 Extract target m/z data using a TSV formatted target file (published to web URL or local file path) or an in-house method library used at the Australian National Phenome Centre (ANPC).
 }
 \details{
-Target file specified should follow a pre-determined layout used by \href{https://github.com/vmalnathnambiar/exfilms/blob/main/docs/how-to-create-a-target-file.md}{ExfilMS}.
-
-If both target file path and ANPC method library is specified, the target file path will be used as the first point of extraction. If no data is found, ANPC method library is then used.
+\enumerate{
+\item Target file specified should follow a pre-determined layout used by
+\href{https://github.com/vmalnathnambiar/exfilms/blob/main/docs/how-to-create-a-target-file.md}{ExfilMS}.
+\item If both target file path and ANPC method library is specified, the target file path will be used as the first point of extraction.
+If no data is found, the ANPC method library specified is then used.
+}
 }
 \examples{
-# Example 1: Specifying a target file with no rounding of decimal places for precision values
-targetFilePath <- "https://docs.google.com/spreadsheets/d/e/2PACX-1vSeo31hlruA3QuwoESz5IDJ9Nu6ndSAgLTRn3uc45rOPO4BlksfHzh9xtNB22Oes9JOxhEbI4NK-zxl/pub?gid=0&single=true&output=tsv"
-targetFile <- ticq::extractTargetFile(targetFilePath = targetFilePath, anpcMethodLibrary = NULL, roundDecimalPlace = NULL)
-print(targetFile)
+# Example 1: Specifying a target file
+extractTargetFile(targetFilePath = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSeo31hlruA3QuwoESz5IDJ9Nu6ndSAgLTRn3uc45rOPO4BlksfHzh9xtNB22Oes9JOxhEbI4NK-zxl/pub?gid=0&single=true&output=tsv")
 
-# Example 2: Specifying an ANPC method library with rounding of precision values up to 4 decimal places
-targetFile <- ticq::extractTargetFile(targetFilePath = NULL, anpcMethodLibrary = "MS-AA-POS", roundDecimalPlace = 4)
-print(targetFile)
+# Example 2: Specifying an ANPC method library
+extractTargetFile(anpcMethodLibrary = "MS-AA-POS")
 }

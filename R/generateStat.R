@@ -19,16 +19,15 @@
 #' - Confidence quantile range (CQ) - 95% and 99% (Lower and upper)
 #'
 #' @export
-#' @param data A continuous data series of numerical values (Must have a minimum of 2 data points and should not contain any NA values): numeric
-#' @returns A list of generated statistical information
+#' @param data A numeric vector representing values to be used to generate statistical analysis.
+#' @returns A list containing statistical information generated using the numeric vector provided.
 #'
 #' @examples
-#' stats <- ticq::generateStat(data = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
-#' print(stats)
+#' generateStat(data = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
 generateStat <- function(data) {
   # Validate parameters
   if (length(data) <= 1 || !is.numeric(data) || any(is.na(data))) {
-    stop("Invalid 'data': Must be a numerical value of length 2 or more with no NA values")
+    stop("Invalid 'data': Must be a non-NA numeric vector with a minimum length of 2")
   }
   
   # Sample size (n)
