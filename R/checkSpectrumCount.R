@@ -41,6 +41,7 @@ checkSpectrumCount <- function(data, commonColumn, sampleID, spectrumCount, thre
   mean <- stat$mean
   lowerThreshold <- floor(mean - ((threshold / 100) * mean))
   upperThreshold <- ceiling(mean + ((threshold / 100) * mean))
+  
   summarisedData <- summarisedData %>%
     dplyr::filter(.data[[spectrumCount]] < lowerThreshold | .data[[spectrumCount]] > upperThreshold)
   

@@ -28,7 +28,15 @@ anonymiseMetadata <- function(data, sampleID, project, cohort, projectCohort, me
     stop("Invalid 'data': Empty data frame")
   }
   
-  parameter <- list(sampleID = sampleID, project = project, cohort = cohort, projectCohort = projectCohort, method = method, instrument = instrument, plate = plate)
+  parameter <- list(
+    sampleID = sampleID,
+    project = project,
+    cohort = cohort,
+    projectCohort = projectCohort,
+    method = method,
+    instrument = instrument,
+    plate = plate
+  )
   for (i in names(parameter)) {
     validateCharacterString(parameterName = i, parameterValue = parameter[[i]])
   }

@@ -23,7 +23,7 @@ extractMetadata <- function(input) {
     stop("Invalid 'input': Must be a character vector with a minimum length of 1")
   }
   
-  # Metadata
+  # Metadata extraction
   project <- extractProject(input = input)
   cohort <- extractCohort(input = input)
   projectCohort <- ifelse(is.na(project), ifelse(is.na(cohort), NA_character_, cohort), ifelse(is.na(cohort), project, paste(project, cohort)))

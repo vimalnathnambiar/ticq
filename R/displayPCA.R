@@ -1,27 +1,29 @@
 #' Display Principal Component Analysis (PCA)
 #'
-#' Perform Principle Component Analysis (PCA) and display analysis outcomes (scree plot, scores plot, loadings plot and/or biplot).
+#' Perform Principle Component Analysis (PCA) and display analysis outcomes (scree plot, scores plot, loadings plot, and/or biplot).
 #'
 #' @import ggplot2
 #' @import HotellingEllipse
 #' @import ggforce
 #'
 #' @export
-#' @param data A data frame containing data to perform PCA on (Must be equal sized and should not contain NA values): data frame
-#' @param firstColumnIndex Index of the first data column to perform PCA on: numeric
-#' @param lastColumnIndex Index of the last data column data to perform PCA on (Default: NULL): NULL or numeric
-#' @param scale PCA scaling (Default: TRUE, Options: TRUE or FALSE): logical
-#' @param confidence Data confidence % (Default: 95, Options: 95 or 99): numeric
-#' @param distribution Data distribution to be drawn on scores plot and biplot (Default: NULL, Options: "normal" or "t"): NULL or character
-#' @param colour Column name representing data to be used for colour grouping (Default: NULL): NULL or character
-#' @param shape Column name representing data to be used for shape grouping (Default: NULL): NULL or character
-#' @param subtitle Plot subtitle (Default: NULL): NULL or character
-#' @param colourLabel Colour grouping label (Default: Value used for colour): NULL or character
-#' @param shapeLabel Shape grouping label (Default: Value used for shape): NULL or character
-#' @param screePlotToggle Toggle to display scree plot (Default: TRUE, Options: TRUE or FALSE): logical
-#' @param scoresPlotToggle Toggle to display scores plot (Default: TRUE, Options: TRUE or FALSE): logical
-#' @param loadingsPlotToggle Toggle to display loadings plot (Default: TRUE, Options: TRUE or FALSE): logical
-#' @param biPlotToggle Toggle to display biplot (Default: TRUE, Options: TRUE or FALSE): logical
+#' @param data A data frame containing data to perform PCA.
+#' @param firstColumnIndex A numeric value representing the index of the first data column to perform PCA on.
+#' @param lastColumnIndex A numeric value representing the index of the last data column to perform PCA on. (Default: `NULL`)
+#' @param scale A logical value representing the scaling used for the PCA. (Default: `TRUE`, Options: `TRUE` or `FALSE`)
+#' @param confidence A numeric value representing the data confidence (%) to be used for identifying the PC threshold.
+#' The value is also used to draw the data distribution and Hotelling Ellipse on scores plot. (Default: `95`, Options: `95` or `99`)
+#' @param distribution A character string representing the data distribution type to be drawn on the scores plot and biplot. (Default: `NULL`, Options: `"normal"` or `"t"`)
+#' @param colour A character string representing the name of the data column to be used for colour grouping. (Default: `NULL`)
+#' @param shape A character string representing the name of the data column to be used for shape grouping. (Default: `NULL`)
+#' @param subtitle A character string representing the plot subtitle. (Default: `NULL`)
+#' @param colourLabel A character string representing the colour grouping label. (Default: Value used for `colour`)
+#' @param shapeLabel A character string representing the shape grouping label. (Default: Value used for `shape`)
+#' @param screePlotToggle A logical value representing the toggle to display the generated scree plot. (Default: `TRUE`, Options: `TRUE` or `FALSE`)
+#' @param scoresPlotToggle A logical value representing the toggle to display the generated scores plot. (Default: `TRUE`, Options: `TRUE` or `FALSE`)
+#' @param loadingsPlotToggle A logical value representing the toggle to display the generated loadings plot. (Default: `TRUE`, Options: `TRUE` or `FALSE`)
+#' @param biPlotToggle A logical value representing the toggle to display the generated biplot. (Default: `TRUE`, Options: `TRUE` or `FALSE`)
+#' @returns This function does not return any value. It prints the ggplot objects representing the scree plot, scores plot, loadings plot, and/or biplot.
 displayPCA <- function(data,
                        firstColumnIndex,
                        lastColumnIndex = NULL,
@@ -38,7 +40,56 @@ displayPCA <- function(data,
                        loadingsPlotToggle = TRUE,
                        biPlotToggle = TRUE) {
   # Validate parameters
+  if (nrow(data) == 0 || ncol(data) == 0) {
+    stop("Invalid 'data': Empty data frame")
+  }
   
+  parameter <- list(
+    firstColumnIndex = firstColumnIndex,
+    lastColumnIndex = lastColumnIndex,
+    scale = scale,
+    confidence = confidence,
+    distribution = distribution,
+    colour = colour,
+    shape = shape,
+    subtitle = subtitle,
+    colourLabel = colourLabel,
+    shapeLabel = shapeLabel,
+    screePlotToggle = screePlotToggle,
+    scoresPlotToggle = scoresPlotToggle,
+    loadingsPlotToggle = loadingsPlotToggle,
+    biPlotToggle = biPlotToggle
+  )
+  for (i in names(parameter)) {
+    if (i == "firstColumnIndex") {
+      validateNumericValue(parameterName = i, parameterValue = parameter[[i]])
+    } else if (i == "lastColumnIndex" && !is.null(parameter[[i]]) && (length(parameter[[i]]) != 1 || !is.numeric(parameter[[i]]))) {
+      stop(paste0("Invalid '", i, "': Must either be NULL or a numeric value of length 1"))
+    } else if (i == "scale" || i == "screePlotToggle" || i == "scoresPlotToggle" || i == "loadingsPlotToggle" || i == "biPlotToggle") {
+      validateLogicalValue(parameterName = i, parameterValue = parameter[[i]])
+    } else if (i == "confidence" && validateNumericValue(parameterName = i, parameterValue = parameter[[i]]) && !parameter[[i]] %in% c(95, 99)) {
+      stop(paste0("Invalid '", i, "': Must either be 95 or 99"))
+    } else if (i == "distribution" && !is.null(parameter[[i]]) && (length(parameter[[i]]) != 1 || !is.character(parameter[[i]]) || !parameter[[i]] %in% c("normal", "t"))) {
+      stop(paste0("Invalid '", i, "': Must either be NULL, 'normal', or 't'"))
+    } else if ((i == "colour" || i == "shape") && !is.null(parameter[[i]]) &&
+               (length(parameter[[i]]) != 1 || !is.character(parameter[[i]]) || is.na(parameter[[i]]) || parameter[[i]] == "")) {
+      stop(paste0("Invalid '", i, "': Must either be NULL or a non-NA, non-empty character string of length 1"))
+    } else if ((i == "subtitle" || i == "colourLabel" || i == "shapeLabel") &&
+               !is.null(parameter[[i]]) && (length(parameter[[i]]) != 1 || !is.character(parameter[[i]]))) {
+      stop(paste0("Invalid '", i, "': Must either be NULL or a character string of length 1"))
+    }
+    
+    if (i == "firstColumnIndex" || (i == "lastColumnIndex" && !is.null(parameter[[i]]))) {
+      if (parameter[[i]] <= 0 || parameter[[i]] > ncol(data)) {
+        stop(paste0("Invalid '", i, "': Must be a valid index of a data column"))
+      }
+    }
+  }
+  
+  parameter <- c(colour, shape)
+  if (!all(parameter %in% colnames(data))) {
+    stop(paste0("Unable to perform Principal Component Analysis: Missing one or more data column (", paste(parameter[!parameter %in% colnames(data)], collapse = ", "), ")"))
+  }
   
   # Perform PCA
   tryCatch({
@@ -86,7 +137,7 @@ displayPCA <- function(data,
         scores <- data.frame(pca$x)
         loading <- data.frame(pca$rotation)
         
-        # Loop through PCs that passes the threshold
+        # Loop through PCs that passed the threshold limit
         for (i in 1:(threshold - 1)) {
           for (j in (i+1):threshold) {
             # Plot scores

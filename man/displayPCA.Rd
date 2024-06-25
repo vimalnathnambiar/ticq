@@ -23,36 +23,40 @@ displayPCA(
 )
 }
 \arguments{
-\item{data}{A data frame containing data to perform PCA on (Must be equal sized and should not contain NA values): data frame}
+\item{data}{A data frame containing data to perform PCA.}
 
-\item{firstColumnIndex}{Index of the first data column to perform PCA on: numeric}
+\item{firstColumnIndex}{A numeric value representing the index of the first data column to perform PCA on.}
 
-\item{lastColumnIndex}{Index of the last data column data to perform PCA on (Default: NULL): NULL or numeric}
+\item{lastColumnIndex}{A numeric value representing the index of the last data column to perform PCA on. (Default: \code{NULL})}
 
-\item{scale}{PCA scaling (Default: TRUE, Options: TRUE or FALSE): logical}
+\item{scale}{A logical value representing the scaling used for the PCA. (Default: \code{TRUE}, Options: \code{TRUE} or \code{FALSE})}
 
-\item{confidence}{Data confidence \% (Default: 95, Options: 95 or 99): numeric}
+\item{confidence}{A numeric value representing the data confidence (\%) to be used for identifying the PC threshold.
+The value is also used to draw the data distribution and Hotelling Ellipse on scores plot. (Default: \code{95}, Options: \code{95} or \code{99})}
 
-\item{distribution}{Data distribution to be drawn on scores plot and biplot (Default: NULL, Options: "normal" or "t"): NULL or character}
+\item{distribution}{A character string representing the data distribution type to be drawn on the scores plot and biplot. (Default: \code{NULL}, Options: \code{"normal"} or \code{"t"})}
 
-\item{colour}{Column name representing data to be used for colour grouping (Default: NULL): NULL or character}
+\item{colour}{A character string representing the name of the data column to be used for colour grouping. (Default: \code{NULL})}
 
-\item{shape}{Column name representing data to be used for shape grouping (Default: NULL): NULL or character}
+\item{shape}{A character string representing the name of the data column to be used for shape grouping. (Default: \code{NULL})}
 
-\item{subtitle}{Plot subtitle (Default: NULL): NULL or character}
+\item{subtitle}{A character string representing the plot subtitle. (Default: \code{NULL})}
 
-\item{colourLabel}{Colour grouping label (Default: Value used for colour): NULL or character}
+\item{colourLabel}{A character string representing the colour grouping label. (Default: Value used for \code{colour})}
 
-\item{shapeLabel}{Shape grouping label (Default: Value used for shape): NULL or character}
+\item{shapeLabel}{A character string representing the shape grouping label. (Default: Value used for \code{shape})}
 
-\item{screePlotToggle}{Toggle to display scree plot (Default: TRUE, Options: TRUE or FALSE): logical}
+\item{screePlotToggle}{A logical value representing the toggle to display the generated scree plot. (Default: \code{TRUE}, Options: \code{TRUE} or \code{FALSE})}
 
-\item{scoresPlotToggle}{Toggle to display scores plot (Default: TRUE, Options: TRUE or FALSE): logical}
+\item{scoresPlotToggle}{A logical value representing the toggle to display the generated scores plot. (Default: \code{TRUE}, Options: \code{TRUE} or \code{FALSE})}
 
-\item{loadingsPlotToggle}{Toggle to display loadings plot (Default: TRUE, Options: TRUE or FALSE): logical}
+\item{loadingsPlotToggle}{A logical value representing the toggle to display the generated loadings plot. (Default: \code{TRUE}, Options: \code{TRUE} or \code{FALSE})}
 
-\item{biPlotToggle}{Toggle to display biplot (Default: TRUE, Options: TRUE or FALSE): logical}
+\item{biPlotToggle}{A logical value representing the toggle to display the generated biplot. (Default: \code{TRUE}, Options: \code{TRUE} or \code{FALSE})}
+}
+\value{
+This function does not return any value. It prints the ggplot objects representing the scree plot, scores plot, loadings plot, and/or biplot.
 }
 \description{
-Perform Principle Component Analysis (PCA) and display analysis outcomes (scree plot, scores plot, loadings plot and/or biplot).
+Perform Principle Component Analysis (PCA) and display analysis outcomes (scree plot, scores plot, loadings plot, and/or biplot).
 }

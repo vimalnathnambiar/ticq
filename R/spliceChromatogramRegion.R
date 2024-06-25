@@ -21,7 +21,7 @@ spliceChromatogramRegion <- function(data, commonColumn, spectrumCount, chromato
     if (i == "commonColumn") {
       validateCharacterVector(parameterName = i, parameterValue = parameter[[i]])
     } else if (i == "chromatogramRegion" && !is.null(parameter[[i]]) && !validateChromatogramRegion(parameterName = i, parameterValue = parameter[[i]])) {
-      stop(paste0("Invalid '", i, "': Must either be NULL or contain a valid list of chromatogram region data"))
+      stop(paste0("Invalid '", i, "': Must either be NULL or contain a valid chromatogram region data list"))
     } else if (i != "commonColumn" && i != "chromatogramRegion") {
       validateCharacterString(parameterName = i, parameterValue = parameter[[i]])
     }

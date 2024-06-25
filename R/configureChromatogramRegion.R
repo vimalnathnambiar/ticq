@@ -28,8 +28,14 @@ configureChromatogramRegion <- function(massCalibrationStart = 0,
                                         washStart,
                                         washEnd = NULL) {
   # Validate parameters
-  parameter <- list(massCalibrationStart = massCalibrationStart, massCalibrationEnd = massCalibrationEnd, analyteStart = analyteStart, analyteEnd = analyteEnd,
-                    washStart = washStart, washEnd = washEnd)
+  parameter <- list(
+    massCalibrationStart = massCalibrationStart,
+    massCalibrationEnd = massCalibrationEnd,
+    analyteStart = analyteStart,
+    analyteEnd = analyteEnd,
+    washStart = washStart,
+    washEnd = washEnd
+  )
   for (i in names(parameter)) {
     if (i == "washEnd" && !is.null(parameter[[i]]) && (length(parameter[[i]]) != 1 || !is.numeric(parameter[[i]]))) {
       stop(paste0("Invalid '", i, "': Must either be NULL or a numeric value of length 1"))

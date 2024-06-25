@@ -16,10 +16,12 @@ loadPackage <- function(packageName) {
   # Validate parameters
   validateCharacterVector(parameterName = "packageName", parameterValue = packageName)
   
-  # Identify, install and load missing packages
+  # Identify and install missing packages
   missingPackage <- packageName[!(packageName %in% installed.packages()[, "Package"])]
   if (length(missingPackage) > 0) {
     install.packages(missingPackage)
   }
+  
+  # Load packages
   return(sapply(packageName, require, character.only = TRUE))
 }

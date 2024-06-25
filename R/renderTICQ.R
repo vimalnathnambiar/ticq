@@ -31,9 +31,10 @@ renderTICQ <- function(inputPath, outputDirectoryPath = paste0(getwd(), "/output
     "MS-RP-NEG" = list(massCalibrationEnd = 0.7, washStart = 11)
   )
   
-  # Validate input path
   message("\nValidating rendering parameters")
   message("---")
+  
+  # Validate input path
   message("1. Input path")
   if (length(retrieveFileName(inputPath = inputPath, fileExtension = "JSON")) == 0) {
     stop("Invalid 'inputPath': No available JSON file was found at the specified path")
@@ -55,7 +56,7 @@ renderTICQ <- function(inputPath, outputDirectoryPath = paste0(getwd(), "/output
   if (!is.null(historicalDataPath)) {
     if (length(parameterValue) != 1 || !is.character(parameterValue) || is.na(parameterValue) || parameterValue == "") {
       stop("Invalid 'historicalDataPath: Must either be NULL or a non-NA, non-empty character string of length 1")
-    } else if (!checkFileExtension(parameterName = 'historicalDataPath', parameterValue = historicalDataPath, fileExtension = "RDS")) {
+    } else if (!validateFileExtension(parameterName = 'historicalDataPath', parameterValue = historicalDataPath, fileExtension = "RDS")) {
       stop("Invalid 'historicalDataPath': No available RDS file found at the specified path")
     }
   }
@@ -70,15 +71,13 @@ renderTICQ <- function(inputPath, outputDirectoryPath = paste0(getwd(), "/output
     
   # Validate ANPC method library
   message("\n5. ANPC method library")
-  if (is.null(anpcMethodLibrary)) {
-    if (inputMetadata$method %in% names(anpcChromatogramRegionData)) {
-      message("Attempting to set method library based on input metadata")
-      if (!is.null(extractTargetFile(anpcMethodLibrary = inputMetadata$method))) {
-        message("Setting new value")
-        anpcMethodLibrary <- inputMetadata$method
-      } else {
-        message("Unsuccessful attempt: No available target file data")
-      }
+  if (is.null(anpcMethodLibrary) && inputMetadata$method %in% names(anpcChromatogramRegionData)) {
+    message("Attempting to set method library based on input metadata")
+    if (!is.null(extractTargetFile(anpcMethodLibrary = inputMetadata$method))) {
+      message("Setting new value")
+      anpcMethodLibrary <- inputMetadata$method
+    } else {
+      message("Unsuccessful attempt: No available target file data")
     }
   } else if (!is.null(anpcMethodLibrary) && is.null(extractTargetFile(anpcMethodLibrary = anpcMethodLibrary))) {
     stop("Invalid 'anpcMethodLibrary': No available target file data")
@@ -87,11 +86,9 @@ renderTICQ <- function(inputPath, outputDirectoryPath = paste0(getwd(), "/output
     
   # Validate chromatogram region data
   message("\n6. Chromatogram region")
-  if (!is.null(chromatogramRegion)) {
-    if (!validateChromatogramRegion(parameterName = "chromatogramRegion", parameterValue = chromatogramRegion)) {
-      message("Setting default value")
-      chromatogramRegion <- NULL
-    }
+  if (!is.null(chromatogramRegion) && !validateChromatogramRegion(parameterName = "chromatogramRegion", parameterValue = chromatogramRegion)) {
+    message("Setting default value")
+    chromatogramRegion <- NULL
   }
   
   if (is.null(chromatogramRegion) && !is.null(anpcMethodLibrary) && anpcMethodLibrary %in% names(anpcChromatogramRegionData)) {
@@ -101,6 +98,7 @@ renderTICQ <- function(inputPath, outputDirectoryPath = paste0(getwd(), "/output
       washStart = anpcChromatogramRegionData[[anpcMethodLibrary]]$washStart
     )
   }
+  
   print(chromatogramRegion)
   
   # Validate round decimal place value
@@ -114,11 +112,13 @@ renderTICQ <- function(inputPath, outputDirectoryPath = paste0(getwd(), "/output
   message("\n8. Metadata anonymiser")
   validateLogicalValue(parameterName = "metadataAnonymiser", parameterValue = metadataAnonymiser)
   print(metadataAnonymiser)
+  
   message("---\n")
 
   # Render TICQ R markdown script
-  message("Rendering TICQ...")
   title <- gsub("\\.json$", "", basename(inputPath), ignore.case = TRUE)
+  
+  message("Rendering TICQ...")
   rmarkdown::render(
     input = system.file("notebooks", "ticq.Rmd", package = "ticq"),
     output_format = "html_document",

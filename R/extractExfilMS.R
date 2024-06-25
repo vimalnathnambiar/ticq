@@ -16,6 +16,7 @@ extractExfilMS <- function(inputPath) {
   # Extract spectral data from JSON files
   passedData <- data.frame()
   fileName <- character(0)
+  
   if (length(inputFiles) > 0) {
     for (i in inputFiles) {
       # Parse JSON file

@@ -11,6 +11,27 @@
 #' @param label A character string representing the chromatogram region label, (Default: `NULL`)
 #' @returns A ggplot object with the added vertical lines representing the chromatogram region start and end time points
 displayChromatogramRegion <- function(plot, maxX, maxY, regionOfInterest, label = NULL) {
+  # Validate parameters
+  parameter <- list(maxX = maxX, maxY = maxY, regionOfInterest = regionOfInterest, label = label)
+  for (i in names(parameter)) {
+    if (i == "maxX" || i == "maxY") {
+      validateNumericValue(parameterName = i, parameterValue = parameter[[i]])
+    } else if (i == "label" && !is.null(parameter[[i]]) && (length(parameter[[i]]) != 1 || !is.character(parameter[[i]]))) {
+      stop(paste0("Invalid '", i, "': Must either be NULL or a character string of length 1"))
+    } else if (i == "regionOfInterest") {
+      pattern <- c("start", "end")
+      if (length(parameter[[i]]) != 2 || !is.list(parameter[[i]])) {
+        stop(paste0("Invalid '", i, "': Must be a list containing 2 time points (start, end)"))
+      } else if (!all(pattern %in% names(parameter[[i]]))) {
+        stop(paste0("Invalid '", i, "': Missing one or more time point (", paste(pattern[!pattern %in% names(parameter[[i]])], collapse = ", "), ")"))
+      } else if (length(parameter[[i]][[pattern[[1]]]]) != 1 || !is.numeric(parameter[[i]][[pattern[[1]]]])) {
+        stop(paste0("Invalid '", pattern[[1]], "': Must be a numeric value of length 1"))
+      } else if (!is.null(parameter[[i]][[pattern[[2]]]]) && (length(parameter[[i]][[pattern[[2]]]]) != 1 || !is.numeric(parameter[[i]][[pattern[[2]]]]))) {
+        stop(paste0("Invalid '", pattern[[2]], "': Must either be NULL or a numeric value of length 1"))
+      }
+    }
+  }
+  
   # Check region end time point
   if (is.null(regionOfInterest$end)) {
     regionOfInterest$end <- maxX

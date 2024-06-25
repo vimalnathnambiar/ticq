@@ -60,7 +60,7 @@ extractTargetFile <- function(targetFilePath = NULL, anpcMethodLibrary = NULL, r
   if (!is.null(targetFilePath) && !is.null(anpcMethodLibrary)) {
     message("Both target file path and ANPC method library specified: Using target file path as first point of extraction")
   } else if (is.null(targetFilePath) && is.null(anpcMethodLibrary)) {
-    message("Unable to extract target file: Requires either a target file path or ANPC method library for extraction")
+    message("Unable to extract target file: Requires either a target file path or an ANPC method library for extraction")
     return(NULL)
   }
   
@@ -115,7 +115,7 @@ extractTargetFile <- function(targetFilePath = NULL, anpcMethodLibrary = NULL, r
     targetFile
   }
     
-  # Validate target file
+  # Validate extracted target file
   pattern <- c("compoundName", "compoundType", "mzValue", "retentionTime", "msLevel", "internalStandard", "product")
   if (!is.null(targetFile) && !all(pattern %in% colnames(targetFile))) {
     message(paste0("Unable to extract target file: Missing one or more data column (", paste(pattern[!pattern %in% colnames(targetFile)], collapse = ", "), ")"))

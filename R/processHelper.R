@@ -69,10 +69,12 @@ validateLogicalValue <- function(parameterName, parameterValue) {
 #' @param pathType A character string representing the path type to validate for. (Default: `"both"`; Options: `"directory"`, `"file"`, or `"both"`)
 #' @returns Invisible TRUE if the directory or file path is valid; otherwise, it stops with an error message.
 validateDirectoryFileExist <- function(parameterName, parameterValue, pathType = "both") {
-  validateCharacterString(parameterName, parameterValue)
+  validateCharacterString(parameterName = parameterName, parameterValue = parameterValue)
   if (!pathType %in% c("directory", "file", "both")) {
     stop("Invalid 'pathType': Must either be 'directory', 'file', or 'both'")
-  } else if (pathType == "directory" && !dir.exists(parameterValue)) {
+  } 
+  
+  if (pathType == "directory" && !dir.exists(parameterValue)) {
     stop(paste0("Invalid '", parameterName, "': No directory was found at the specified path"))
   } else if (pathType == "file" && !file.exists(parameterValue)) {
     stop(paste0("Invalid '", parameterName, "': No file was found at the specified path"))
@@ -82,38 +84,35 @@ validateDirectoryFileExist <- function(parameterName, parameterValue, pathType =
   return(invisible(TRUE))
 }
 
-#' Check File Extension
+#' Validate File Extension
 #' 
-#' A helper function to validate a character string representing a file path, and check if it matches a specific file extension.
+#' A helper function to validate a character string representing a file path if it matches a specific file extension.
 #' It ensures that the file specified has a length of 1, is a character type, is not NA or an empty character string, is a valid file at the specified path,
-#' and checks if the file matches the file extension specified.
+#' and validates if the file matches the file extension specified.
 #' 
 #' @param parameterName A character string representing the name of the parameter being validated.
 #' @param parameterValue A character string representing a file path to be checked.
 #' @param fileExtension A character string representing a file extension to check for.
 #' @returns Invisible TRUE if the file path is valid and matches the file extension specified; otherwise returns invisible FALSE.
-checkFileExtension <- function(parameterName, parameterValue, fileExtension) {
-  validateCharacterString(parameterName, parameterValue)
+validateFileExtension <- function(parameterName, parameterValue, fileExtension) {
+  validateCharacterString(parameterName = parameterName, parameterValue = parameterValue)
   validateCharacterString(parameterName = "fileExtension", parameterValue = fileExtension)
-  validateDirectoryFileExist(parameterName, parameterValue, pathType = "file")
+  validateDirectoryFileExist(parameterName = parameterName, parameterValue = parameterValue, pathType = "file")
   return(invisible(grepl(paste0("\\.", fileExtension, "$"), parameterValue, ignore.case = TRUE)))
 }
 
-#' Validate Directory Path Format
+#' Format Directory Path
 #' 
-#' A helper function to validate and standardize the format of a character string representing a directory path. 
+#' A helper function to format and standardise a character string representing a directory path. 
 #' It ensures that the directory path specified has a length of 1, is a character type, is not NA or an empty character string,
 #' and ends with a forward slash (/).
 #' 
 #' @param parameterName A character string representing the name of the parameter being validated.
 #' @param parameterValue A character string representing the directory path to be validated.
 #' @returns A character string representing the validated and standardised directory path with a forward slash (/); otherwise, it stops with an error message.
-validateDirectoryPathFormat <- function(parameterName, parameterValue) {
-  validateCharacterString(parameterName, parameterValue)
-  if (substring(parameterValue, nchar(parameterValue)) != "/") {
-    return(paste0(parameterValue, "/"))
-  }
-  return(parameterValue)
+formatDirectoryPath <- function(parameterName, parameterValue) {
+  validateCharacterString(parameterName = parameterName, parameterValue = parameterValue)
+  return(if (substring(parameterValue, nchar(parameterValue)) != "/") paste0(parameterValue, "/") else parameterValue)
 }
 
 #' Create Directory Path
@@ -126,7 +125,7 @@ validateDirectoryPathFormat <- function(parameterName, parameterValue) {
 #' @param parameterValue A character string representing a directory path to be created.
 #' @returns Invisible TRUE if the directory exists or is created at the specified path; otherwise, it stops with an error message.
 createDirectoryPath <- function(parameterName, parameterValue) {
-  parameterValue <- validateDirectoryPathFormat(parameterName = parameterName, parameterValue = parameterValue)
+  parameterValue <- formatDirectoryPath(parameterName = parameterName, parameterValue = parameterValue)
   tryCatch({
     if (!dir.exists(parameterValue)) {
       dir.create(parameterValue, recursive = TRUE)
@@ -170,14 +169,14 @@ validateChromatogramRegion <- function(parameterName, parameterValue) {
       message(paste0("Invalid '", i, "' region data: Missing one or more time point (", paste(timepoint[!timepoint %in% names(parameterValue[[i]])], collapse = ", "), ")"))
       return(invisible(FALSE))
     } else if (length(parameterValue[[i]][[timepoint[[1]]]]) != 1 || !is.numeric(parameterValue[[i]][[timepoint[[1]]]])) {
-      message(paste("Invalid 'start' for", i, "region data: Must be a numeric value of length 1"))
+      message(paste0("Invalid '", timepoint[[1]], "' for ", i, " region data: Must be a numeric value of length 1"))
       return(invisible(FALSE))
     } else if (((i == "wash" && !is.null(parameterValue[[i]][[timepoint[[2]]]])) || i != "wash") &&
                (length(parameterValue[[i]][[timepoint[[2]]]]) != 1 || !is.numeric(parameterValue[[i]][[timepoint[[2]]]]))) {
       if (i == "wash") {
-        message(paste("Invalid 'end' for", i, "region data: Must either be NULL or a numeric value of length 1"))
+        message(paste0("Invalid '", timepoint[[2]], "' for ", i, " region data: Must either be NULL or a numeric value of length 1"))
       } else {
-        message(paste("Invalid 'end' for", i, "region data: Must be a numeric value of length 1"))
+        message(paste0("Invalid '", timepoint[[2]], "' for ", i, " region data: Must be a numeric value of length 1"))
       }
       return(invisible(FALSE))
     }

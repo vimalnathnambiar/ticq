@@ -41,8 +41,22 @@ displayChromatogram <- function(data,
     stop("Invalid 'data': Empty data frame")
   }
   
-  parameter <- list(x = x, y = y, colour = colour, title = title, subtitle = subtitle, caption = caption, xLabel = xLabel, yLabel = yLabel, colourLabel = colourLabel,
-                    xTickToggle = xTickToggle, facetWrapBy = facetWrapBy, facetColumn = facetColumn, facetRow = facetRow, chromatogramRegion = chromatogramRegion)
+  parameter <- list(
+    x = x,
+    y = y,
+    colour = colour,
+    title = title,
+    subtitle = subtitle,
+    caption = caption,
+    xLabel = xLabel,
+    yLabel = yLabel,
+    colourLabel = colourLabel,
+    xTickToggle = xTickToggle,
+    facetWrapBy = facetWrapBy,
+    facetColumn = facetColumn,
+    facetRow = facetRow,
+    chromatogramRegion = chromatogramRegion
+  )
   for (i in names(parameter)) {
     if (i == "x" || i == "y") {
       validateCharacterString(parameterName = i, parameterValue = parameter[[i]])
