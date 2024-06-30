@@ -18,7 +18,7 @@
 #' @import dplyr
 #'
 #' @export
-#' @param data A data frame containing data to be used for plotting.
+#' @param data A data frame of the time series data to be used for plotting.
 #' @param x A character string representing the name of the data column to be used for the x-axis.
 #' @param y A character string representing the name of the data column to be used for the y-axis.
 #' @param colour A character string representing the name of the data column to be used for colour grouping. (Default: `NULL`)
@@ -31,6 +31,7 @@
 #' @param colourLabel A character string representing the colour grouping label. (Default: `colour`)
 #' @param shapeLabel A character string representing the shape grouping label. (Default: `shape`)
 #' @param boundary A character string representing the boundary analysis type to perform. (Default: `NULL`, Options: `"value"`, `"percentage"`, or `"sd"`)
+#' @param boundaryValue A numeric value to be used for "value" and "percentage" type boundary analysis. (Default: `0`)
 #' @param referenceData A data frame containing reference data to be used for "sd" type boundary analysis. (Default: `NULL`)
 #' @param trendlineToggle A logical value representing the toggle to display the data trendline. (Default: `TRUE`, Options: `TRUE` or `FALSE`)
 #' @param xTickToggle A logical value representing the toggle to display the ticks on the x-axis. (Default: `TRUE`, Options: `TRUE` or `FALSE`)
@@ -52,6 +53,7 @@ displayTimeSeries <- function(data,
                               colourLabel = colour,
                               shapeLabel = shape,
                               boundary = NULL,
+                              boundaryValue = 0,
                               referenceData = NULL,
                               trendlineToggle = TRUE,
                               xTickToggle = TRUE,
@@ -76,6 +78,7 @@ displayTimeSeries <- function(data,
     colourLabel = colourLabel,
     shapeLabel = shapeLabel,
     boundary = boundary,
+    boundaryValue = boundaryValue,
     trendlineToggle = trendlineToggle,
     xTickToggle = xTickToggle,
     facetWrapBy = facetWrapBy,
@@ -92,6 +95,8 @@ displayTimeSeries <- function(data,
     } else if (i == "boundary" && !is.null(parameter[[i]]) &&
                (length(parameter[[i]]) != 1 || !is.character(parameter[[i]]) || !parameter[[i]] %in% c("value", "percentage", "sd"))) {
       stop(paste0("Invalid '", i, "': Must either be NULL or a character string of length 1 ('value', 'percentage', or 'sd'"))
+    } else if (i == "boundaryValue" && boundary %in% c("value", "percentage")) {
+      validateNumericValue(name = i, value = parameter[[i]])
     } else if (i == "trendlineToggle" || i == "xTickToggle") {
       validateLogicalValue(name = i, value = parameter[[i]])
     } else if (i == "facetColumn" || i == "facetRow") {
@@ -104,7 +109,7 @@ displayTimeSeries <- function(data,
     stop(paste0("Unable to display ", title, ": Missing one or more data column (", paste(parameter[!parameter %in% colnames(data)], collapse = ", "), ")"))
   }
   
-  validateNumericVectorElement(name = "y", value = data[[y]])
+  validateNumericVectorElement(name = paste0("data[[", y, "]]"), value = data[[y]])
   if (!is.null(referenceData) && boundary == "sd") {
     if (!is.data.frame(referenceData)) {
       stop("Invalid 'referenceData': Must be a data frame")
@@ -113,10 +118,10 @@ displayTimeSeries <- function(data,
     }
     
     if (length(referenceData[[y]]) < 2) {
-      message("Invalid referenceData': Insufficient data to generate statistics (Setting default)")
+      message("Invalid 'referenceData': Insufficient data to generate statistics (Setting default)")
       referenceData <- NULL
     } else {
-      validateStatisticalNumericVectorElement(name = "referenceData[[y]]", value = referenceData[[y]])
+      validateStatisticalNumericVectorElement(name = paste0("referenceData[[", y, "]]"), value = referenceData[[y]])
     }
   }
   
@@ -215,11 +220,11 @@ displayTimeSeries <- function(data,
         }
       },
       warning = function(w) {
-        message(paste0("Unable to perform '", boundary, "' type boundary analysis:", w))
+        message(paste0("Unable to perform '", boundary, "' type boundary analysis: ", w))
         result <- NULL
       },
       error = function(e) {
-        message(paste0("Unable to perform '", boundary, "' type boundary analysis:", e))
+        message(paste0("Unable to perform '", boundary, "' type boundary analysis: ", e))
         result <- NULL
       })
     }
@@ -229,6 +234,12 @@ displayTimeSeries <- function(data,
       return(result)
     }
   }, 
-  warning = function(w) message(paste0("Unable to display ", title, ": ", w)),
-  error = function(e) message(paste0("Unable to display ", title, ": ", e)))
+  warning = function(w) {
+    message(paste0("Unable to display ", title, ": ", w))
+    return(invisible(NULL))
+  },
+  error = function(e) {
+    message(paste0("Unable to display ", title, ": ", e))
+    return(invisible(NULL))
+  })
 }

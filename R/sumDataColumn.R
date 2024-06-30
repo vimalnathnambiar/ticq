@@ -5,10 +5,10 @@
 #' @import dplyr
 #'
 #' @export
-#' @param data A data frame containing MS spectral data.
+#' @param data A data frame of the MS spectral data.
 #' @param commonColumn A character vector representing the names of the common data columns to be used for data grouping.
 #' @param sumColumn A character string representing the name of the data column with values to be summed.
-#' @returns A data frame of MS spectral data summary grouped by their common data columns and the sum value of the specified data column.
+#' @returns A data frame of the MS spectral data summary grouped by their common data columns and the sum value of the data column.
 sumDataColumn <- function(data, commonColumn, sumColumn) {
   # Validate parameters
   if (!is.data.frame(data)) {

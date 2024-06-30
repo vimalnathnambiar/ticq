@@ -1,31 +1,52 @@
 #' Sum Extracted Ion Current (EIC)
 #'
-#' Sum intensity values of target m/z (EIC) from multiple data columns by grouping using its common columns.
+#' Sum the intensity of each target m/z value of each data group.
 #'
 #' @import dplyr
 #'
 #' @export
-#' @param data A data frame containing spectral data: data frame
-#' @param commonColumn Column names of data common for each sample: character vector
-#' @param spectrumCount Spectrum count column name: character
-#' @param firstColumnIndex Index of the first data column to summed: double
-#' @param lastColumnIndex Index of the last data column to summed: double
-#' @returns A data frame grouped by common columns and the summed values of each column specified
+#' @param data A data frame of the MS spectral data.
+#' @param commonColumn A character vector representing the names of the common data columns to be used for data grouping.
+#' @param spectrumCount A character string representing the name of the spectrum count column.
+#' @param firstColumnIndex A numeric value representing the index of the first data column to be summed.
+#' @param lastColumnIndex A numeric value representing the index of the last data column to be summed. (Default: `NULL`)
+#' @returns A data frame of the MS spectral data grouped by their common data columns and the summed intensity of each target m/z value.
 sumEIC <- function(data, commonColumn, spectrumCount, firstColumnIndex, lastColumnIndex = NULL) {
-  # Data frame to store summed EIC values
-  summedDataEIC <- ticq::countSpectrum(data = data, commonColumn = commonColumn, spectrumCount = spectrumCount)
+  # Validate parameters
+  if (!is.data.frame(data)) {
+    stop("Invalid 'data': Must be a data frame")
+  }
   
-  # Check last data column index
+  parameter <- list(commonColumn = commonColumn, spectrumCount = spectrumCount, firstColumnIndex = firstColumnIndex, lastColumnIndex = lastColumnIndex)
+  for (i in names(parameter)) {
+    if (i == "commonColumn") {
+      validateCharacterVectorElement(name = i, value = parameter[[i]])
+    } else if (i == "spectrumCount") {
+      validateCharacterStringValue(name = i, value = parameter[[i]])
+    } else if (i == "firstColumnIndex") {
+      validateNumericValue(name = i, value = parameter[[i]])
+    } else if (i == "lastColumnIndex") {
+      validateNullableNumericValue(name = i, value = parameter[[i]])
+    }
+    
+    if ((i == "firstColumnIndex" || (i == "lastColumnIndex" && !is.null(parameter[[i]]))) && (parameter[[i]] < 1 || parameter[[i]] > ncol(data))) {
+      stop(paste0("Invalid '", i, "': Data column index out of bound"))
+    }
+  }
+  
+  parameter <- c(commonColumn, spectrumCount)
+  if (!all(parameter %in% colnames(data))) {
+    stop(paste0("Unable to sum EIC: Missing one or more data column (", paste(parameter[!parameter %in% colnames(data)], collapse = ", "), ")"))
+  }
+  
+  # Sum intensity of each target m/z
+  summedDataEIC <- ticq::countSpectrum(data = data, commonColumn = commonColumn, spectrumCount = spectrumCount)
   if (is.null(lastColumnIndex)) {
     lastColumnIndex <- ncol(data)
   }
   
-  # Loop through data columns
   for (i in firstColumnIndex:lastColumnIndex) {
-    # Data column name
     y <- colnames(data)[i]
-    
-    # Sum EIC
     summedDataEIC <- data %>%
       dplyr::group_by(across(all_of(commonColumn))) %>%
       dplyr::summarise(!!spectrumCount := n(), !!y := sum(.data[[y]]), .groups = "drop") %>%

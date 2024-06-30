@@ -5,7 +5,7 @@
 #' @import dplyr
 #'
 #' @export
-#' @param data A data frame containing MS spectral data.
+#' @param data A data frame of the MS spectral data.
 #' @param commonColumn A character vector representing the names of the common data columns to be used for data grouping.
 #' @param sampleType A character string representing the name of the sample type column.
 #' @param spectrumCount A character string representing the name of the spectrum count column.

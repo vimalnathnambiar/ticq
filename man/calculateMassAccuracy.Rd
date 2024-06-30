@@ -7,22 +7,17 @@
 calculateMassAccuracy(data, mzArray, targetMZ, roundDecimalPlace = NULL)
 }
 \arguments{
-\item{data}{A data frame containing spectral data: data frame}
+\item{data}{A data frame of the MS spectral data.}
 
-\item{mzArray}{m/z array column name: character}
+\item{mzArray}{A character string representing the name of the m/z array column.}
 
-\item{targetMZ}{Target m/z values (Must be unique, sorted, and equal length and correspond to the values stored within intensity array): character vector}
+\item{targetMZ}{A numeric vector representing the target m/z values in the spectra array.}
 
-\item{roundDecimalPlace}{Number of decimal places for precision value rounding (Default: NULL): NULL or double}
-
-\item{commonColumn}{Column names of data common for each sample: character vector}
+\item{roundDecimalPlace}{A numeric value representing the number of decimal places to be used for precision value rounding. (Default: \code{NULL})}
 }
 \value{
-A data frame with appended columns representing the calculated mass accuracy (in ppm) for each target m/z (EIC)
+A data frame of the MS spectral data and the calculated mass accuracy of each target m/z value.
 }
 \description{
-Calculate the mass accuracy (in ppm) of each target m/z data detected within the spectra.
-}
-\details{
-The length of the target list containing unique m/z values must be equal to the length of m/z array for each spectral data and reflect the corresponding m/z values stored.
+Calculate the mass accuracy (in ppm) of each target m/z value in the spectra array.
 }

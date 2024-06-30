@@ -1,43 +1,49 @@
 #' Display Multiple Time Series
 #'
-#' Display multiple time series data (and perform boundary analysis if defined).
+#' Display multiple time series data and perform boundary analysis to evaluate data performance over time.
+#' - Value (Evaluates data by +/- value from 0)
+#' - Percentage (Evaluates data by +/- value from 100)
+#' - Standard deviation, sd (Evaluates data using 1st and 2nd standard deviations from average mean of the data or reference data).
 #'
-#' Boundary analysis that can be performed:
-#' - value: Evaluates data by +/- value from 0
-#' - percentage: Evaluates data by +/- value from 100
-#' - sd: Evaluates data using 1st and 2nd standard deviations from average mean of the data or reference data
-#'
-#' To define mean and standard deviation values to be used for "sd" boundary analysis, pass reference data that mirrors the same columns as data.
+#' Type of boundary analysis:
+#' 
+#' 1. "value" - Uses a boundary value set +/- from 0 as the boundary ranges for evaluation.
+#' 
+#' 2. "percentage" - Uses a boundary value set +/- from 100 as the boundary ranges for evaluation.
+#' 
+#' 3. "sd" - Uses 1st and 2nd standard deviation value from the average mean as the boundary ranges. 
+#' To specify an external mean and standard deviation value to be used for analysis, provide reference data (Should have the same data columns as the actual data).
 #'
 #' @import ggplot2
 #' @import dplyr
 #'
 #' @export
-#' @param data A data frame containing plot data: data frame
-#' @param commonColumn Column names of data common for each sample: character vector
-#' @param x Column name representing the continuous data series to be used for x-axis: character
-#' @param firstColumnIndex Index of the first data column containing continuous data series for the y-axis: double
-#' @param lastColumnIndex Index of the last data column data containing continuous data series for the y-axis (Default: NULL): NULL or double
-#' @param colour Column name representing data to be used for colour grouping (Default: NULL): NULL or character
-#' @param shape Column name representing data to be used for shape grouping (Default: NULL): NULL or character
-#' @param title Plot title (Default: "Chromatogram"): NULL or character
-#' @param subtitle Plot subtitle (Default: NULL): NULL or character
-#' @param caption Plot caption (Default: NULL): NULL or character
-#' @param xLabel x-axis label (Default: Value used for x): NULL or character
-#' @param yLabel y-axis label (Default: NULL): NULL or character
-#' @param colourLabel Colour grouping label (Default: Value used for colour): NULL or character
-#' @param shapeLabel Shape grouping label (Default: Value used for shape)
-#' @param boundary Boundary analysis to perform (Default: NULL, Options: "value", "percentage", "sd"): NULL or character.
-#' @param boundaryValue Value used for "value" and "percentage" boundary analysis (Default: 0): double
-#' @param referenceData A data frame with the same column names and data to calculate "sd" boundaries (Default: NULL): NULL or data frame
-#' @param trendlineToggle Toggle to display trendline in the data (Default: TRUE, Options: TRUE or FALSE): boolean
-#' @param xTickToggle Toggle to display ticks on x-axis (Default: TRUE, Options: TRUE or FALSE): boolean
-#' @param facetWrapBy Column name representing data to be used for facet wrapping (Default: NULL): NULL or character
-#' @param facetColumn Number of columns to use for facet wrapping (Default: NULL): NULL or double
-#' @param facetRow Number of rows to use for facet wrapping (Default: NULL): NULL or double
-#' @param plotColumn Number of columns to use for plotting (Default: 1): double
-#' @param plotRow Number of rows to use for plotting (Default: 1): double
-#' @returns A data frame containing the result of the boundary analysis performed
+#' @param data A data frame of the time series data to be used for plotting.
+#' @param commonColumn A character vector representing the names of the common data columns to be used for data grouping.
+#' @param x A character string representing the name of the data column to be used for the x-axis.
+#' @param firstColumnIndex A numeric value representing the index of the first data column to be used for y-axis.
+#' @param lastColumnIndex A numeric value representing the index of the last data column to be used for y-axis. (Default: `NULL`)
+#' @param colour A character string representing the name of the data column to be used for colour grouping. (Default: `NULL`)
+#' @param shape A character string representing the name of the data column to be used for shape grouping. (Default: `NULL`)
+#' @param title A character string representing the plot title. (Default: `"Time Series"`)
+#' @param subtitle A character string representing the plot subtitle. (Default: `NULL`)
+#' @param caption A character string representing the plot caption. (Default: `NULL`)
+#' @param xLabel  character string representing the x-axis label. (Default: `x`)
+#' @param yLabel A character string representing the y-axis label. (Default: `y`)
+#' @param colourLabel A character string representing the colour grouping label. (Default: `colour`)
+#' @param shapeLabel A character string representing the shape grouping label. (Default: `shape`)
+#' @param boundary A character string representing the boundary analysis type to perform. (Default: `NULL`, Options: `"value"`, `"percentage"`, or `"sd"`)
+#' @param boundaryValue A numeric value to be used for "value" and "percentage" type boundary analysis. (Default: `0`)
+#' @param referenceData A data frame containing reference data to be used for "sd" type boundary analysis. (Default: `NULL`)
+#' @param trendlineToggle A logical value representing the toggle to display the data trendline. (Default: `TRUE`, Options: `TRUE` or `FALSE`)
+#' @param xTickToggle A logical value representing the toggle to display the ticks on the x-axis. (Default: `TRUE`, Options: `TRUE` or `FALSE`)
+#' @param facetWrapBy A character string representing the name of the data column to be used for facet wrapping. (Default: `NULL`)
+#' @param facetColumn A numeric value representing the number of columns to be used for facet wrapping. (Default: `NULL`)
+#' @param facetRow A numeric value representing the number of rows to be used for face wrapping. (Default: `NULL`)
+#' @param plotColumn A numeric value representing the number of columns to be used for plotting (Default: `1`)
+#' @param plotRow A numeric value representing the number of rows to be used for plotting (Default: `1`)
+#' @returns A data frame of the boundary analysis result if performed; otherwise, this function does not return any value.
+#' It prints the ggplot objects displaying the multiple time series data.
 displayMultipleTimeSeries <- function(data,
                                       commonColumn, 
                                       x,
@@ -62,31 +68,105 @@ displayMultipleTimeSeries <- function(data,
                                       facetRow = NULL,
                                       plotColumn = 1,
                                       plotRow = 1) {
+  # Validate parameters
+  if (!is.data.frame(data)) {
+    stop("Invalid 'data': Must be a data frame")
+  }
+  
+  parameter <- list(
+    commonColumn = commonColumn,
+    x = x,
+    firstColumnIndex = firstColumnIndex,
+    lastColumnIndex = lastColumnIndex,
+    colour = colour,
+    shape = shape,
+    title = title,
+    subtitle = subtitle,
+    caption = caption,
+    xLabel = xLabel,
+    yLabel = yLabel,
+    colourLabel = colourLabel,
+    shapeLabel = shapeLabel,
+    boundary = boundary,
+    boundaryValue = boundaryValue,
+    trendlineToggle = trendlineToggle,
+    xTickToggle = xTickToggle,
+    facetWrapBy = facetWrapBy,
+    facetColumn = facetColumn,
+    facetRow = facetRow,
+    plotColumn = plotColumn,
+    plotRow = plotRow
+  )
+  for (i in names(parameter)) {
+    if (i == "commonColumn") {
+      validateCharacterVectorElement(name = i, value = parameter[[i]])
+    } else if (i == "x") {
+      validateCharacterStringValue(name = i, value = parameter[[i]])
+    } else if (i == "firstColumnIndex" || i == "plotColumn" || i == "plotRow" || (i == "boundaryValue" && boundary %in% c("value", "percentage"))) {
+      validateNumericValue(name = i, value = parameter[[i]])
+    } else if (i == "lastColumnIndex" || i == "facetColumn" || i == "facetRow") {
+      validateNullableNumericValue(name = i, value = parameter[[i]])
+    } else if (i == "colour" || i == "shape" || i == "facetWrapBy") {
+      validateNullableCharacterStringValue(name = i, value = parameter[[i]])
+    } else if (i == "title" || i == "subtitle" || i == "caption" || i == "xLabel" || i == "yLabel" || i == "colourLabel" || i == "shapeLabel") {
+      validateNullableCharacterString(name = i, value = parameter[[i]])
+    } else if (i == "boundary" && !is.null(parameter[[i]]) &&
+               (length(parameter[[i]]) != 1 || !is.character(parameter[[i]]) || !parameter[[i]] %in% c("value", "percentage", "sd"))) {
+      stop(paste0("Invalid '", i, "': Must either be NULL or a character string of length 1 ('value', 'percentage', or 'sd'"))
+    } else if (i == "trendlineToggle" || i == "xTickTogle") {
+      validateLogicalValue(name = i, value = parameter[[i]])
+    }
+    
+    if ((i == "firstColumnIndex" || (i == "lastColumnIndex" && !is.null(parameter[[i]]))) && (parameter[[i]] < 1 || parameter[[i]] > ncol(data))) {
+      stop(paste0("Invalid '", i, "': Data column index out of bound"))
+    }
+  }
+  
+  parameter <- c(commonColumn, x, colour, shape, facetWrapBy)
+  if (!all(parameter %in% colnames(data))) {
+    stop(paste0("Unable to display ", title, ": Missing one or more data column (", paste(parameter[!parameter %in% colnames(data)], collapse = ", "), ")"))
+  }
+  
+  if (is.null(lastColumnIndex)) {
+    lastColumnIndex <- ncol(data)
+  }
+  
+  for (i in firstColumnIndex:lastColumnIndex) {
+    y <- colnames(data)[i]
+    validateNumericVectorElement(name = paste0("data[[", y, "]]"), value = data[[y]])
+  }
+  
+  if (!is.null(referenceData) && boundary == "sd") {
+    if (!is.data.frame(referenceData)) {
+      stop("Invalid 'referenceData': Must be a data frame")
+    } else if (!identical(colnames(referenceData), colnames(data))) {
+      stop("Invalid 'referenceData': Data columns must be identical to 'data'")
+    }
+    
+    if (nrow(referenceData) < 2) {
+      message("Invalid 'referenceData': Insufficient data to generate statistics (Setting default)")
+      referenceData <- NULL
+    } else {
+      for (i in firstColumnIndex:lastColumnIndex) {
+        y <- colnames(data)[i]
+        validateStatisticalNumericVectorElement(name = paste0("referenceData[[", y, "]]"), value = referenceData[[y]])
+      }
+    }
+  }
+  
+  # Display multiple time series
   tryCatch({
-    # Defaults
     plotList <- list()
     isFirstPlot <- TRUE
     nPlotData <- plotColumn * plotRow
     
-    # Check last data column index
-    if (is.null(lastColumnIndex)) {
-      lastColumnIndex <- ncol(data)
-    }
-    
-    # Data frame to store analysis result
     result <- if (!is.null(boundary)) {
       data %>%
         dplyr::select(all_of(commonColumn))
-    } else {
-      NULL
     }
-      
-    # Loop through data columns
+    
     for (i in firstColumnIndex:lastColumnIndex) {
-      # Data column name
       y <- colnames(data)[i]
-      
-      # Plot time series
       timeSeries <- ggplot2::ggplot(data = data, aes(x = .data[[x]], y = .data[[y]])) +
         ggplot2::geom_point(
           aes(
@@ -104,41 +184,34 @@ displayMultipleTimeSeries <- function(data,
         ) + 
         ggplot2::labs(caption = if (is.null(caption)) y else paste(y, caption), x = xLabel, y = yLabel, colour = colourLabel, shape = shapeLabel)
       
-        # Trendline
-        if (trendlineToggle) {
-          timeSeries <- timeSeries +
-            ggplot2::geom_smooth(colour = "red", fill = "grey", alpha = 0.25)
-        }
+      if (trendlineToggle) {
+        timeSeries <- timeSeries +
+          ggplot2::geom_smooth(colour = "red", fill = "grey", alpha = 0.25)
+      }
+    
+      if (!xTickToggle) {
+        timeSeries <- timeSeries +
+          ggplot2::theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
+      }
       
-        # x-axis ticks
-        if (!xTickToggle) {
-          timeSeries <- timeSeries +
-            ggplot2::theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
-        }
+      if (!is.null(facetWrapBy)) {
+        timeSeries <- timeSeries +
+          ggplot2::facet_wrap( ~ .data[[facetWrapBy]], ncol = facetColumn, nrow = facetRow)
+      }
       
-        # Facet wrap
-        if (!is.null(facetWrapBy)) {
-          timeSeries <- timeSeries +
-            ggplot2::facet_wrap( ~ .data[[facetWrapBy]], ncol = facetColumn, nrow = facetRow)
-        }
-      
-      # Boundary analysis
+      # Perform boundary analysis
       if (!is.null(boundary)) {
         tryCatch({
-          # Check boundary type
           if (boundary == "value" || boundary == "percentage") {
-            # Determine boundaries
             mid <- if (boundary == "value") 0 else 100
             lowerBound <- mid - boundaryValue
             upperBound <- mid + boundaryValue
             
-            # Display boundaries
             timeSeries <- timeSeries +
               ggplot2::geom_hline(yintercept = mid, linetype = "dashed", colour = "grey") +
               ggplot2::geom_hline(yintercept = lowerBound, linetype = "dashed", colour = "red") +
               ggplot2::geom_hline(yintercept = upperBound, linetype = "dashed", colour = "red")
             
-            # Analysis result
             result <- data %>%
               dplyr::mutate(
                 !!y := dplyr::case_when(
@@ -150,24 +223,9 @@ displayMultipleTimeSeries <- function(data,
               dplyr::select(all_of(commonColumn), !!y) %>%
               dplyr::left_join(result, ., by = commonColumn)
           } else if (boundary == "sd") {
-            # Check reference data
-            if (!is.null(referenceData)) {
-              if (!is.data.frame(referenceData) ||
-                  ncol(referenceData) != ncol(data) ||
-                  all(colnames(referenceData) != colnames(data)) ||
-                  nrow(referenceData) < 2 ||
-                  any(is.na(referenceData[[y]]))) {
-                referenceData <- NULL
-              }
-            }
-            
-            # Check sample data and reference data
-            if (nrow(data) > 1 || !is.null(referenceData)) {
-              # Determine boundaries
+            if (!is.null(referenceData) || nrow(data) > 1) {
               if (!is.null(referenceData)) {
-                # Generate statistics
-                stat <- ticq::generateStat(data = referenceData[[y]])
-                
+                stat <- generateStatistic(data = referenceData[[y]])
                 mean <- stat$mean
                 sd <- stat$sd
               } else {
@@ -180,7 +238,6 @@ displayMultipleTimeSeries <- function(data,
               lowerBound2 <- mean - (2 * sd)
               upperBound2 <- mean + (2 * sd)
               
-              # Display boundaries
               timeSeries <- timeSeries +
                 ggplot2::geom_hline(yintercept = mean, linetype = "dashed", colour = "grey") +
                 ggplot2::geom_hline(yintercept = lowerBound1, linetype = "dashed", colour = "blue") +
@@ -188,7 +245,6 @@ displayMultipleTimeSeries <- function(data,
                 ggplot2::geom_hline(yintercept = lowerBound2, linetype = "dashed", colour = "red") +
                 ggplot2::geom_hline(yintercept = upperBound2, linetype = "dashed", colour = "red")
               
-              # Analysis result
               result <- data %>%
                 dplyr::mutate(
                   !!y := dplyr::case_when(
@@ -202,35 +258,28 @@ displayMultipleTimeSeries <- function(data,
                 dplyr::select(all_of(commonColumn), !!y) %>%
                 dplyr::left_join(result, ., by = commonColumn)
             } else {
-              # Analysis result
               result <- data %>%
                 dplyr::mutate(!!y := "Normal") %>%
                 dplyr::select(all_of(commonColumn), !!y) %>%
                 dplyr::left_join(result, ., by = commonColumn)
             }
-          } else {
-            result <- NULL
           }
         },
         warning = function(w) {
-          print(paste("Unable to perform boundary analysis for", y, "-", w))
+          message(paste0("Unable to perform '", boundary, "' type boundary analysis for ", y, ": ", w))
           result <- result %>%
             dplyr::mutate(!!y := NA_character_)
         },
         error = function(e) {
-          print(paste("Unable to perform boundary analysis for", y, "-", e))
+          message(paste0("Unable to perform '", boundary, "' type boundary analysis for ", y, ": ", w))
           result <- result %>%
             dplyr::mutate(!!y := NA_character_)
         })
       }
       
-      # Append plot to plot list
       plotList[[y]] <- timeSeries
-      
-      # Display time series
       suppressMessages(
         if (length(plotList) %% nPlotData == 0 || i == lastColumnIndex) {
-          # Arrange plots into grid
           plotGrid <- ggpubr::ggarrange(
             plotlist = plotList,
             ncol = plotColumn,
@@ -239,28 +288,28 @@ displayMultipleTimeSeries <- function(data,
             legend = ifelse(isFirstPlot, "top", "none")
           )
           
-          # Plot grid title and subtitle
           if (isFirstPlot) {
             plotGrid <- ggpubr::annotate_figure(plotGrid, top = ggpubr::text_grob(paste0(title, ": ", subtitle)))
           }
           
-          # Display grid
           print(plotGrid)
           
-          # Reset
           plotList <- list()
           isFirstPlot <- FALSE
         }
       )
     }
-    return(result)
+    
+    if (!is.null(boundary)) {
+      return(result)
+    }
   }, 
   warning = function(w) {
-    print(paste("Unable to display", title, "-", w))
-    return(NULL)
+    message(paste0("Unable to display ", title, ": ", w))
+    return(invisible(NULL))
   },
   error = function(e) {
-    print(paste("Unable to display", title, "-", e))
-    return(NULL)
+    message(paste0("Unable to display ", title, ": ", e))
+    return(invisible(NULL))
   })
 }

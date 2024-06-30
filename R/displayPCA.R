@@ -11,7 +11,7 @@
 #' @import ggforce
 #'
 #' @export
-#' @param data A data frame containing data to be used to perform PCA.
+#' @param data A data frame of the data to be used to perform PCA.
 #' @param firstColumnIndex A numeric value representing the index of the first data column to perform PCA.
 #' @param lastColumnIndex A numeric value representing the index of the last data column to perform PCA. (Default: `NULL`)
 #' @param scale A logical value representing the scaling to be used for the PCA. (Default: `TRUE`, Options: `TRUE` or `FALSE`)
@@ -85,7 +85,7 @@ displayPCA <- function(data,
     }
     
     if ((i == "firstColumnIndex" || (i == "lastColumnIndex" && !is.null(parameter[[i]]))) && (parameter[[i]] < 1 || parameter[[i]] > ncol(data))) {
-      stop(paste0("Invalid '", i, "': Column index out of bound"))
+      stop(paste0("Invalid '", i, "': Data column index out of bound"))
     }
   }
   

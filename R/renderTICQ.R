@@ -147,5 +147,5 @@ renderTICQ <- function(inputPath,
       metadataAnonymiser = metadataAnonymiser
     )
   )
-  message("Rendering complete!")
+  message("Render complete!")
 }

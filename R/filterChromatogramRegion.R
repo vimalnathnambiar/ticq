@@ -5,11 +5,11 @@
 #' @import dplyr
 #'
 #' @export
-#' @param data A data frame containing MS spectral data.
+#' @param data A data frame of the MS spectral data.
 #' @param regionOfInterest A list representing the start and end time points of a chromatogram region of interest.
 #' (Default: `NULL`; Options: `configureChromatogramRegion()$regionOfInterest` or `configureChromatogramRegion()[["regionOfInterest"]]`)
 #' @param retentionTime A character string representing the name of the retention time column.
-#' @returns A data frame of MS spectral data that has a retention time between the start and end time point of the specified chromatogram region of interest.
+#' @returns A data frame of the MS spectral data with a retention time between the start and end time point of the chromatogram region of interest.
 filterChromatogramRegion <- function(data, regionOfInterest = NULL, retentionTime) {
   # Validate parameters
   if (!is.data.frame(data)) {

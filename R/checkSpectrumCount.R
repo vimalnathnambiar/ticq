@@ -1,11 +1,11 @@
 #' Check Spectrum Count
 #'
-#' Check the total number of MS spectral data (spectrum count) of each data group against an accepted threshold limit (%) (+/-)from the average mean.
+#' Check the total number of MS spectral data (spectrum count) of each data group against an accepted threshold limit (%) (+/-) from the average mean.
 #'
 #' @import dplyr
 #'
 #' @export
-#' @param data A data frame containing MS spectral data.
+#' @param data A data frame of the MS spectral data.
 #' @param commonColumn A character vector representing the names of the common data columns to be used for data grouping.
 #' @param sampleID A character string representing the name of the sample ID column.
 #' @param spectrumCount A character string representing the name of the spectrum count column.
@@ -21,14 +21,14 @@ checkSpectrumCount <- function(data, commonColumn, sampleID, spectrumCount, thre
   for (i in names(parameter)) {
     if (i == "commonColumn") {
       validateCharacterVectorElement(name = i, value = parameter[[i]])
+    } else if (i == "sampleID" || i == "spectrumCount") {
+      validateCharacterStringValue(name = i, value = parameter[[i]])
     } else if (i == "threshold") {
       validateNumericValue(name = i, value = parameter[[i]])
-    } else {
-      validateCharacterStringValue(name = i, value = parameter[[i]])
     }
   }
   
-  parameter <- c(commonColumn, sampleType, spectrumCount)
+  parameter <- c(commonColumn, sampleID, spectrumCount)
   if (!all(parameter %in% colnames(data))) {
     stop(paste0("Unable to check spectrum count: Missing one or more data column (", paste(parameter[!parameter %in% colnames(data)], collapse = ", "), ")"))
   }

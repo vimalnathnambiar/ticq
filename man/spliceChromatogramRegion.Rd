@@ -14,7 +14,7 @@ spliceChromatogramRegion(
 )
 }
 \arguments{
-\item{data}{A data frame containing MS spectral data.}
+\item{data}{A data frame of the MS spectral data.}
 
 \item{commonColumn}{A character vector representing the names of the common data columns to be used for data grouping.}
 
@@ -27,7 +27,7 @@ spliceChromatogramRegion(
 \item{sumColumn}{A character string representing the name of the data column with values to be summed.}
 }
 \value{
-A data frame of MS spectral data summary grouped by their common data columns and spliced data of each chromatogram regions of interest.
+A data frame of the MS spectral data summary grouped by their common data columns and the spliced data of each chromatogram region of interest.
 }
 \description{
 Splice MS spectral data of each data group by summing the values of a data column using the chromatogram region data of interests (start and end time points).

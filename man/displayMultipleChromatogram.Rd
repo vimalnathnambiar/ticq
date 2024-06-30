@@ -26,41 +26,44 @@ displayMultipleChromatogram(
 )
 }
 \arguments{
-\item{data}{A data frame containing plot data: data frame}
+\item{data}{A data frame of the chromatogram data to be used for plotting.}
 
-\item{x}{Column name representing the continuous data series to be used for x-axis: character}
+\item{x}{A character string representing the name of the data column to be used for the x-axis.}
 
-\item{firstColumnIndex}{Index of the first data column containing the continuous data series to be used for y-axis: numeric}
+\item{firstColumnIndex}{A numeric value representing the index of the first data column to be used for y-axis.}
 
-\item{lastColumnIndex}{Index of the last data column data containing the continuous data series to be used for y-axis (Default: NULL): NULL or numeric}
+\item{lastColumnIndex}{A numeric value representing the index of the last data column to be used for y-axis. (Default: \code{NULL})}
 
-\item{colour}{Column name representing data to be used for colour grouping (Default: NULL): NULL or character}
+\item{colour}{A character string representing the name of the data column to be used for colour grouping. (Default: \code{NULL})}
 
-\item{title}{Plot title (Default: "Chromatogram"): NULL or character}
+\item{title}{A character string representing the plot title. (Default: \code{"Chromatogram"})}
 
-\item{subtitle}{Plot subtitle (Default: NULL): NULL or character}
+\item{subtitle}{A character string representing the plot subtitle. (Default: \code{NULL})}
 
-\item{caption}{Plot caption. This will append a caption value to the column name used for the y-axis (Default: Column name used for y): NULL or character}
+\item{caption}{A character string representing the plot caption. (Default: \code{NULL})}
 
-\item{xLabel}{x-axis label (Default: Column name used for x): NULL or character}
+\item{xLabel}{A character string representing the x-axis label. (Default: \code{x})}
 
-\item{yLabel}{y-axis label (Default: NULL): NULL or character}
+\item{yLabel}{A character string representing the y-axis label. (Default: \code{y})}
 
-\item{colourLabel}{Colour grouping label (Default: Value used for colour): NULL or character}
+\item{colourLabel}{A character string representing the colour grouping label. (Default: \code{colour})}
 
-\item{xTickToggle}{Toggle to display ticks on x-axis (Default: TRUE, Options: TRUE or FALSE): logical}
+\item{xTickToggle}{A logical value representing the toggle to display the ticks on the x-axis. (Default: \code{TRUE}, Options: \code{TRUE} or \code{FALSE})}
 
-\item{facetWrapBy}{Column name representing data to be used for facet wrapping (Default: NULL): NULL or character}
+\item{facetWrapBy}{A character string representing the name of the data column to be used for facet wrapping. (Default: \code{NULL})}
 
-\item{facetColumn}{Number of columns to use for facet wrapping (Default: NULL): NULL or numeric}
+\item{facetColumn}{A numeric value representing the number of columns to be used for facet wrapping. (Default: \code{NULL})}
 
-\item{facetRow}{Number of rows to use for facet wrapping (Default: NULL): NULL or numeric}
+\item{facetRow}{A numeric value representing the number of rows to be used for face wrapping. (Default: \code{NULL})}
 
-\item{plotColumn}{Number of columns to use for plotting (Default: 1): numeric}
+\item{plotColumn}{A numeric value representing the number of columns to be used for plotting (Default: \code{1})}
 
-\item{plotRow}{Number of rows to use for plotting (Default: 1): numeric}
+\item{plotRow}{A numeric value representing the number of rows to be used for plotting (Default: \code{1})}
 
-\item{chromatogramRegion}{A list representing the different chromatogram regions of interest (Default: NULL, Options: ticq::configureChromatogramRegion()): NULL or list}
+\item{chromatogramRegion}{A list representing the chromatogram region data of interests. (Default: \code{NULL}; Options: \code{configureChromatogramRegion()})}
+}
+\value{
+This function does not return any value. It prints the ggplot objects displaying the multiple chromatogram.
 }
 \description{
 Display multiple chromatogram data.

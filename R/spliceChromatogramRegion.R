@@ -3,13 +3,13 @@
 #' Splice MS spectral data of each data group by summing the values of a data column using the chromatogram region data of interests (start and end time points).
 #'
 #' @export
-#' @param data A data frame containing MS spectral data.
+#' @param data A data frame of the MS spectral data.
 #' @param commonColumn A character vector representing the names of the common data columns to be used for data grouping.
 #' @param spectrumCount A character string representing the name of the spectrum count column.
 #' @param chromatogramRegion A list representing the chromatogram region data of interests. (Default: `NULL`; Options: `configureChromatogramRegion()`)
 #' @param retentionTime A character string representing the name of the retention time column.
 #' @param sumColumn A character string representing the name of the data column with values to be summed.
-#' @returns A data frame of MS spectral data summary grouped by their common data columns and spliced data of each chromatogram regions of interest.
+#' @returns A data frame of the MS spectral data summary grouped by their common data columns and the spliced data of each chromatogram region of interest.
 spliceChromatogramRegion <- function(data, commonColumn, spectrumCount, chromatogramRegion = NULL, retentionTime, sumColumn) {
   # Validate parameters
   if (!is.data.frame(data)) {
@@ -29,9 +29,7 @@ spliceChromatogramRegion <- function(data, commonColumn, spectrumCount, chromato
     } else if (i == "spectrumCount" || i == "retentionTime" || i == "sumColumn") {
       validateCharacterStringValue(name = i, value = parameter[[i]])
     } else if (i == "chromatogramRegion" && !is.null(parameter[[i]]) && !validateChromatogramRegion(name = i, value = parameter[[i]])) {
-      stop(paste0(
-        "Invalid '", i, "': Must either be NULL or a list of the chromatogram region data of interests"
-      ))
+      stop(paste0("Invalid '", i, "': Must either be NULL or a list of the chromatogram region data of interests"))
     }
   }
   

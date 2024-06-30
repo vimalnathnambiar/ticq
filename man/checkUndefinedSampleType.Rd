@@ -7,7 +7,7 @@
 checkUndefinedSampleType(data, commonColumn, sampleType, spectrumCount)
 }
 \arguments{
-\item{data}{A data frame containing MS spectral data.}
+\item{data}{A data frame of the MS spectral data.}
 
 \item{commonColumn}{A character vector representing the names of the common data columns to be used for data grouping.}
 

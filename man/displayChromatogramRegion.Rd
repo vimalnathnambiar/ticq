@@ -18,7 +18,7 @@ displayChromatogramRegion(plot, maxX, maxY, regionOfInterest, label)
 \item{label}{A character string representing the chromatogram region label.}
 }
 \value{
-A ggplot object with added dashed vertical lines representing the chromatogram region start and end time points.
+A ggplot object with the added vertical lines representing the chromatogram region start and end time points.
 }
 \description{
 Display vertical lines on a chromatogram plot representing the start and end time points of a chromatogram region of interest.

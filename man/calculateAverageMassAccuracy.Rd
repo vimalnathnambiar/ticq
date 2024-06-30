@@ -14,21 +14,21 @@ calculateAverageMassAccuracy(
 )
 }
 \arguments{
-\item{data}{A data frame containing spectral data: data frame}
+\item{data}{A data frame of the MS spectral data.}
 
-\item{commonColumn}{Column names of data common for each sample: character vector}
+\item{commonColumn}{A character vector representing the names of the common data columns to be used for data grouping.}
 
-\item{spectrumCount}{Spectrum count column name: character}
+\item{spectrumCount}{A character string representing the name of the spectrum count column.}
 
-\item{firstColumnIndex}{Index of the first data column to averaged: double}
+\item{firstColumnIndex}{A numeric value representing the index of the first data column to be averaged.}
 
-\item{lastColumnIndex}{Index of the last data column to averaged: double}
+\item{lastColumnIndex}{A numeric value representing the index of the last data column to be averaged. (Default: \code{NULL})}
 
-\item{roundDecimalPlace}{Number of decimal places for precision value rounding (Default: NULL): NULL or double}
+\item{roundDecimalPlace}{A numeric value representing the number of decimal places to be used for precision value rounding. (Default: \code{NULL})}
 }
 \value{
-A data frame grouped by common columns and the average ppm accuracy for each target m/z value
+A data frame of the MS spectral data summary grouped by their common data columns and the average mass accuracy of each target m/z value.
 }
 \description{
-Calculate the average mass accuracy (in ppm) of each target m/z from multiple data columns by grouping using its common columns.
+Calculate the average mass accuracy (in ppm) of each target m/z for each data group.
 }

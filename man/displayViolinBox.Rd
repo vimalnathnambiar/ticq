@@ -18,6 +18,7 @@ displayViolinBox(
   colourLabel = colour,
   shapeLabel = shape,
   boundary = NULL,
+  boundaryValue = 0,
   referenceData = NULL,
   violinPlotToggle = TRUE,
   tailTrimToggle = FALSE,
@@ -30,7 +31,7 @@ displayViolinBox(
 )
 }
 \arguments{
-\item{data}{A data frame containing data to be used for plotting.}
+\item{data}{A data frame of the data to be used for plotting.}
 
 \item{x}{A character string representing the name of the data column to be used for the x-axis.}
 
@@ -55,6 +56,8 @@ displayViolinBox(
 \item{shapeLabel}{A character string representing the shape grouping label. (Default: \code{shape})}
 
 \item{boundary}{A character string representing the boundary analysis type to perform. (Default: \code{NULL}, Options: \code{"value"}, \code{"percentage"}, or \code{"sd"})}
+
+\item{boundaryValue}{A numeric value to be used for "value" and "percentage" type boundary analysis. (Default: \code{0})}
 
 \item{referenceData}{A data frame containing reference data to be used for "sd" type boundary analysis. (Default: \code{NULL})}
 

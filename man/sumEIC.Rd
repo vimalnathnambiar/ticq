@@ -13,19 +13,19 @@ sumEIC(
 )
 }
 \arguments{
-\item{data}{A data frame containing spectral data: data frame}
+\item{data}{A data frame of the MS spectral data.}
 
-\item{commonColumn}{Column names of data common for each sample: character vector}
+\item{commonColumn}{A character vector representing the names of the common data columns to be used for data grouping.}
 
-\item{spectrumCount}{Spectrum count column name: character}
+\item{spectrumCount}{A character string representing the name of the spectrum count column.}
 
-\item{firstColumnIndex}{Index of the first data column to summed: double}
+\item{firstColumnIndex}{A numeric value representing the index of the first data column to be summed.}
 
-\item{lastColumnIndex}{Index of the last data column to summed: double}
+\item{lastColumnIndex}{A numeric value representing the index of the last data column to be summed. (Default: \code{NULL})}
 }
 \value{
-A data frame grouped by common columns and the summed values of each column specified
+A data frame of the MS spectral data grouped by their common data columns and the summed intensity of each target m/z value.
 }
 \description{
-Sum intensity values of target m/z (EIC) from multiple data columns by grouping using its common columns.
+Sum the intensity of each target m/z value of each data group.
 }

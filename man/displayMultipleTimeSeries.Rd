@@ -32,67 +32,72 @@ displayMultipleTimeSeries(
 )
 }
 \arguments{
-\item{data}{A data frame containing plot data: data frame}
+\item{data}{A data frame of the time series data to be used for plotting.}
 
-\item{commonColumn}{Column names of data common for each sample: character vector}
+\item{commonColumn}{A character vector representing the names of the common data columns to be used for data grouping.}
 
-\item{x}{Column name representing the continuous data series to be used for x-axis: character}
+\item{x}{A character string representing the name of the data column to be used for the x-axis.}
 
-\item{firstColumnIndex}{Index of the first data column containing continuous data series for the y-axis: double}
+\item{firstColumnIndex}{A numeric value representing the index of the first data column to be used for y-axis.}
 
-\item{lastColumnIndex}{Index of the last data column data containing continuous data series for the y-axis (Default: NULL): NULL or double}
+\item{lastColumnIndex}{A numeric value representing the index of the last data column to be used for y-axis. (Default: \code{NULL})}
 
-\item{colour}{Column name representing data to be used for colour grouping (Default: NULL): NULL or character}
+\item{colour}{A character string representing the name of the data column to be used for colour grouping. (Default: \code{NULL})}
 
-\item{shape}{Column name representing data to be used for shape grouping (Default: NULL): NULL or character}
+\item{shape}{A character string representing the name of the data column to be used for shape grouping. (Default: \code{NULL})}
 
-\item{title}{Plot title (Default: "Chromatogram"): NULL or character}
+\item{title}{A character string representing the plot title. (Default: \code{"Time Series"})}
 
-\item{subtitle}{Plot subtitle (Default: NULL): NULL or character}
+\item{subtitle}{A character string representing the plot subtitle. (Default: \code{NULL})}
 
-\item{caption}{Plot caption (Default: NULL): NULL or character}
+\item{caption}{A character string representing the plot caption. (Default: \code{NULL})}
 
-\item{xLabel}{x-axis label (Default: Value used for x): NULL or character}
+\item{xLabel}{character string representing the x-axis label. (Default: \code{x})}
 
-\item{yLabel}{y-axis label (Default: NULL): NULL or character}
+\item{yLabel}{A character string representing the y-axis label. (Default: \code{y})}
 
-\item{colourLabel}{Colour grouping label (Default: Value used for colour): NULL or character}
+\item{colourLabel}{A character string representing the colour grouping label. (Default: \code{colour})}
 
-\item{shapeLabel}{Shape grouping label (Default: Value used for shape)}
+\item{shapeLabel}{A character string representing the shape grouping label. (Default: \code{shape})}
 
-\item{boundary}{Boundary analysis to perform (Default: NULL, Options: "value", "percentage", "sd"): NULL or character.}
+\item{boundary}{A character string representing the boundary analysis type to perform. (Default: \code{NULL}, Options: \code{"value"}, \code{"percentage"}, or \code{"sd"})}
 
-\item{boundaryValue}{Value used for "value" and "percentage" boundary analysis (Default: 0): double}
+\item{boundaryValue}{A numeric value to be used for "value" and "percentage" type boundary analysis. (Default: \code{0})}
 
-\item{referenceData}{A data frame with the same column names and data to calculate "sd" boundaries (Default: NULL): NULL or data frame}
+\item{referenceData}{A data frame containing reference data to be used for "sd" type boundary analysis. (Default: \code{NULL})}
 
-\item{trendlineToggle}{Toggle to display trendline in the data (Default: TRUE, Options: TRUE or FALSE): boolean}
+\item{trendlineToggle}{A logical value representing the toggle to display the data trendline. (Default: \code{TRUE}, Options: \code{TRUE} or \code{FALSE})}
 
-\item{xTickToggle}{Toggle to display ticks on x-axis (Default: TRUE, Options: TRUE or FALSE): boolean}
+\item{xTickToggle}{A logical value representing the toggle to display the ticks on the x-axis. (Default: \code{TRUE}, Options: \code{TRUE} or \code{FALSE})}
 
-\item{facetWrapBy}{Column name representing data to be used for facet wrapping (Default: NULL): NULL or character}
+\item{facetWrapBy}{A character string representing the name of the data column to be used for facet wrapping. (Default: \code{NULL})}
 
-\item{facetColumn}{Number of columns to use for facet wrapping (Default: NULL): NULL or double}
+\item{facetColumn}{A numeric value representing the number of columns to be used for facet wrapping. (Default: \code{NULL})}
 
-\item{facetRow}{Number of rows to use for facet wrapping (Default: NULL): NULL or double}
+\item{facetRow}{A numeric value representing the number of rows to be used for face wrapping. (Default: \code{NULL})}
 
-\item{plotColumn}{Number of columns to use for plotting (Default: 1): double}
+\item{plotColumn}{A numeric value representing the number of columns to be used for plotting (Default: \code{1})}
 
-\item{plotRow}{Number of rows to use for plotting (Default: 1): double}
+\item{plotRow}{A numeric value representing the number of rows to be used for plotting (Default: \code{1})}
 }
 \value{
-A data frame containing the result of the boundary analysis performed
+A data frame of the boundary analysis result if performed; otherwise, this function does not return any value.
+It prints the ggplot objects displaying the multiple time series data.
 }
 \description{
-Display multiple time series data (and perform boundary analysis if defined).
+Display multiple time series data and perform boundary analysis to evaluate data performance over time.
+\itemize{
+\item Value (Evaluates data by +/- value from 0)
+\item Percentage (Evaluates data by +/- value from 100)
+\item Standard deviation, sd (Evaluates data using 1st and 2nd standard deviations from average mean of the data or reference data).
+}
 }
 \details{
-Boundary analysis that can be performed:
-\itemize{
-\item value: Evaluates data by +/- value from 0
-\item percentage: Evaluates data by +/- value from 100
-\item sd: Evaluates data using 1st and 2nd standard deviations from average mean of the data or reference data
+Type of boundary analysis:
+\enumerate{
+\item "value" - Uses a boundary value set +/- from 0 as the boundary ranges for evaluation.
+\item "percentage" - Uses a boundary value set +/- from 100 as the boundary ranges for evaluation.
+\item "sd" - Uses 1st and 2nd standard deviation value from the average mean as the boundary ranges.
+To specify an external mean and standard deviation value to be used for analysis, provide reference data (Should have the same data columns as the actual data).
 }
-
-To define mean and standard deviation values to be used for "sd" boundary analysis, pass reference data that mirrors the same columns as data.
 }

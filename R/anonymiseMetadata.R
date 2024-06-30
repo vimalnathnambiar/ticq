@@ -13,7 +13,7 @@
 #' @import dplyr
 #'
 #' @export
-#' @param data A data frame containing MS spectral data.
+#' @param data A data frame of the MS spectral data.
 #' @param sampleID A character string representing the name of the sample ID column.
 #' @param project A character string representing the name of the project column.
 #' @param cohort A character string representing the name of the cohort column.
@@ -21,7 +21,7 @@
 #' @param method A character string representing the name of the method column.
 #' @param instrument A character string representing the name of the instrument column.
 #' @param plate A character string representing the name of the plate column.
-#' @returns A data frame of MS spectral data and its associated anonymised metadata in respective data columns.
+#' @returns A data frame of the MS spectral data and its associated anonymised metadata in respective data columns.
 #'
 #' @examples
 #' data <- data.frame(sampleID = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29", project = "COVID-19", cohort = "Heidelberg",

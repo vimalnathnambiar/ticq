@@ -7,7 +7,7 @@
 checkSpectrumCount(data, commonColumn, sampleID, spectrumCount, threshold = 20)
 }
 \arguments{
-\item{data}{A data frame containing MS spectral data.}
+\item{data}{A data frame of the MS spectral data.}
 
 \item{commonColumn}{A character vector representing the names of the common data columns to be used for data grouping.}
 
@@ -21,5 +21,5 @@ checkSpectrumCount(data, commonColumn, sampleID, spectrumCount, threshold = 20)
 A list with statistical information (sample size, sum, and mean) and two data frames (data that passed and failed the spectrum count check).
 }
 \description{
-Check the total number of MS spectral data (spectrum count) of each data group against an accepted threshold limit (\%) (+/-)from the average mean.
+Check the total number of MS spectral data (spectrum count) of each data group against an accepted threshold limit (\%) (+/-) from the average mean.
 }

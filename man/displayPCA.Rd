@@ -23,7 +23,7 @@ displayPCA(
 )
 }
 \arguments{
-\item{data}{A data frame containing data to be used to perform PCA.}
+\item{data}{A data frame of the data to be used to perform PCA.}
 
 \item{firstColumnIndex}{A numeric value representing the index of the first data column to perform PCA.}
 

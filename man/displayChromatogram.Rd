@@ -23,7 +23,7 @@ displayChromatogram(
 )
 }
 \arguments{
-\item{data}{A data frame containing chromatogram data to be used for plotting.}
+\item{data}{A data frame of the chromatogram data to be used for plotting.}
 
 \item{x}{A character string representing the name of the data column to be used for the x-axis.}
 

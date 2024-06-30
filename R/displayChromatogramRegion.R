@@ -9,7 +9,7 @@
 #' @param maxY A numeric value representing the maximum value on the y-axis.
 #' @param regionOfInterest A list representing the start and end time points of a chromatogram region of interest.
 #' @param label A character string representing the chromatogram region label.
-#' @returns A ggplot object with added dashed vertical lines representing the chromatogram region start and end time points.
+#' @returns A ggplot object with the added vertical lines representing the chromatogram region start and end time points.
 displayChromatogramRegion <- function(plot, maxX, maxY, regionOfInterest, label) {
   # Validate parameters
   if (is.null(regionOfInterest$end)) {

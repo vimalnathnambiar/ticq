@@ -5,7 +5,7 @@
 #' @import ggplot2
 #'
 #' @export
-#' @param data A data frame containing chromatogram data to be used for plotting.
+#' @param data A data frame of the chromatogram data to be used for plotting.
 #' @param x A character string representing the name of the data column to be used for the x-axis.
 #' @param y A character string representing the name of the data column to be used for the y-axis.
 #' @param colour A character string representing the name of the data column to be used for colour grouping. (Default: `NULL`)
@@ -69,9 +69,7 @@ displayChromatogram <- function(data,
     } else if (i == "facetColumn" || i == "facetRow") {
       validateNullableNumericValue(name = i, value = parameter[[i]])
     } else if (i == "chromatogramRegion" && !is.null(parameter[[i]]) && !validateChromatogramRegion(name = i, value = parameter[[i]])) {
-      stop(paste0(
-        "Invalid '", i, "': Must either be NULL or a list of the chromatogram region data of interests"
-      ))
+      stop(paste0("Invalid '", i, "': Must either be NULL or a list of the chromatogram region data of interests"))
     }
   }
   

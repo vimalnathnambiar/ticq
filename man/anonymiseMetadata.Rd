@@ -16,7 +16,7 @@ anonymiseMetadata(
 )
 }
 \arguments{
-\item{data}{A data frame containing MS spectral data.}
+\item{data}{A data frame of the MS spectral data.}
 
 \item{sampleID}{A character string representing the name of the sample ID column.}
 
@@ -33,7 +33,7 @@ anonymiseMetadata(
 \item{plate}{A character string representing the name of the plate column.}
 }
 \value{
-A data frame of MS spectral data and its associated anonymised metadata in respective data columns.
+A data frame of the MS spectral data and its associated anonymised metadata in respective data columns.
 }
 \description{
 Anonymise metadata associated with Australian National Phenome Centre (ANPC)-specific data files including:

@@ -1,29 +1,41 @@
 #' Calculate Mass Accuracy
 #'
-#' Calculate the mass accuracy (in ppm) of each target m/z data detected within the spectra.
-#'
-#' The length of the target list containing unique m/z values must be equal to the length of m/z array for each spectral data and reflect the corresponding m/z values stored.
+#' Calculate the mass accuracy (in ppm) of each target m/z value in the spectra array.
 #'
 #' @import dplyr
 #'
 #' @export
-#' @param data A data frame containing spectral data: data frame
-#' @param commonColumn Column names of data common for each sample: character vector
-#' @param mzArray m/z array column name: character
-#' @param targetMZ Target m/z values (Must be unique, sorted, and equal length and correspond to the values stored within intensity array): character vector
-#' @param roundDecimalPlace Number of decimal places for precision value rounding (Default: NULL): NULL or double
-#' @returns A data frame with appended columns representing the calculated mass accuracy (in ppm) for each target m/z (EIC)
+#' @param data A data frame of the MS spectral data.
+#' @param mzArray A character string representing the name of the m/z array column.
+#' @param targetMZ A numeric vector representing the target m/z values in the spectra array.
+#' @param roundDecimalPlace A numeric value representing the number of decimal places to be used for precision value rounding. (Default: `NULL`)
+#' @returns A data frame of the MS spectral data and the calculated mass accuracy of each target m/z value.
 calculateMassAccuracy <- function(data, mzArray, targetMZ, roundDecimalPlace = NULL) {
-  # Extract m/z value within the array of each spectra into a matrix
+  # Validate parameters
+  if (!is.data.frame(data)) {
+    stop("Invalid 'data': Must be a data frame")
+  }
+  
+  parameter <- list(mzArray = mzArray, targetMZ = targetMZ, roundDecimalPlace = roundDecimalPlace)
+  for (i in names(parameter)) {
+    if (i == "mzArray") {
+      validateCharacterStringValue(name = i, value = parameter[[i]])
+    } else if (i == "targetMZ") {
+      validateNumericVectorElement(name = i, value = parameter[[i]])
+    } else if (i == "roundDecimalPlace") {
+      validateNullableNumericValue(name = i, value = parameter[[i]])
+    }
+  }
+  
+  parameter <- c(mzArray)
+  if (!all(parameter %in% colnames(data))) {
+    stop(paste0("Unable to extract EIC: Missing one or more data column (", paste(parameter[!parameter %in% colnames(data)], collapse = ", "), ")"))
+  }
+  
+  # Calculate mass accuracy
   tmp <- do.call(cbind, data[[mzArray]])
-  
-  # Calculate mass accuracy (in ppm)
   tmp <- if (!is.null(roundDecimalPlace)) round((tmp - targetMZ) / targetMZ * 1e6, digits = roundDecimalPlace) else (tmp - targetMZ) / targetMZ * 1e6
-  
-  # Transpose matrix and convert into data frame
   tmp <- as.data.frame(t(tmp))
-  
-  # Rename columns
   colnames(tmp) <- as.character(targetMZ)
   
   return(cbind(data, tmp))
