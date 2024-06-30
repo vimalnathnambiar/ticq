@@ -6,8 +6,8 @@
 #'
 #' @import dplyr
 #'
-#' @param input A character vector representing ANPC sample file names or paths.
-#' @returns A character vector of matrix types.
+#' @param input A character vector representing ANPC-specific data file names or paths.
+#' @returns A character vector of the associated matrix types.
 extractMatrix <- function(input) {
   return(
     dplyr::case_when(

@@ -14,21 +14,21 @@ spliceChromatogramRegion(
 )
 }
 \arguments{
-\item{data}{A data frame containing spectral data.}
+\item{data}{A data frame containing MS spectral data.}
 
-\item{commonColumn}{A character vector representing names of the common data columns to be used for data grouping.}
+\item{commonColumn}{A character vector representing the names of the common data columns to be used for data grouping.}
 
 \item{spectrumCount}{A character string representing the name of the spectrum count column.}
 
-\item{chromatogramRegion}{A list of lists representing the different chromatogram regions of interest and their respective start and end time points. (Default: \code{NULL}; Options: Use \code{ticq::configureChromatogramRegion()})}
+\item{chromatogramRegion}{A list representing the chromatogram region data of interests. (Default: \code{NULL}; Options: \code{configureChromatogramRegion()})}
 
 \item{retentionTime}{A character string representing the name of the retention time column.}
 
-\item{sumColumn}{A character string representing the name of the data column to be summed.}
+\item{sumColumn}{A character string representing the name of the data column with values to be summed.}
 }
 \value{
-A data frame containing a summarised listing of samples along with the spliced data of the different chromatogram regions of interest.
+A data frame of MS spectral data summary grouped by their common data columns and spliced data of each chromatogram regions of interest.
 }
 \description{
-Splice spectral data by summing the values of a data column by the respective start and end time points of the different chromatogram regions of interest.
+Splice MS spectral data of each data group by summing the values of a data column using the chromatogram region data of interests (start and end time points).
 }

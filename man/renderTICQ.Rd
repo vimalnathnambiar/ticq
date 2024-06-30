@@ -16,31 +16,40 @@ renderTICQ(
 )
 }
 \arguments{
-\item{inputPath}{A character string representing an existing directory or file path.}
+\item{inputPath}{A character string representing a directory or file path.}
 
-\item{outputDirectoryPath}{A character string representing a directory path to store output files (HTML report and RDS formatted spectral data). (Default: "/home/vimalnathnambiar/git/github/vmalnathnambiar/ticq/output/")}
+\item{outputDirectoryPath}{A character string representing an output directory path. (Default: "/home/vimalnathnambiar/git/github/vmalnathnambiar/ticq/output/")}
 
-\item{historicalDataPath}{A character string representing a RDS file containing historical spectral data associated to the current spectral data being assessed. (Default: \code{NULL}; Options: \code{"/path/to/local/file.rds"})}
+\item{historicalDataPath}{A character string representing a RDS file containing historical MS spectral data for comparison.
+(Default: \code{NULL}; Options: \code{"/path/to/local/file.rds"})}
 
-\item{targetFilePath}{A character string representing an existing TSV target file path. (Default: \code{NULL}; Options: \code{"https://published-to-web-URL&output=tsv"} or \code{"/path/to/local/file.tsv"})}
+\item{targetFilePath}{A character string representing a TSV target file path.
+(Default: \code{NULL}; Options: \code{"https://published-to-web-URL&output=tsv"} or \code{"/path/to/local/file.tsv"})}
 
-\item{anpcMethodLibrary}{A character string representing an ANPC method library. (Default: \code{NULL}; Options: \code{"MS-AA-POS"}, \code{"MS-HIL-POS"}, \code{"MS-HIL-NEG"}, \code{"MS-RP-POS"}, or \code{"MS-RP-NEG"})}
+\item{anpcMethodLibrary}{A character string representing an ANPC method library.
+(Default: \code{NULL}; Options: \code{"MS-AA-POS"}, \code{"MS-HIL-POS"}, \code{"MS-HIL-NEG"}, \code{"MS-RP-POS"}, or \code{"MS-RP-NEG"})}
 
-\item{chromatogramRegion}{A list of lists representing the different chromatogram regions of interest and their respective start and end time points. (Default: \code{NULL}; Options: Use \code{ticq::configureChromatogramRegion()})}
+\item{chromatogramRegion}{A list representing the chromatogram region data of interests. (Default: \code{NULL}; Options: \code{configureChromatogramRegion()})}
 
-\item{metadataAnonymiser}{A logical value representing the metadata anonymiser status to anonymising metadata acquired from sample data. (Default: \code{FALSE}; Options: \code{TRUE} or \code{FALSE})}
+\item{roundDecimalPlace}{A numeric value representing the number of decimal places to be used for precision value rounding. (Default: \code{NULL})}
+
+\item{metadataAnonymiser}{A logical value representing the status of the metadata anonymiser to anonymise acquired metadata from ANPC-specific data files.
+(Default: \code{FALSE}; Options: \code{TRUE} or \code{FALSE})}
 }
 \value{
-A character string representing the rendered HTML output file path.
+A character string of the rendered HTML TICQ assessment report file path.
 }
 \description{
-Generate a HTML report of TICQ assessment performed on MS spectral data acquired from JSON files generated using \href{https://github.com/vmalnathnambiar/exfilms}{ExfilMS}.
+Render a HTML report of the TICQ assessment performed on MS spectral data retrieved from
+\href{https://github.com/vmalnathnambiar/exfilms}{ExfilMS} extracted JSON files.
 }
 \details{
 \enumerate{
 \item Metadata extraction and anonymisation only applicable to data acquired at the Australian National Phenome Centre (ANPC).
-\item To perform a targeted assessment of extracted ions (targeted m/z values) with TICQ, spectral data extracted using ExfilMS should have undergone targeted spectra filtering during the extraction process using a target file or an in-house ANPC method library.
-The target file or ANPC method library used should then also be specified in TICQ for a comprehensive assessment.
-\item To perform comparison with a historical spectral data, the mentioned data should have also undergo the same extraction process as the current spectral data being assessed.
+\item To perform a targeted assessment of extracted ions (targeted m/z) with TICQ, spectral data extracted using ExfilMS must have undergone
+targeted spectra filtering during the extraction process using a target file or an in-house ANPC method library. The same target file or
+ANPC method library should then be specified in TICQ for a comprehensive assessment.
+\item To perform comparison with a historical spectral data, the data should have also undergone the same extraction process as
+the current spectral data being assessed.
 }
 }

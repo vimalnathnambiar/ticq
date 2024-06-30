@@ -2,7 +2,7 @@
 % Please edit documentation in R/displayPCA.R
 \name{displayPCA}
 \alias{displayPCA}
-\title{Display Principal Component Analysis (PCA)}
+\title{Display PCA}
 \usage{
 displayPCA(
   data,
@@ -23,18 +23,20 @@ displayPCA(
 )
 }
 \arguments{
-\item{data}{A data frame containing data to perform PCA.}
+\item{data}{A data frame containing data to be used to perform PCA.}
 
-\item{firstColumnIndex}{A numeric value representing the index of the first data column to perform PCA on.}
+\item{firstColumnIndex}{A numeric value representing the index of the first data column to perform PCA.}
 
-\item{lastColumnIndex}{A numeric value representing the index of the last data column to perform PCA on. (Default: \code{NULL})}
+\item{lastColumnIndex}{A numeric value representing the index of the last data column to perform PCA. (Default: \code{NULL})}
 
-\item{scale}{A logical value representing the scaling used for the PCA. (Default: \code{TRUE}, Options: \code{TRUE} or \code{FALSE})}
+\item{scale}{A logical value representing the scaling to be used for the PCA. (Default: \code{TRUE}, Options: \code{TRUE} or \code{FALSE})}
 
-\item{confidence}{A numeric value representing the data confidence (\%) to be used for identifying the PC threshold.
-The value is also used to draw the data distribution and Hotelling Ellipse on scores plot. (Default: \code{95}, Options: \code{95} or \code{99})}
+\item{confidence}{A numeric value representing the data confidence (\%) to be used for identifying the principle component (PC) threshold.
+The value is also used to draw the data distribution and confidence (Hotelling T² Ellipse) on the scores plot and biplot.
+(Default: \code{95}, Options: \code{95} or \code{99})}
 
-\item{distribution}{A character string representing the data distribution type to be drawn on the scores plot and biplot. (Default: \code{NULL}, Options: \code{"normal"} or \code{"t"})}
+\item{distribution}{A character string representing the data distribution type to be drawn on the scores plot and biplot.
+(Default: \code{NULL}, Options: \code{"normal"} or \code{"t"})}
 
 \item{colour}{A character string representing the name of the data column to be used for colour grouping. (Default: \code{NULL})}
 
@@ -42,9 +44,9 @@ The value is also used to draw the data distribution and Hotelling Ellipse on sc
 
 \item{subtitle}{A character string representing the plot subtitle. (Default: \code{NULL})}
 
-\item{colourLabel}{A character string representing the colour grouping label. (Default: Value used for \code{colour})}
+\item{colourLabel}{A character string representing the colour grouping label. (Default: \code{colour})}
 
-\item{shapeLabel}{A character string representing the shape grouping label. (Default: Value used for \code{shape})}
+\item{shapeLabel}{A character string representing the shape grouping label. (Default: \code{shape})}
 
 \item{screePlotToggle}{A logical value representing the toggle to display the generated scree plot. (Default: \code{TRUE}, Options: \code{TRUE} or \code{FALSE})}
 
@@ -58,5 +60,11 @@ The value is also used to draw the data distribution and Hotelling Ellipse on sc
 This function does not return any value. It prints the ggplot objects representing the scree plot, scores plot, loadings plot, and/or biplot.
 }
 \description{
-Perform Principle Component Analysis (PCA) and display analysis outcomes (scree plot, scores plot, loadings plot, and/or biplot).
+Perform principle component analysis (PCA) and display analysis outcomes:
+\itemize{
+\item Scree plot
+\item Scores plot
+\item Loadings plot
+\item Biplot
+}
 }

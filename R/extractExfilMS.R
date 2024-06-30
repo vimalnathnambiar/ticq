@@ -1,25 +1,24 @@
 #' Extract ExfilMS
 #'
-#' Extract spectral data and retrieve metadata from JSON files generated using \href{https://github.com/vmalnathnambiar/exfilms#readme}{ExfilMS}.
+#' Extract MS spectral data along with its associated metadata from \href{https://github.com/vmalnathnambiar/exfilms#readme}{ExfilMS} extracted JSON files.
 #'
 #' Metadata extraction only applicable to data acquired at the Australian National Phenome Centre (ANPC).
 #'
 #' @import jsonlite
 #'
 #' @export
-#' @param inputPath A character string representing an existing directory or file path.
-#' @returns A list containing two data frames (`passedData` containing the extracted spectral data and `failedData` with file names that failed the extraction process).
+#' @param inputPath A character string representing a directory or file path containing ExfilMS extracted JSON files.
+#' @returns A list with two data frames (data that passed and failed the extraction process).
 extractExfilMS <- function(inputPath) {
   # Validate parameters
   inputFiles <- retrieveFileName(inputPath = inputPath, fileExtension = "JSON")
   
-  # Extract spectral data from JSON files
+  # Extract spectral and metadata
   passedData <- data.frame()
   fileName <- character(0)
   
   if (length(inputFiles) > 0) {
     for (i in inputFiles) {
-      # Parse JSON file
       filePath <- if (file.info(inputPath)$isdir) paste0(inputPath, i) else inputPath
       sample <- tryCatch(
         jsonlite::fromJSON(filePath),
@@ -33,7 +32,6 @@ extractExfilMS <- function(inputPath) {
         }
       )
       
-      # Extract metadata and spectral data
       if (!is.null(sample)) {
         tryCatch({
           sampleInfo <- extractMetadata(input = filePath)
@@ -65,7 +63,6 @@ extractExfilMS <- function(inputPath) {
         })
       }
       
-      # Record file names of failed extraction
       if (is.null(sample)) {
         fileName <- c(fileName, i)
       }

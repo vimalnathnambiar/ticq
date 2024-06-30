@@ -23,7 +23,7 @@ displayChromatogram(
 )
 }
 \arguments{
-\item{data}{A data frame containing plot data.}
+\item{data}{A data frame containing chromatogram data to be used for plotting.}
 
 \item{x}{A character string representing the name of the data column to be used for the x-axis.}
 
@@ -37,13 +37,13 @@ displayChromatogram(
 
 \item{caption}{A character string representing the plot caption. (Default: \code{NULL})}
 
-\item{xLabel}{A character string representing the x-axis label. (Default: Value used for \code{x})}
+\item{xLabel}{A character string representing the x-axis label. (Default: \code{x})}
 
-\item{yLabel}{A character string representing the y-axis label. (Default: Value used for \code{y})}
+\item{yLabel}{A character string representing the y-axis label. (Default: \code{y})}
 
-\item{colourLabel}{A character string representing the colour grouping label. (Default: Value used for \code{colour})}
+\item{colourLabel}{A character string representing the colour grouping label. (Default: \code{colour})}
 
-\item{xTickToggle}{A logical value representing the toggle to display ticks on the x-axis. (Default: \code{TRUE}, Options: \code{TRUE} or \code{FALSE})}
+\item{xTickToggle}{A logical value representing the toggle to display the ticks on the x-axis. (Default: \code{TRUE}, Options: \code{TRUE} or \code{FALSE})}
 
 \item{facetWrapBy}{A character string representing the name of the data column to be used for facet wrapping. (Default: \code{NULL})}
 
@@ -51,7 +51,7 @@ displayChromatogram(
 
 \item{facetRow}{A numeric value representing the number of rows to be used for face wrapping. (Default: \code{NULL})}
 
-\item{chromatogramRegion}{A list of lists representing the different chromatogram regions of interest and their respective start and end time points. (Default: \code{NULL}; Options: Use \code{ticq::configureChromatogramRegion()})}
+\item{chromatogramRegion}{A list representing the chromatogram region data of interests. (Default: \code{NULL}; Options: \code{configureChromatogramRegion()})}
 }
 \value{
 This function does not return any value. It prints the ggplot object displaying the chromatogram.

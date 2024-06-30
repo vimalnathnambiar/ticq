@@ -1,29 +1,37 @@
 #' Splice Chromatogram Region
 #'
-#' Splice spectral data by summing the values of a data column by the respective start and end time points of the different chromatogram regions of interest.
+#' Splice MS spectral data of each data group by summing the values of a data column using the chromatogram region data of interests (start and end time points).
 #'
 #' @export
-#' @param data A data frame containing spectral data.
-#' @param commonColumn A character vector representing names of the common data columns to be used for data grouping.
+#' @param data A data frame containing MS spectral data.
+#' @param commonColumn A character vector representing the names of the common data columns to be used for data grouping.
 #' @param spectrumCount A character string representing the name of the spectrum count column.
-#' @param chromatogramRegion A list of lists representing the different chromatogram regions of interest and their respective start and end time points. (Default: `NULL`; Options: Use `ticq::configureChromatogramRegion()`)
+#' @param chromatogramRegion A list representing the chromatogram region data of interests. (Default: `NULL`; Options: `configureChromatogramRegion()`)
 #' @param retentionTime A character string representing the name of the retention time column.
-#' @param sumColumn A character string representing the name of the data column to be summed.
-#' @returns A data frame containing a summarised listing of samples along with the spliced data of the different chromatogram regions of interest.
+#' @param sumColumn A character string representing the name of the data column with values to be summed.
+#' @returns A data frame of MS spectral data summary grouped by their common data columns and spliced data of each chromatogram regions of interest.
 spliceChromatogramRegion <- function(data, commonColumn, spectrumCount, chromatogramRegion = NULL, retentionTime, sumColumn) {
   # Validate parameters
-  if (nrow(data) == 0 || ncol(data) == 0) {
-    stop("Invalid 'data': Empty data frame")
+  if (!is.data.frame(data)) {
+    stop("Invalid 'data': Must be a data frame")
   }
   
-  parameter <- list(commonColumn = commonColumn, spectrumCount = spectrumCount, chromatogramRegion = chromatogramRegion, retentionTime = retentionTime, sumColumn = sumColumn)
+  parameter <- list(
+    commonColumn = commonColumn,
+    spectrumCount = spectrumCount,
+    chromatogramRegion = chromatogramRegion,
+    retentionTime = retentionTime,
+    sumColumn = sumColumn
+  )
   for (i in names(parameter)) {
     if (i == "commonColumn") {
-      validateCharacterVector(parameterName = i, parameterValue = parameter[[i]])
-    } else if (i == "chromatogramRegion" && !is.null(parameter[[i]]) && !validateChromatogramRegion(parameterName = i, parameterValue = parameter[[i]])) {
-      stop(paste0("Invalid '", i, "': Must either be NULL or contain a valid chromatogram region data list"))
-    } else if (i != "commonColumn" && i != "chromatogramRegion") {
-      validateCharacterString(parameterName = i, parameterValue = parameter[[i]])
+      validateCharacterVectorElement(name = i, value = parameter[[i]])
+    } else if (i == "spectrumCount" || i == "retentionTime" || i == "sumColumn") {
+      validateCharacterStringValue(name = i, value = parameter[[i]])
+    } else if (i == "chromatogramRegion" && !is.null(parameter[[i]]) && !validateChromatogramRegion(name = i, value = parameter[[i]])) {
+      stop(paste0(
+        "Invalid '", i, "': Must either be NULL or a list of the chromatogram region data of interests"
+      ))
     }
   }
   
@@ -32,17 +40,16 @@ spliceChromatogramRegion <- function(data, commonColumn, spectrumCount, chromato
     stop(paste0("Unable to splice chromatogram region: Missing one or more data column (", paste(parameter[!parameter %in% colnames(data)], collapse = ", "), ")"))
   }
   
-  # Splice overall region
-  splicedChromatogramData <- ticq::countSpectrum(data = data, commonColumn = commonColumn, spectrumCount = spectrumCount) %>%
-    mutate(overallRegion = ticq::sumDataColumn(data = data, commonColumn = commonColumn, sumColumn = sumColumn)$sum)
-  
   # Splice chromatogram regions
+  splicedChromatogramData <- countSpectrum(data = data, commonColumn = commonColumn, spectrumCount = spectrumCount) %>%
+    mutate(overallRegion = sumDataColumn(data = data, commonColumn = commonColumn, sumColumn = sumColumn)$sum)
+  
   if (!is.null(chromatogramRegion)) {
     pattern <- c("prewash", "massCalibration", "analyte", "wash")
     for (i in pattern) {
       splicedChromatogramData[[paste0(i, "Region")]] <- (
-        ticq::filterChromatogramRegion(data = data, regionOfInterest = chromatogramRegion[[i]], retentionTime = retentionTime) %>%
-        ticq::sumDataColumn(data = ., commonColumn = commonColumn, sumColumn = sumColumn)
+        filterChromatogramRegion(data = data, regionOfInterest = chromatogramRegion[[i]], retentionTime = retentionTime) %>%
+        sumDataColumn(data = ., commonColumn = commonColumn, sumColumn = sumColumn)
       )$sum
     }
   }

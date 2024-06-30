@@ -7,8 +7,8 @@
 #' @import dplyr
 #' @import stringr
 #'
-#' @param input A character vector representing ANPC sample file names or paths.
-#' @returns A character vector representing plate numbers.
+#' @param input A character vector representing ANPC-specific data file names or paths.
+#' @returns A character vector of the associated plate numbers.
 extractPlate <- function(input) {
   # Identify and extract plate number
   pattern <- "[pP][0-9]+|PLATE[0-9]+|PLASMA[0-9]+"

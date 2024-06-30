@@ -1,36 +1,38 @@
 #' Check Undefined Sample Type
 #'
-#' Check for samples that have an undefined sample type.
+#' Check data for undefined sample type.
 #'
 #' @import dplyr
 #'
 #' @export
-#' @param data A data frame containing spectral data.
-#' @param commonColumn A character vector representing names of the common data columns to be used for data grouping.
+#' @param data A data frame containing MS spectral data.
+#' @param commonColumn A character vector representing the names of the common data columns to be used for data grouping.
 #' @param sampleType A character string representing the name of the sample type column.
 #' @param spectrumCount A character string representing the name of the spectrum count column.
-#' @returns A list containing two data frames (`passedData` containing spectral data of samples with a defined sample type and `failedData` containing a summarised listing of samples with an undefined sample type).
+#' @returns A list with two data frames (data that passed and failed the undefined sample type check).
 checkUndefinedSampleType <- function(data, commonColumn, sampleType, spectrumCount) {
   # Validate parameters
-  if (nrow(data) == 0 || ncol(data) == 0) {
-    stop("Invalid 'data': Empty data frame")
+  if (!is.data.frame(data)) {
+    stop("Invalid 'data': Must be a data frame")
   }
   
   parameter <- list(commonColumn = commonColumn, sampleType = sampleType, spectrumCount = spectrumCount)
   for (i in names(parameter)) {
     if (i == "commonColumn") {
-      validateCharacterVector(parameterName = i, parameterValue = parameter[[i]])
+      validateCharacterVectorElement(name = i, value = parameter[[i]])
     } else {
-      validateCharacterString(parameterName = i, parameterValue = parameter[[i]])
+      validateCharacterStringValue(name = i, value = parameter[[i]])
     }
   }
 
   parameter <- c(commonColumn, sampleType, spectrumCount)
   if (!all(parameter %in% colnames(data))) {
-    stop(paste0("Unable to check undefined sample type: Missing one or more data column (", paste(parameter[!parameter %in% colnames(data)], collapse = ", "), ")"))
+    stop(paste0(
+      "Unable to check undefined sample type: Missing one or more data column (", paste(parameter[!parameter %in% colnames(data)], collapse = ", "), ")"
+    ))
   }
   
-  # Filter data with valid (passed) and undefined (failed) sample type 
+  # Check undefined sample type
   return(
     list(
       passedData = data %>%

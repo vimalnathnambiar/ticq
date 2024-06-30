@@ -1,48 +1,53 @@
 #' Display Violin/Box Plot
 #'
-#' Display data distribution using violin and/or box plot (and perform boundary analysis if defined).
+#' Display data distribution using violin and/or box plot and perform boundary analysis to evaluate data performance.
+#' - Value (Evaluates data by +/- value from 0)
+#' - Percentage (Evaluates data by +/- value from 100)
+#' - Standard deviation, sd (Evaluates data using 1st and 2nd standard deviations from average mean of the data or reference data)
 #'
-#' Boundary analysis that can be performed:
-#' - value: Evaluates data by +/- value from 0
-#' - percentage: Evaluates data by +/- value from 100
-#' - sd: Evaluates data using 1st and 2nd standard deviations from average mean of the data or reference data
+#' Type of boundary analysis:
+#' 
+#' 1. "value" - Uses a boundary value set +/- from 0 as the boundary ranges for evaluation.
+#' 
+#' 2. "percentage" - Uses a boundary value set +/- from 100 as the boundary ranges for evaluation.
+#' 
+#' 3. "sd" - Uses 1st and 2nd standard deviation value from the average mean as the boundary ranges. 
+#' To specify an external mean and standard deviation value to be used for analysis, provide reference data (Should have the same data columns as the actual data).
 #'
-#' To define mean and standard deviation values to be used for "sd" boundary analysis, pass reference data that mirrors the same columns as data.
 #'
 #' @import ggplot2
 #' @import dplyr
 #'
 #' @export
-#' @param data A data frame containing plot data: data frame
-#' @param x Column name representing the continuous data series to be used for x-axis: character
-#' @param y Column name representing the continuous data series to be used for y-axis: character
-#' @param colour Column name representing data to be used for colour grouping (Default: NULL): NULL or character
-#' @param shape Column name representing data to be used for shape grouping (Default: NULL): NULL or character
-#' @param outlierShape Shape style to be used to identify outliers (Default: NA): NA or double
-#' @param title Plot title (Default: "Violin/Box Plot"): NULL or character
-#' @param subtitle Plot subtitle (Default: NULL): NULL or character
-#' @param caption Plot caption (Default: NULL): NULL or character
-#' @param xLabel x-axis label (Default: Value used for x): NULL or character
-#' @param yLabel y-axis label (Default: Value used for y): NULL or character
-#' @param colourLabel Colour grouping label (Default: Value used for colour): NULL or character
-#' @param shapeLabel Shape grouping label (Default: Value used for shape)
-#' @param boundary Boundary analysis to perform (Default: NULL, Options: "value", "percentage", "sd"): NULL or character.
-#' @param boundaryValue Value used for "value" and "percentage" boundary analysis (Default: 0): double
-#' @param referenceData A data frame with the same column names and data to calculate "sd" boundaries (Default: NULL): NULL or data frame
-#' @param violinPlotToggle Toggle to display violin plot (Default: TRUE, Options: TRUE or FALSE): boolean
-#' @param tailTrimToggle Toggle to trim the tails of the violin plot. Applicable only if violinPlotToggle is set to TRUE (Default: FALSE, Options: TRUE or FALSE): boolean
-#' @param boxPlotToggle Toggle to display box plot (Default: TRUE, Options: TRUE or FALSE): boolean
-#' @param boxWidth Box plot width. Applicable only if boxPlotToggle is set to TRUE (Default: 1): double
-#' @param facetWrapBy Column name representing data to be used for facet wrapping (Default: NULL): NULL or character
-#' @param facetColumn Number of columns to use for facet wrapping (Default: NULL): NULL or double
-#' @param facetRow Number of rows to use for facet wrapping (Default: NULL): NULL or double
-#' @returns A data frame containing the result of the boundary analysis performed
+#' @param data A data frame containing data to be used for plotting.
+#' @param x A character string representing the name of the data column to be used for the x-axis.
+#' @param y A character string representing the name of the data column to be used for the y-axis.
+#' @param colour A character string representing the name of the data column to be used for colour grouping. (Default: `NULL`)
+#' @param shape A character string representing the name of the data column to be used for shape grouping. (Default: `NULL`)
+#' @param title A character string representing the plot title. (Default: `"Violin/Box Plot"`)
+#' @param subtitle A character string representing the plot subtitle. (Default: `NULL`)
+#' @param caption A character string representing the plot caption. (Default: `NULL`)
+#' @param xLabel A character string representing the x-axis label. (Default: `x`)
+#' @param yLabel A character string representing the y-axis label. (Default: `y`)
+#' @param colourLabel A character string representing the colour grouping label. (Default: `colour`)
+#' @param shapeLabel A character string representing the shape grouping label. (Default: `shape`)
+#' @param boundary A character string representing the boundary analysis type to perform. (Default: `NULL`, Options: `"value"`, `"percentage"`, or `"sd"`)
+#' @param referenceData A data frame containing reference data to be used for "sd" type boundary analysis. (Default: `NULL`)
+#' @param violinPlotToggle A logical value representing the toggle to display a violin plot. (Default: `TRUE`, Options: `TRUE` or `FALSE`)
+#' @param tailTrimToggle A logical value representing the toggle to trim the tails of the violin plot. (Default: `TRUE`, Options: `TRUE` or `FALSE`)
+#' @param boxPlotToggle A logical value representing the toggle to display a box plot. (Default: `TRUE`, Options: `TRUE` or `FALSE`)
+#' @param outlierShape A numeric value representing the shape style to be used to highlight identified outliers. (Default: `NA`)
+#' @param boxWidth A numeric value representing the width size to be used for the box plot. (Default: `1`)
+#' @param facetWrapBy A character string representing the name of the data column to be used for facet wrapping. (Default: `NULL`)
+#' @param facetColumn A numeric value representing the number of columns to be used for facet wrapping. (Default: `NULL`)
+#' @param facetRow A numeric value representing the number of rows to be used for face wrapping. (Default: `NULL`)
+#' @returns A data frame of the boundary analysis result if performed; otherwise, this function does not return any value.
+#' It prints the ggplot object displaying violin/box plot.
 displayViolinBox <- function(data,
                              x,
                              y,
                              colour = NULL,
                              shape = NULL,
-                             outlierShape = NA,
                              title = "Violin/Box Plot",
                              subtitle = NULL,
                              caption = NULL,
@@ -51,72 +56,133 @@ displayViolinBox <- function(data,
                              colourLabel = colour,
                              shapeLabel = shape,
                              boundary = NULL,
-                             boundaryValue = 0,
                              referenceData = NULL,
                              violinPlotToggle = TRUE,
                              tailTrimToggle = FALSE,
                              boxPlotToggle = TRUE,
+                             outlierShape = NA,
                              boxWidth = 1,
                              facetWrapBy = NULL,
                              facetColumn = NULL,
                              facetRow = NULL) {
+  # Validate parameters
+  if (!is.data.frame(data)) {
+    stop("Invalid 'data': Must be a data frame")
+  }
+  
+  parameter <- list(
+    x = x,
+    y = y,
+    colour = colour,
+    shape = shape,
+    title = title,
+    subtitle = subtitle,
+    caption = caption,
+    xLabel = xLabel,
+    yLabel = yLabel,
+    colourLabel = colourLabel,
+    shapeLabel = shapeLabel,
+    boundary = boundary,
+    violinPlotToggle = violinPlotToggle,
+    tailTrimToggle = tailTrimToggle,
+    boxPlotToggle = boxPlotToggle,
+    outlierShape = outlierShape,
+    boxWidth = boxWidth,
+    facetWrapBy = facetWrapBy,
+    facetColumn = facetColumn,
+    facetRow = facetRow
+  )
+  for (i in names(parameter)) {
+    if (i == "x" || i == "y") {
+      validateCharacterStringValue(name = i, value = parameter[[i]])
+    } else if (i == "colour" || i == "shape" || i == "facetWrapBy") {
+      validateNullableCharacterStringValue(name = i, value = parameter[[i]])
+    } else if (i == "title" || i == "subtitle" || i == "caption" || i == "xLabel" || i == "yLabel" || i == "colourLabel" || i == "shapeLabel") {
+      validateNullableCharacterString(name = i, value = parameter[[i]])
+    } else if (i == "boundary" && !is.null(parameter[[i]]) &&
+               (length(parameter[[i]]) != 1 || !is.character(parameter[[i]]) || !parameter[[i]] %in% c("value", "percentage", "sd"))) {
+      stop(paste0("Invalid '", i, "': Must either be NULL or a character string of length 1 ('value', 'percentage', or 'sd'"))
+    } else if (i == "violinPlotToggle" || (i == "tailTrimToggle" && violinPlotToggle) || i == "boxPlotToggle") {
+      validateLogicalValue(name = i, value = parameter[[i]])
+    } else if (i == "outlierShape" && boxPlotToggle) {
+      validateMissingNumericValue(name = i, value = parameter[[i]])
+    } else if (i == "boxWidth" && boxPlotToggle) {
+      validateNumericValue(name = i, value = parameter[[i]])
+    } else if (i == "facetColumn" || i == "facetRow") {
+      validateNullableNumericValue(name = i, value = parameter[[i]])
+    }
+  }
+  
+  parameter <- c(x, y, colour, shape, facetWrapBy)
+  if (!all(parameter %in% colnames(data))) {
+    stop(paste0("Unable to display ", title, ": Missing one or more data column (", paste(parameter[!parameter %in% colnames(data)], collapse = ", "), ")"))
+  }
+  
+  validateNumericVectorElement(name = "y", value = data[[y]])
+  if (!is.null(referenceData) && boundary == "sd") {
+    if (!is.data.frame(referenceData)) {
+      stop("Invalid 'referenceData': Must be a data frame")
+    } else if (!identical(colnames(referenceData), colnames(data))) {
+      stop("Invalid 'referenceData': Data columns must be identical to 'data'")
+    }
+
+    if (length(referenceData[[y]]) < 2) {
+      message("Invalid referenceData': Insufficient data to generate statistics (Setting default)")
+      referenceData <- NULL
+    } else {
+      validateStatisticalNumericVectorElement(name = "referenceData[[y]]", value = referenceData[[y]])
+    }
+  }
+  
+  # Display violin / box plot
   tryCatch({
-    # Plot violin / box plot
     violinBoxPlot <- ggplot2::ggplot(data = data, aes(x = .data[[x]], y = .data[[y]]))
     
-      # Violin plot
-      if (violinPlotToggle) {
-        violinBoxPlot <- violinBoxPlot +
-          ggplot2::geom_violin(trim = tailTrimToggle)
-      }
-    
-      # Box plot
-      if (boxPlotToggle) {
-        violinBoxPlot <- violinBoxPlot +
-          ggplot2::geom_boxplot(outlier.color = "red", outlier.shape = outlierShape, width = boxWidth)
-      }
-    
-      # Colour and shape grouping, theme and labels
+    if (violinPlotToggle) {
       violinBoxPlot <- violinBoxPlot +
-        ggplot2::geom_jitter(
-          aes(
-            colour = if (!is.null(colour)) .data[[colour]] else NULL,
-            shape = if (!is.null(shape)) .data[[shape]] else NULL,
-            group = if (!is.null(colour)) ifelse(.data[[colour]] == "Historical", 1, 2) else NULL
-          ),
-          alpha = 0.25, position = position_jitter(seed = 1, width = 0.2)
-        ) +
-        ggplot2::theme(
-          panel.background = element_blank(),
-          axis.line = element_line(colour = "black"),
-          legend.title = element_text(size = 8),
-          legend.text = element_text(size = 8)
-        ) + 
-        ggplot2::labs(title = title, subtitle = subtitle, caption = caption, x = xLabel, y = yLabel, colour = colourLabel, shape = shapeLabel)
-      
-      # Facet wrap
-      if (!is.null(facetWrapBy)) {
-        violinBoxPlot <- violinBoxPlot +
-          ggplot2::facet_wrap( ~ .data[[facetWrapBy]], ncol = facetColumn, nrow = facetRow)
-      }
+        ggplot2::geom_violin(trim = tailTrimToggle)
+    }
     
-    # Boundary analysis
+    if (boxPlotToggle) {
+      violinBoxPlot <- violinBoxPlot +
+        ggplot2::geom_boxplot(outlier.color = "red", outlier.shape = outlierShape, width = boxWidth)
+    }
+    
+    violinBoxPlot <- violinBoxPlot +
+      ggplot2::geom_jitter(
+        aes(
+          colour = if (!is.null(colour)) .data[[colour]] else NULL,
+          shape = if (!is.null(shape)) .data[[shape]] else NULL,
+          group = if (!is.null(colour)) ifelse(.data[[colour]] == "Historical", 1, 2) else NULL
+        ),
+        alpha = 0.25, position = position_jitter(seed = 1, width = 0.2)
+      ) +
+      ggplot2::theme(
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"),
+        legend.title = element_text(size = 8),
+        legend.text = element_text(size = 8)
+      ) + 
+      ggplot2::labs(title = title, subtitle = subtitle, caption = caption, x = xLabel, y = yLabel, colour = colourLabel, shape = shapeLabel)
+    
+    if (!is.null(facetWrapBy)) {
+      violinBoxPlot <- violinBoxPlot +
+        ggplot2::facet_wrap( ~ .data[[facetWrapBy]], ncol = facetColumn, nrow = facetRow)
+    }
+    
+    # Perform boundary analysis
     if (!is.null(boundary)) {
       tryCatch({
-        # Check boundary type
         if (boundary == "value" || boundary == "percentage") {
-          # Determine boundaries
           mid <- if (boundary == "value") 0 else 100
           lowerBound <- mid - boundaryValue
           upperBound <- mid + boundaryValue
           
-          # Display boundaries
           timeSeries <- timeSeries +
             ggplot2::geom_hline(yintercept = mid, linetype = "dashed", colour = "grey") +
             ggplot2::geom_hline(yintercept = lowerBound, linetype = "dashed", colour = "red") +
             ggplot2::geom_hline(yintercept = upperBound, linetype = "dashed", colour = "red")
           
-          # Analysis result
           result <- data %>%
             dplyr::mutate(
               sampleRange = dplyr::case_when(
@@ -126,24 +192,9 @@ displayViolinBox <- function(data,
               )
             )
         } else if (boundary == "sd") {
-          # Check reference data
-          if (!is.null(referenceData)) {
-            if (!is.data.frame(referenceData) ||
-                ncol(referenceData) != ncol(data) ||
-                all(colnames(referenceData) != colnames(data)) ||
-                nrow(referenceData) < 2 ||
-                any(is.na(referenceData[[y]]))) {
-              referenceData <- NULL
-            }
-          }
-          
-          # Check sample data and reference data
-          if (nrow(data) > 1 || !is.null(referenceData)) {
-            # Determine boundaries
+          if (!is.null(referenceData) || nrow(data) > 1) {
             if (!is.null(referenceData)) {
-              # Generate statistics
-              stat <- ticq::generateStat(data = referenceData[[y]])
-              
+              stat <- generateStatistic(data = referenceData[[y]])
               mean <- stat$mean
               sd <- stat$sd
             } else {
@@ -156,7 +207,6 @@ displayViolinBox <- function(data,
             lowerBound2 <- mean - (2 * sd)
             upperBound2 <- mean + (2 * sd)
             
-            # Display boundaries
             violinBoxPlot <- violinBoxPlot +
               ggplot2::geom_hline(yintercept = mean, linetype = "dashed", colour = "grey") +
               ggplot2::geom_hline(yintercept = lowerBound1, linetype = "dashed", colour = "blue") +
@@ -164,7 +214,6 @@ displayViolinBox <- function(data,
               ggplot2::geom_hline(yintercept = lowerBound2, linetype = "dashed", colour = "red") +
               ggplot2::geom_hline(yintercept = upperBound2, linetype = "dashed", colour = "red")
             
-            # Analysis result
             result <- data %>%
               dplyr::mutate(
                 sampleRange = dplyr::case_when(
@@ -176,26 +225,21 @@ displayViolinBox <- function(data,
                 )
               )
           } else {
-            # Analysis result
             result <- data %>%
               dplyr::mutate(sampleRange = "Normal")
           }
-        } else {
-          message("Unable to perform boundary analysis: Invalid boundary type")
-          result <- NULL
         }
       },
       warning = function(w) {
-        message(paste("Unable to perform boundary analysis:", w))
+        message(paste0("Unable to perform '", boundary, "' type boundary analysis:", w))
         result <- NULL
       },
       error = function(e) {
-        message(paste("Unable to perform boundary analysis:", e))
+        message(paste0("Unable to perform '", boundary, "' type boundary analysis:", e))
         result <- NULL
       })
     }
     
-    # Display violin/box plot and return analysis result
     print(violinBoxPlot)
     if (!is.null(boundary)) {
       return(result)

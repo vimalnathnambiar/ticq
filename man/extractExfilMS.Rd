@@ -7,13 +7,13 @@
 extractExfilMS(inputPath)
 }
 \arguments{
-\item{inputPath}{A character string representing an existing directory or file path.}
+\item{inputPath}{A character string representing a directory or file path containing ExfilMS extracted JSON files.}
 }
 \value{
-A list containing two data frames (\code{passedData} containing the extracted spectral data and \code{failedData} with file names that failed the extraction process).
+A list with two data frames (data that passed and failed the extraction process).
 }
 \description{
-Extract spectral data and retrieve metadata from JSON files generated using \href{https://github.com/vmalnathnambiar/exfilms#readme}{ExfilMS}.
+Extract MS spectral data along with its associated metadata from \href{https://github.com/vmalnathnambiar/exfilms#readme}{ExfilMS} extracted JSON files.
 }
 \details{
 Metadata extraction only applicable to data acquired at the Australian National Phenome Centre (ANPC).

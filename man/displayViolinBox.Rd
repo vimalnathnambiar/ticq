@@ -10,7 +10,6 @@ displayViolinBox(
   y,
   colour = NULL,
   shape = NULL,
-  outlierShape = NA,
   title = "Violin/Box Plot",
   subtitle = NULL,
   caption = NULL,
@@ -19,11 +18,11 @@ displayViolinBox(
   colourLabel = colour,
   shapeLabel = shape,
   boundary = NULL,
-  boundaryValue = 0,
   referenceData = NULL,
   violinPlotToggle = TRUE,
   tailTrimToggle = FALSE,
   boxPlotToggle = TRUE,
+  outlierShape = NA,
   boxWidth = 1,
   facetWrapBy = NULL,
   facetColumn = NULL,
@@ -31,65 +30,68 @@ displayViolinBox(
 )
 }
 \arguments{
-\item{data}{A data frame containing plot data: data frame}
+\item{data}{A data frame containing data to be used for plotting.}
 
-\item{x}{Column name representing the continuous data series to be used for x-axis: character}
+\item{x}{A character string representing the name of the data column to be used for the x-axis.}
 
-\item{y}{Column name representing the continuous data series to be used for y-axis: character}
+\item{y}{A character string representing the name of the data column to be used for the y-axis.}
 
-\item{colour}{Column name representing data to be used for colour grouping (Default: NULL): NULL or character}
+\item{colour}{A character string representing the name of the data column to be used for colour grouping. (Default: \code{NULL})}
 
-\item{shape}{Column name representing data to be used for shape grouping (Default: NULL): NULL or character}
+\item{shape}{A character string representing the name of the data column to be used for shape grouping. (Default: \code{NULL})}
 
-\item{outlierShape}{Shape style to be used to identify outliers (Default: NA): NA or double}
+\item{title}{A character string representing the plot title. (Default: \code{"Violin/Box Plot"})}
 
-\item{title}{Plot title (Default: "Violin/Box Plot"): NULL or character}
+\item{subtitle}{A character string representing the plot subtitle. (Default: \code{NULL})}
 
-\item{subtitle}{Plot subtitle (Default: NULL): NULL or character}
+\item{caption}{A character string representing the plot caption. (Default: \code{NULL})}
 
-\item{caption}{Plot caption (Default: NULL): NULL or character}
+\item{xLabel}{A character string representing the x-axis label. (Default: \code{x})}
 
-\item{xLabel}{x-axis label (Default: Value used for x): NULL or character}
+\item{yLabel}{A character string representing the y-axis label. (Default: \code{y})}
 
-\item{yLabel}{y-axis label (Default: Value used for y): NULL or character}
+\item{colourLabel}{A character string representing the colour grouping label. (Default: \code{colour})}
 
-\item{colourLabel}{Colour grouping label (Default: Value used for colour): NULL or character}
+\item{shapeLabel}{A character string representing the shape grouping label. (Default: \code{shape})}
 
-\item{shapeLabel}{Shape grouping label (Default: Value used for shape)}
+\item{boundary}{A character string representing the boundary analysis type to perform. (Default: \code{NULL}, Options: \code{"value"}, \code{"percentage"}, or \code{"sd"})}
 
-\item{boundary}{Boundary analysis to perform (Default: NULL, Options: "value", "percentage", "sd"): NULL or character.}
+\item{referenceData}{A data frame containing reference data to be used for "sd" type boundary analysis. (Default: \code{NULL})}
 
-\item{boundaryValue}{Value used for "value" and "percentage" boundary analysis (Default: 0): double}
+\item{violinPlotToggle}{A logical value representing the toggle to display a violin plot. (Default: \code{TRUE}, Options: \code{TRUE} or \code{FALSE})}
 
-\item{referenceData}{A data frame with the same column names and data to calculate "sd" boundaries (Default: NULL): NULL or data frame}
+\item{tailTrimToggle}{A logical value representing the toggle to trim the tails of the violin plot. (Default: \code{TRUE}, Options: \code{TRUE} or \code{FALSE})}
 
-\item{violinPlotToggle}{Toggle to display violin plot (Default: TRUE, Options: TRUE or FALSE): boolean}
+\item{boxPlotToggle}{A logical value representing the toggle to display a box plot. (Default: \code{TRUE}, Options: \code{TRUE} or \code{FALSE})}
 
-\item{tailTrimToggle}{Toggle to trim the tails of the violin plot. Applicable only if violinPlotToggle is set to TRUE (Default: FALSE, Options: TRUE or FALSE): boolean}
+\item{outlierShape}{A numeric value representing the shape style to be used to highlight identified outliers. (Default: \code{NA})}
 
-\item{boxPlotToggle}{Toggle to display box plot (Default: TRUE, Options: TRUE or FALSE): boolean}
+\item{boxWidth}{A numeric value representing the width size to be used for the box plot. (Default: \code{1})}
 
-\item{boxWidth}{Box plot width. Applicable only if boxPlotToggle is set to TRUE (Default: 1): double}
+\item{facetWrapBy}{A character string representing the name of the data column to be used for facet wrapping. (Default: \code{NULL})}
 
-\item{facetWrapBy}{Column name representing data to be used for facet wrapping (Default: NULL): NULL or character}
+\item{facetColumn}{A numeric value representing the number of columns to be used for facet wrapping. (Default: \code{NULL})}
 
-\item{facetColumn}{Number of columns to use for facet wrapping (Default: NULL): NULL or double}
-
-\item{facetRow}{Number of rows to use for facet wrapping (Default: NULL): NULL or double}
+\item{facetRow}{A numeric value representing the number of rows to be used for face wrapping. (Default: \code{NULL})}
 }
 \value{
-A data frame containing the result of the boundary analysis performed
+A data frame of the boundary analysis result if performed; otherwise, this function does not return any value.
+It prints the ggplot object displaying violin/box plot.
 }
 \description{
-Display data distribution using violin and/or box plot (and perform boundary analysis if defined).
+Display data distribution using violin and/or box plot and perform boundary analysis to evaluate data performance.
+\itemize{
+\item Value (Evaluates data by +/- value from 0)
+\item Percentage (Evaluates data by +/- value from 100)
+\item Standard deviation, sd (Evaluates data using 1st and 2nd standard deviations from average mean of the data or reference data)
+}
 }
 \details{
-Boundary analysis that can be performed:
-\itemize{
-\item value: Evaluates data by +/- value from 0
-\item percentage: Evaluates data by +/- value from 100
-\item sd: Evaluates data using 1st and 2nd standard deviations from average mean of the data or reference data
+Type of boundary analysis:
+\enumerate{
+\item "value" - Uses a boundary value set +/- from 0 as the boundary ranges for evaluation.
+\item "percentage" - Uses a boundary value set +/- from 100 as the boundary ranges for evaluation.
+\item "sd" - Uses 1st and 2nd standard deviation value from the average mean as the boundary ranges.
+To specify an external mean and standard deviation value to be used for analysis, provide reference data (Should have the same data columns as the actual data).
 }
-
-To define mean and standard deviation values to be used for "sd" boundary analysis, pass reference data that mirrors the same columns as data.
 }

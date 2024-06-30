@@ -1,6 +1,6 @@
-#' Generate Statistics
+#' Generate Statistic
 #'
-#' Generate statistical information of a dataset including: 
+#' Generate statistical information including: 
 #' - Sample size (n)
 #' - Sum (sum)
 #' - Minimum (min)
@@ -19,16 +19,14 @@
 #' - Confidence quantile range (CQ) - 95% and 99% (Lower and upper)
 #'
 #' @export
-#' @param data A numeric vector representing values to be used to generate statistical analysis.
-#' @returns A list containing statistical information generated using the numeric vector provided.
+#' @param data A numeric vector representing values to be used to generate statistical information.
+#' @returns A list of statistical information.
 #'
 #' @examples
-#' generateStat(data = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
-generateStat <- function(data) {
+#' generateStatistic(data = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
+generateStatistic <- function(data) {
   # Validate parameters
-  if (length(data) <= 1 || !is.numeric(data) || any(is.na(data))) {
-    stop("Invalid 'data': Must be a non-NA numeric vector with a minimum length of 2")
-  }
+  validateStatisticalNumericVectorElement(name = "data", value = data)
   
   # Sample size (n)
   n <- length(data)

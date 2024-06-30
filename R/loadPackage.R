@@ -14,7 +14,7 @@
 #' loadPackage(packageName = c("DT", "dplyr"))
 loadPackage <- function(packageName) {
   # Validate parameters
-  validateCharacterVector(parameterName = "packageName", parameterValue = packageName)
+  validateCharacterVectorElement(name = "packageName", value = packageName)
   
   # Identify and install missing packages
   missingPackage <- packageName[!(packageName %in% installed.packages()[, "Package"])]

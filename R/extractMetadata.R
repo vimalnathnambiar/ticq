@@ -1,6 +1,6 @@
 #' Extract Metadata
 #'
-#' Extract metadata from ANPC sample file names or paths including:
+#' Extract metadata from Australian National Phenome Centre (ANPC)-specific data files including:
 #' - Project name
 #' - Cohort name
 #' - Matrix type
@@ -9,21 +9,19 @@
 #' - Instrument name
 #' - Plate number
 #'
-#' Applicable only to data acquired at the Australian National Phenome Centre (ANPC).
+#' Only applicable to data acquired at the Australian National Phenome Centre (ANPC).
 #'
 #' @export
-#' @param input A character vector representing ANPC sample file names or paths.
-#' @returns A list containing lists of character vectors representing different metadata.
+#' @param input A character vector representing ANPC-specific data file names or paths.
+#' @returns A list of character vectors of the associated metadata.
 #'
 #' @examples
 #' extractMetadata(input = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29.json")
 extractMetadata <- function(input) {
   # Validate parameters
-  if (length(input) == 0  || !is.character(input)) {
-    stop("Invalid 'input': Must be a character vector with a minimum length of 1")
-  }
+  validateCharacterVector(name = "input", value = input)
   
-  # Metadata extraction
+  # Extract metadata
   project <- extractProject(input = input)
   cohort <- extractCohort(input = input)
   projectCohort <- ifelse(is.na(project), ifelse(is.na(cohort), NA_character_, cohort), ifelse(is.na(cohort), project, paste(project, cohort)))

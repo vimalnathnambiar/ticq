@@ -7,13 +7,13 @@
 retrieveFileName(inputPath, fileExtension = NULL)
 }
 \arguments{
-\item{inputPath}{A character string representing an existing directory or file path.}
+\item{inputPath}{A character string representing a directory or file path.}
 
-\item{fileExtension}{A character string representing a file extension type (e.g., "JSON"). (Default: \code{NULL})}
+\item{fileExtension}{A character string representing a file extension pattern (e.g., "JSON"). (Default: \code{NULL})}
 }
 \value{
-A character vector of file names matching the specified file extension type.
+A character vector of the file names matching the specified file extension pattern.
 }
 \description{
-Retrieve file names matching a specified file extension type.
+Retrieve file names from a directory or file path that matches a specific file extension pattern.
 }

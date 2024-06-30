@@ -7,10 +7,10 @@
 extractInstrument(input)
 }
 \arguments{
-\item{input}{A character vector representing ANPC sample file names or paths.}
+\item{input}{A character vector representing ANPC-specific data file names or paths.}
 }
 \value{
-A character vector representing instrument names.
+A character vector of the associated instrument names.
 }
 \description{
 Extract instrument name.

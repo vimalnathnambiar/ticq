@@ -7,9 +7,9 @@
 checkSpectrumCount(data, commonColumn, sampleID, spectrumCount, threshold = 20)
 }
 \arguments{
-\item{data}{A data frame containing spectral data.}
+\item{data}{A data frame containing MS spectral data.}
 
-\item{commonColumn}{A character vector representing names of the common data columns to be used for data grouping.}
+\item{commonColumn}{A character vector representing the names of the common data columns to be used for data grouping.}
 
 \item{sampleID}{A character string representing the name of the sample ID column.}
 
@@ -18,9 +18,8 @@ checkSpectrumCount(data, commonColumn, sampleID, spectrumCount, threshold = 20)
 \item{threshold}{A numeric value representing the accepted threshold limit (\%). (Default: \code{20})}
 }
 \value{
-A list containing the statistical result (sample size, sum, and mean) and
-two data frames (\code{passedData} containing spectral data that has a spectrum count within the threshold limit and \code{failedData} containing a summarised listing of samples that falls outside the threshold limit).
+A list with statistical information (sample size, sum, and mean) and two data frames (data that passed and failed the spectrum count check).
 }
 \description{
-Check the total number of spectral data (spectrum count) of each sample against an accepted threshold limit (\%) from the average mean.
+Check the total number of MS spectral data (spectrum count) of each data group against an accepted threshold limit (\%) (+/-)from the average mean.
 }

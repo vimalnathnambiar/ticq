@@ -1,31 +1,30 @@
 #' Check Spectrum Count
 #'
-#' Check the total number of spectral data (spectrum count) of each sample against an accepted threshold limit (%) from the average mean.
+#' Check the total number of MS spectral data (spectrum count) of each data group against an accepted threshold limit (%) (+/-)from the average mean.
 #'
 #' @import dplyr
 #'
 #' @export
-#' @param data A data frame containing spectral data.
-#' @param commonColumn A character vector representing names of the common data columns to be used for data grouping.
+#' @param data A data frame containing MS spectral data.
+#' @param commonColumn A character vector representing the names of the common data columns to be used for data grouping.
 #' @param sampleID A character string representing the name of the sample ID column.
 #' @param spectrumCount A character string representing the name of the spectrum count column.
 #' @param threshold A numeric value representing the accepted threshold limit (%). (Default: `20`)
-#' @returns A list containing the statistical result (sample size, sum, and mean) and
-#' two data frames (`passedData` containing spectral data that has a spectrum count within the threshold limit and `failedData` containing a summarised listing of samples that falls outside the threshold limit).
+#' @returns A list with statistical information (sample size, sum, and mean) and two data frames (data that passed and failed the spectrum count check).
 checkSpectrumCount <- function(data, commonColumn, sampleID, spectrumCount, threshold = 20) {
   # Validate parameters
-  if (nrow(data) == 0 || ncol(data) == 0) {
-    stop("Invalid 'data': Empty data frame")
+  if (!is.data.frame(data)) {
+    stop("Invalid 'data': Must be a data frame")
   }
   
   parameter <- list(commonColumn = commonColumn, sampleID = sampleID, spectrumCount = spectrumCount, threshold = threshold)
   for (i in names(parameter)) {
     if (i == "commonColumn") {
-      validateCharacterVector(parameterName = i, parameterValue = parameter[[i]])
+      validateCharacterVectorElement(name = i, value = parameter[[i]])
     } else if (i == "threshold") {
-      validateNumericValue(parameterName = i, parameterValue = parameter[[i]])
+      validateNumericValue(name = i, value = parameter[[i]])
     } else {
-      validateCharacterString(parameterName = i, parameterValue = parameter[[i]])
+      validateCharacterStringValue(name = i, value = parameter[[i]])
     }
   }
   
@@ -34,10 +33,10 @@ checkSpectrumCount <- function(data, commonColumn, sampleID, spectrumCount, thre
     stop(paste0("Unable to check spectrum count: Missing one or more data column (", paste(parameter[!parameter %in% colnames(data)], collapse = ", "), ")"))
   }
   
-  # Perform statistical analysis on spectrum count and filter samples outside the accepted threshold limit
+  # Check spectrum count
   summarisedData <- countSpectrum(data = data, commonColumn = commonColumn, spectrumCount = spectrumCount)
-  stat <- generateStat(summarisedData[[spectrumCount]])
   
+  stat <- generateStatistic(data = summarisedData[[spectrumCount]])
   mean <- stat$mean
   lowerThreshold <- floor(mean - ((threshold / 100) * mean))
   upperThreshold <- ceiling(mean + ((threshold / 100) * mean))

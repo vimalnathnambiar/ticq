@@ -16,7 +16,7 @@ anonymiseMetadata(
 )
 }
 \arguments{
-\item{data}{A data frame containing spectral data.}
+\item{data}{A data frame containing MS spectral data.}
 
 \item{sampleID}{A character string representing the name of the sample ID column.}
 
@@ -30,13 +30,21 @@ anonymiseMetadata(
 
 \item{instrument}{A character string representing the name of the instrument column.}
 
-\item{plate}{Acharacter string representing the name of the plate column.}
+\item{plate}{A character string representing the name of the plate column.}
 }
 \value{
-A data frame with anonymised sample metadata in their respective columns.
+A data frame of MS spectral data and its associated anonymised metadata in respective data columns.
 }
 \description{
-Anonymise sample metadata including sample ID, project name, cohort name, method name, instrument name, and plate number.
+Anonymise metadata associated with Australian National Phenome Centre (ANPC)-specific data files including:
+\itemize{
+\item Sample ID
+\item Project name
+\item Cohort name
+\item Method name
+\item Instrument name
+\item Plate number
+}
 }
 \details{
 Only applicable to data acquired at the Australian National Phenome Centre (ANPC).

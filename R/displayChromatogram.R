@@ -5,21 +5,21 @@
 #' @import ggplot2
 #'
 #' @export
-#' @param data A data frame containing plot data.
+#' @param data A data frame containing chromatogram data to be used for plotting.
 #' @param x A character string representing the name of the data column to be used for the x-axis.
 #' @param y A character string representing the name of the data column to be used for the y-axis.
 #' @param colour A character string representing the name of the data column to be used for colour grouping. (Default: `NULL`)
 #' @param title A character string representing the plot title. (Default: `"Chromatogram"`)
 #' @param subtitle A character string representing the plot subtitle. (Default: `NULL`)
 #' @param caption A character string representing the plot caption. (Default: `NULL`)
-#' @param xLabel A character string representing the x-axis label. (Default: Value used for `x`)
-#' @param yLabel A character string representing the y-axis label. (Default: Value used for `y`)
-#' @param colourLabel A character string representing the colour grouping label. (Default: Value used for `colour`)
-#' @param xTickToggle A logical value representing the toggle to display ticks on the x-axis. (Default: `TRUE`, Options: `TRUE` or `FALSE`)
+#' @param xLabel A character string representing the x-axis label. (Default: `x`)
+#' @param yLabel A character string representing the y-axis label. (Default: `y`)
+#' @param colourLabel A character string representing the colour grouping label. (Default: `colour`)
+#' @param xTickToggle A logical value representing the toggle to display the ticks on the x-axis. (Default: `TRUE`, Options: `TRUE` or `FALSE`)
 #' @param facetWrapBy A character string representing the name of the data column to be used for facet wrapping. (Default: `NULL`)
 #' @param facetColumn A numeric value representing the number of columns to be used for facet wrapping. (Default: `NULL`)
 #' @param facetRow A numeric value representing the number of rows to be used for face wrapping. (Default: `NULL`)
-#' @param chromatogramRegion A list of lists representing the different chromatogram regions of interest and their respective start and end time points. (Default: `NULL`; Options: Use `ticq::configureChromatogramRegion()`)
+#' @param chromatogramRegion A list representing the chromatogram region data of interests. (Default: `NULL`; Options: `configureChromatogramRegion()`)
 #' @returns This function does not return any value. It prints the ggplot object displaying the chromatogram.
 displayChromatogram <- function(data,
                                 x,
@@ -37,8 +37,8 @@ displayChromatogram <- function(data,
                                 facetRow = NULL,
                                 chromatogramRegion = NULL) {
   # Validate parameters
-  if (nrow(data) == 0 || ncol(data) == 0) {
-    stop("Invalid 'data': Empty data frame")
+  if (!is.data.frame(data)) {
+    stop("Invalid 'data': Must be a data frame")
   }
   
   parameter <- list(
@@ -59,19 +59,19 @@ displayChromatogram <- function(data,
   )
   for (i in names(parameter)) {
     if (i == "x" || i == "y") {
-      validateCharacterString(parameterName = i, parameterValue = parameter[[i]])
-    } else if ((i == "colour" || i == "facetWrapBy") && !is.null(parameter[[i]]) &&
-               (length(parameter[[i]]) != 1 || !is.character(parameter[[i]]) || is.na(parameter[[i]]) || parameter[[i]] == "")) {
-      stop(paste0("Invalid '", i, "': Must either be NULL or a non-NA, non-empty character string of length 1"))
-    } else if (i == "xTickToggle") {
-      validateLogicalValue(parameterName = i, parameterValue = parameter[[i]])
-    } else if (i == "chromatogramRegion" && !is.null(parameter[[i]]) && !validateChromatogramRegion(parameterName = i, parameterValue = parameter[[i]])) {
-      stop(paste0("Invalid '", i, "': Must either be NULL or contain a valid list of chromatogram region data"))
-    } else if ((i == "facetColumn" || i == "facetRow") && !is.null(parameter[[i]]) && (length(parameter[[i]]) != 1 || !is.numeric(parameter[[i]]))) {
-      stop(paste0("Invalid '", i, "': Must either be NULL or a numeric value of length 1"))
-    } else if ((i == "title" || i == "subtitle" || i == "caption" || i == "xLabel" || i == "yLabel" || i == "colourLabel") &&
-               !is.null(parameter[[i]]) && (length(parameter[[i]]) != 1 || !is.character(parameter[[i]]))){
-      stop(paste0("Invalid '", i, "': Must either be NULL or a character string of length 1"))
+      validateCharacterStringValue(name = i, value = parameter[[i]])
+    } else if (i == "colour" || i == "facetWrapBy") {
+      validateNullableCharacterStringValue(name = i, value = parameter[[i]])
+    } else if (i == "title" || i == "subtitle" || i == "caption" || i == "xLabel" || i == "yLabel" || i == "colourLabel") {
+      validateNullableCharacterString(name = i, value = parameter[[i]])
+    } else if (i == "xTickTogle") {
+      validateLogicalValue(name = i, value = parameter[[i]])
+    } else if (i == "facetColumn" || i == "facetRow") {
+      validateNullableNumericValue(name = i, value = parameter[[i]])
+    } else if (i == "chromatogramRegion" && !is.null(parameter[[i]]) && !validateChromatogramRegion(name = i, value = parameter[[i]])) {
+      stop(paste0(
+        "Invalid '", i, "': Must either be NULL or a list of the chromatogram region data of interests"
+      ))
     }
   }
   
@@ -82,7 +82,6 @@ displayChromatogram <- function(data,
   
   # Display chromatogram
   tryCatch({
-    # Plot data
     chromatogram <- ggplot2::ggplot(data = data, aes(x = .data[[x]], y = .data[[y]])) +
       ggplot2::geom_line(
         aes(
@@ -99,19 +98,16 @@ displayChromatogram <- function(data,
       ) + 
       ggplot2::labs(title = title, subtitle = subtitle, caption = caption, x = xLabel, y = yLabel, colour = colourLabel)
     
-    # Display x-axis ticks
     if (!xTickToggle) {
       chromatogram <- chromatogram +
         ggplot2::theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
     }
     
-    # Facet wrap
     if (!is.null(facetWrapBy)) {
       chromatogram <- chromatogram +
         ggplot2::facet_wrap( ~ .data[[facetWrapBy]], ncol = facetColumn, nrow = facetRow)
     }
       
-    # Display chromatogram regions
     if (!is.null(chromatogramRegion)) {
       label <- list(massCalibration = "Mass Calibration Region", analyte = "Analyte Region", wash = "Wash Region")
       for (i in names(label)) {

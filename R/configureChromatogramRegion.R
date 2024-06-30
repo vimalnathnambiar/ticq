@@ -1,25 +1,25 @@
 #' Configure Chromatogram Region
 #'
-#' Configure the start and end time points of the different chromatogram regions of interest:
-#' - Prewash region
-#' - Mass calibration region
-#' - Analyte region
-#' - Wash region
+#' Configure the start and end time points of the chromatogram regions of interest:
+#' - Prewash
+#' - Mass calibration
+#' - Analyte
+#' - Wash
 #'
 #' @export
-#' @param massCalStart A numeric value that represents the starting time point of the mass calibration region. (Default: `0`)
-#' @param massCalEnd A numeric value that represents the end time point of the mass calibration region.
-#' @param analyteStart A numeric value that represents the starting time point of the analyte region. (Default: Value used for `massCalEnd`)
-#' @param analyteEnd A numeric value that represents the end time point of the analyte region. (Default: Value used for `washStart`)
-#' @param washStart A numeric value that represents the starting time point of the wash region.
-#' @param washEnd A numeric value that represents the end time point of the wash region. (Default: `NULL`)
-#' @returns A list of lists representing the different chromatogram regions of interest and their respective start and end time points.
+#' @param massCalStart A numeric value representing the start of the mass calibration region. (Default: `0`)
+#' @param massCalEnd A numeric value representing the end of the mass calibration region.
+#' @param analyteStart A numeric value representing the start of the analyte region. (Default: `massCalEnd`)
+#' @param analyteEnd A numeric value representing the end of the analyte region. (Default: `washStart`)
+#' @param washStart A numeric value representing the start of the wash region.
+#' @param washEnd A numeric value representing the end of the wash region. (Default: `NULL`)
+#' @returns A list of chromatogram region data of interests.
 #'
 #' @examples
-#' # Example 1: Using default values for massCalibrationStart, analyteStart, analyteEnd and washEnd
+#' # Example 1: Using default values
 #' configureChromatogramRegion(massCalibrationEnd = 0.3, washStart = 5)
 #'
-#' # Example 2: Specifying values for analyteStart, analyteEnd and washEnd
+#' # Example 2: Specifying values
 #' configureChromatogramRegion(massCalibrationStart = 0, massCalibrationEnd = 0.3, analyteStart = 2, analyteEnd = 4, washStart = 5, washEnd = 6)
 configureChromatogramRegion <- function(massCalibrationStart = 0,
                                         massCalibrationEnd,
@@ -37,14 +37,14 @@ configureChromatogramRegion <- function(massCalibrationStart = 0,
     washEnd = washEnd
   )
   for (i in names(parameter)) {
-    if (i == "washEnd" && !is.null(parameter[[i]]) && (length(parameter[[i]]) != 1 || !is.numeric(parameter[[i]]))) {
-      stop(paste0("Invalid '", i, "': Must either be NULL or a numeric value of length 1"))
-    } else if (i != "washEnd") {
-      validateNumericValue(parameterName = i, parameterValue = parameter[[i]])
+    if (i == "washEnd") {
+      validateNullableNumericValue(name = i, value = parameter[[i]])
+    } else {
+      validateNumericValue(name = i, value = parameter[[i]])
     }
   }
   
-  # Configure start and end time points of each chromatogram region of interest
+  # Configure chromatogram region data
   return(
     list(
       prewash = list(start = 0, end = washStart),

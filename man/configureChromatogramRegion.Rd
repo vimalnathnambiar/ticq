@@ -14,34 +14,34 @@ configureChromatogramRegion(
 )
 }
 \arguments{
-\item{analyteStart}{A numeric value that represents the starting time point of the analyte region. (Default: Value used for \code{massCalEnd})}
+\item{analyteStart}{A numeric value representing the start of the analyte region. (Default: \code{massCalEnd})}
 
-\item{analyteEnd}{A numeric value that represents the end time point of the analyte region. (Default: Value used for \code{washStart})}
+\item{analyteEnd}{A numeric value representing the end of the analyte region. (Default: \code{washStart})}
 
-\item{washStart}{A numeric value that represents the starting time point of the wash region.}
+\item{washStart}{A numeric value representing the start of the wash region.}
 
-\item{washEnd}{A numeric value that represents the end time point of the wash region. (Default: \code{NULL})}
+\item{washEnd}{A numeric value representing the end of the wash region. (Default: \code{NULL})}
 
-\item{massCalStart}{A numeric value that represents the starting time point of the mass calibration region. (Default: \code{0})}
+\item{massCalStart}{A numeric value representing the start of the mass calibration region. (Default: \code{0})}
 
-\item{massCalEnd}{A numeric value that represents the end time point of the mass calibration region.}
+\item{massCalEnd}{A numeric value representing the end of the mass calibration region.}
 }
 \value{
-A list of lists representing the different chromatogram regions of interest and their respective start and end time points.
+A list of chromatogram region data of interests.
 }
 \description{
-Configure the start and end time points of the different chromatogram regions of interest:
+Configure the start and end time points of the chromatogram regions of interest:
 \itemize{
-\item Prewash region
-\item Mass calibration region
-\item Analyte region
-\item Wash region
+\item Prewash
+\item Mass calibration
+\item Analyte
+\item Wash
 }
 }
 \examples{
-# Example 1: Using default values for massCalibrationStart, analyteStart, analyteEnd and washEnd
+# Example 1: Using default values
 configureChromatogramRegion(massCalibrationEnd = 0.3, washStart = 5)
 
-# Example 2: Specifying values for analyteStart, analyteEnd and washEnd
+# Example 2: Specifying values
 configureChromatogramRegion(massCalibrationStart = 0, massCalibrationEnd = 0.3, analyteStart = 2, analyteEnd = 4, washStart = 5, washEnd = 6)
 }

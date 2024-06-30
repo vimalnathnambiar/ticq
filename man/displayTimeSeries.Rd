@@ -18,7 +18,6 @@ displayTimeSeries(
   colourLabel = colour,
   shapeLabel = shape,
   boundary = NULL,
-  boundaryValue = 0,
   referenceData = NULL,
   trendlineToggle = TRUE,
   xTickToggle = TRUE,
@@ -28,59 +27,62 @@ displayTimeSeries(
 )
 }
 \arguments{
-\item{data}{A data frame containing plot data: data frame}
+\item{data}{A data frame containing data to be used for plotting.}
 
-\item{x}{Column name representing the continuous data series to be used for x-axis: character}
+\item{x}{A character string representing the name of the data column to be used for the x-axis.}
 
-\item{y}{Column name representing the continuous data series to be used for y-axis: character}
+\item{y}{A character string representing the name of the data column to be used for the y-axis.}
 
-\item{colour}{Column name representing data to be used for colour grouping (Default: NULL): NULL or character}
+\item{colour}{A character string representing the name of the data column to be used for colour grouping. (Default: \code{NULL})}
 
-\item{shape}{Column name representing data to be used for shape grouping (Default: NULL): NULL or character}
+\item{shape}{A character string representing the name of the data column to be used for shape grouping. (Default: \code{NULL})}
 
-\item{title}{Plot title (Default: "Time Series"): NULL or character}
+\item{title}{A character string representing the plot title. (Default: \code{"Time Series"})}
 
-\item{subtitle}{Plot subtitle (Default: NULL): NULL or character}
+\item{subtitle}{A character string representing the plot subtitle. (Default: \code{NULL})}
 
-\item{caption}{Plot caption (Default: NULL): NULL or character}
+\item{caption}{A character string representing the plot caption. (Default: \code{NULL})}
 
-\item{xLabel}{x-axis label (Default: Value used for x): NULL or character}
+\item{xLabel}{A character string representing the x-axis label. (Default: \code{x})}
 
-\item{yLabel}{y-axis label (Default: Value used for y): NULL or character}
+\item{yLabel}{A character string representing the y-axis label. (Default: \code{y})}
 
-\item{colourLabel}{Colour grouping label (Default: Value used for colour): NULL or character}
+\item{colourLabel}{A character string representing the colour grouping label. (Default: \code{colour})}
 
-\item{shapeLabel}{Shape grouping label (Default: Value used for shape): NULL or character}
+\item{shapeLabel}{A character string representing the shape grouping label. (Default: \code{shape})}
 
-\item{boundary}{Boundary analysis to perform (Default: NULL, Options: "value", "percentage", "sd"): NULL or character.}
+\item{boundary}{A character string representing the boundary analysis type to perform. (Default: \code{NULL}, Options: \code{"value"}, \code{"percentage"}, or \code{"sd"})}
 
-\item{boundaryValue}{Value used for "value" and "percentage" boundary analysis (Default: 0): numeric or double}
+\item{referenceData}{A data frame containing reference data to be used for "sd" type boundary analysis. (Default: \code{NULL})}
 
-\item{referenceData}{A data frame of reference sample data with the same column names as data to calculate "sd" boundaries (Default: NULL): NULL or data frame}
+\item{trendlineToggle}{A logical value representing the toggle to display the data trendline. (Default: \code{TRUE}, Options: \code{TRUE} or \code{FALSE})}
 
-\item{trendlineToggle}{Toggle to display trendline in the data (Default: TRUE, Options: TRUE or FALSE): logical}
+\item{xTickToggle}{A logical value representing the toggle to display the ticks on the x-axis. (Default: \code{TRUE}, Options: \code{TRUE} or \code{FALSE})}
 
-\item{xTickToggle}{Toggle to display ticks on x-axis (Default: TRUE, Options: TRUE or FALSE): logical}
+\item{facetWrapBy}{A character string representing the name of the data column to be used for facet wrapping. (Default: \code{NULL})}
 
-\item{facetWrapBy}{Column name representing data to be used for facet wrapping (Default: NULL): NULL or character}
+\item{facetColumn}{A numeric value representing the number of columns to be used for facet wrapping. (Default: \code{NULL})}
 
-\item{facetColumn}{Number of columns to use for facet wrapping (Default: NULL): NULL or numeric}
-
-\item{facetRow}{Number of rows to use for facet wrapping (Default: NULL): NULL or numeric}
+\item{facetRow}{A numeric value representing the number of rows to be used for face wrapping. (Default: \code{NULL})}
 }
 \value{
-A data frame containing the result of the boundary analysis performed (if specified)
+A data frame of the boundary analysis result if performed; otherwise, this function does not return any value.
+It prints the ggplot object displaying the time series data.
 }
 \description{
-Display time series data (and perform boundary analysis if specified).
+Display time series data and perform boundary analysis to evaluate data performance over time.
+\itemize{
+\item Value (Evaluates data by +/- value from 0)
+\item Percentage (Evaluates data by +/- value from 100)
+\item Standard deviation, sd (Evaluates data using 1st and 2nd standard deviations from average mean of the data or reference data)
+}
 }
 \details{
-Boundary analysis that can be performed:
-\itemize{
-\item value: Evaluates data by +/- value from 0
-\item percentage: Evaluates data by +/- value from 100
-\item sd: Evaluates data using 1st and 2nd standard deviations from average mean of the data or reference data
+Type of boundary analysis:
+\enumerate{
+\item "value" - Uses a boundary value set +/- from 0 as the boundary ranges for evaluation.
+\item "percentage" - Uses a boundary value set +/- from 100 as the boundary ranges for evaluation.
+\item "sd" - Uses 1st and 2nd standard deviation value from the average mean as the boundary ranges.
+To specify an external mean and standard deviation value to be used for analysis, provide reference data (Should have the same data columns as the actual data).
 }
-
-To specify mean and standard deviation values to be used for "sd" boundary analysis, pass reference data that mirrors the same columns as data.
 }

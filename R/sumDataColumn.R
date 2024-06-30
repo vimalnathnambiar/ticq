@@ -5,22 +5,22 @@
 #' @import dplyr
 #'
 #' @export
-#' @param data A data frame containing spectral data.
-#' @param commonColumn A character vector representing names of the common data columns to be used for data grouping.
-#' @param sumColumn A character string representing the name of the data column to be summed.
-#' @returns A data frame grouped by common data columns and the sum value of the data column specified.
+#' @param data A data frame containing MS spectral data.
+#' @param commonColumn A character vector representing the names of the common data columns to be used for data grouping.
+#' @param sumColumn A character string representing the name of the data column with values to be summed.
+#' @returns A data frame of MS spectral data summary grouped by their common data columns and the sum value of the specified data column.
 sumDataColumn <- function(data, commonColumn, sumColumn) {
   # Validate parameters
-  if (nrow(data) == 0 || ncol(data) == 0) {
-    stop("Invalid 'data': Empty data frame")
+  if (!is.data.frame(data)) {
+    stop("Invalid 'data': Must be a data frame")
   }
   
   parameter <- list(commonColumn = commonColumn, sumColumn = sumColumn)
   for (i in names(parameter)) {
     if (i == "commonColumn") {
-      validateCharacterVector(parameterName = i, parameterValue = parameter[[i]])
+      validateCharacterVectorElement(name = i, value = parameter[[i]])
     } else {
-      validateCharacterString(parameterName = i, parameterValue = parameter[[i]])
+      validateCharacterStringValue(name = i, value = parameter[[i]])
     }
   }
   
@@ -29,7 +29,7 @@ sumDataColumn <- function(data, commonColumn, sumColumn) {
     stop(paste0("Unable to sum data column: Missing one or more data column (", paste(parameter[!parameter %in% colnames(data)], collapse = ", "), ")"))
   }
   
-  # Sum data column for each data group
+  # Sum data column
   return(
     data %>%
       dplyr::group_by(across(all_of(commonColumn))) %>%

@@ -6,10 +6,10 @@
 #'
 #' @import dplyr
 #'
-#' @param input A character vector representing ANPC sample file names or paths.
-#' @param matrix A character vector representing matrix types. (Default: `NA_character_`)
-#' @returns A character vector representing sample types.
-extractSampleType <- function(input, matrix = NA_character_) {
+#' @param input A character vector representing ANPC-specific data file names or paths.
+#' @param matrix A character vector representing associated matrix types.
+#' @returns A character vector of the associated sample types.
+extractSampleType <- function(input, matrix) {
   return(
     dplyr::case_when(
       grepl("DLTR|dLTR|dltr", input) ~ ifelse(is.na(matrix), NA_character_, paste("dLTR", matrix)),

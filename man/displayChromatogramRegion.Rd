@@ -4,7 +4,7 @@
 \alias{displayChromatogramRegion}
 \title{Display Chromatogram Region}
 \usage{
-displayChromatogramRegion(plot, maxX, maxY, regionOfInterest, label = NULL)
+displayChromatogramRegion(plot, maxX, maxY, regionOfInterest, label)
 }
 \arguments{
 \item{plot}{A ggplot object of a chromatogram.}
@@ -13,13 +13,13 @@ displayChromatogramRegion(plot, maxX, maxY, regionOfInterest, label = NULL)
 
 \item{maxY}{A numeric value representing the maximum value on the y-axis.}
 
-\item{regionOfInterest}{A list representing the start and end time points of a chromatogram region. (Options: Use \code{ticq::configureChromatogram()$regionOfInterest})}
+\item{regionOfInterest}{A list representing the start and end time points of a chromatogram region of interest.}
 
-\item{label}{A character string representing the chromatogram region label, (Default: \code{NULL})}
+\item{label}{A character string representing the chromatogram region label.}
 }
 \value{
-A ggplot object with the added vertical lines representing the chromatogram region start and end time points
+A ggplot object with added dashed vertical lines representing the chromatogram region start and end time points.
 }
 \description{
-Display vertical lines representing the start and end time points of a chromatogram region.
+Display vertical lines on a chromatogram plot representing the start and end time points of a chromatogram region of interest.
 }

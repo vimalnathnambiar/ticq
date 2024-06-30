@@ -1,21 +1,27 @@
 #' Anonymise Metadata
 #'
-#' Anonymise sample metadata including sample ID, project name, cohort name, method name, instrument name, and plate number.
+#' Anonymise metadata associated with Australian National Phenome Centre (ANPC)-specific data files including:
+#' - Sample ID
+#' - Project name
+#' - Cohort name
+#' - Method name
+#' - Instrument name
+#' - Plate number
 #'
 #' Only applicable to data acquired at the Australian National Phenome Centre (ANPC).
 #'
 #' @import dplyr
 #'
 #' @export
-#' @param data A data frame containing spectral data.
+#' @param data A data frame containing MS spectral data.
 #' @param sampleID A character string representing the name of the sample ID column.
 #' @param project A character string representing the name of the project column.
 #' @param cohort A character string representing the name of the cohort column.
 #' @param projectCohort A character string representing the name of the combined project and cohort column.
 #' @param method A character string representing the name of the method column.
 #' @param instrument A character string representing the name of the instrument column.
-#' @param plate Acharacter string representing the name of the plate column.
-#' @returns A data frame with anonymised sample metadata in their respective columns.
+#' @param plate A character string representing the name of the plate column.
+#' @returns A data frame of MS spectral data and its associated anonymised metadata in respective data columns.
 #'
 #' @examples
 #' data <- data.frame(sampleID = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29", project = "COVID-19", cohort = "Heidelberg",
@@ -24,8 +30,8 @@
 #'                   method = "method", instrument = "instrument", plate = "plate")
 anonymiseMetadata <- function(data, sampleID, project, cohort, projectCohort, method, instrument, plate) {
   # Validate parameters
-  if (nrow(data) == 0 || ncol(data) == 0) {
-    stop("Invalid 'data': Empty data frame")
+  if (!is.data.frame(data)) {
+    stop("Invalid 'data': Must be a data frame")
   }
   
   parameter <- list(
@@ -38,7 +44,7 @@ anonymiseMetadata <- function(data, sampleID, project, cohort, projectCohort, me
     plate = plate
   )
   for (i in names(parameter)) {
-    validateCharacterString(parameterName = i, parameterValue = parameter[[i]])
+    validateCharacterStringValue(name = i, value = parameter[[i]])
   }
   
   parameter <- c(sampleID, project, cohort, projectCohort, method, instrument, plate)
@@ -46,7 +52,7 @@ anonymiseMetadata <- function(data, sampleID, project, cohort, projectCohort, me
     stop(paste0("Unable to anonymise metadata: Missing one or more data column (", paste(parameter[!parameter %in% colnames(data)], collapse = ", "), ")"))
   }
   
-  # Anonymise metadata (and replace NA) values
+  # Anonymise metadata
   return(
     data %>%
       dplyr::mutate(

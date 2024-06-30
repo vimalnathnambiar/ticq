@@ -7,10 +7,10 @@
 extractCohort(input)
 }
 \arguments{
-\item{input}{A character vector representing ANPC sample file names or paths.}
+\item{input}{A character vector representing ANPC-specific data file names or paths.}
 }
 \value{
-A character vector representing cohort names.
+A character vector of the associated cohort names.
 }
 \description{
 Extract cohort name.

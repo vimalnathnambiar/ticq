@@ -7,13 +7,13 @@
 extractMetadata(input)
 }
 \arguments{
-\item{input}{A character vector representing ANPC sample file names or paths.}
+\item{input}{A character vector representing ANPC-specific data file names or paths.}
 }
 \value{
-A list containing lists of character vectors representing different metadata.
+A list of character vectors of the associated metadata.
 }
 \description{
-Extract metadata from ANPC sample file names or paths including:
+Extract metadata from Australian National Phenome Centre (ANPC)-specific data files including:
 \itemize{
 \item Project name
 \item Cohort name
@@ -25,7 +25,7 @@ Extract metadata from ANPC sample file names or paths including:
 }
 }
 \details{
-Applicable only to data acquired at the Australian National Phenome Centre (ANPC).
+Only applicable to data acquired at the Australian National Phenome Centre (ANPC).
 }
 \examples{
 extractMetadata(input = "covid19_heidelberg_SER_MS-AA_PAI05_COVp88_261121_QC04_29.json")

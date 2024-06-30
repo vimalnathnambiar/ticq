@@ -11,28 +11,31 @@ extractTargetFile(
 )
 }
 \arguments{
-\item{targetFilePath}{A character string representing an existing TSV target file path. (Default: \code{NULL}; Options: \code{"https://published-to-web-URL&output=tsv"} or \code{"/path/to/local/file.tsv"})}
+\item{targetFilePath}{A character string representing a TSV target file path.
+(Default: \code{NULL}; Options: \code{"https://published-to-web-URL&output=tsv"} or \code{"/path/to/local/file.tsv"})}
 
-\item{anpcMethodLibrary}{A character string representing an ANPC method library. (Default: \code{NULL}; Options: \code{"MS-AA-POS"}, \code{"MS-HIL-POS"}, \code{"MS-HIL-NEG"}, \code{"MS-RP-POS"}, or \code{"MS-RP-NEG"})}
+\item{anpcMethodLibrary}{A character string representing an ANPC method library.
+(Default: \code{NULL}; Options: \code{"MS-AA-POS"}, \code{"MS-HIL-POS"}, \code{"MS-HIL-NEG"}, \code{"MS-RP-POS"}, or \code{"MS-RP-NEG"})}
 
-\item{roundDecimalPlace}{A numeric value representing the number of decimals places for precision value rounding. (Default: \code{NULL})}
+\item{roundDecimalPlace}{A numeric value representing the number of decimal places to be used for precision value rounding. (Default: \code{NULL})}
 }
 \value{
-A data frame representing the target file to be used for extracted ion (target m/z) assessment.
+A data frame of the targeted m/z data.
 }
 \description{
-Extract target m/z data using a TSV formatted target file (published to web URL or local file path) or an in-house method library used at the Australian National Phenome Centre (ANPC).
+Extract targeted m/z data from a TSV formatted target file (published to web URL or local file path) or an in-house method library
+used at the Australian National Phenome Centre (ANPC).
 }
 \details{
 \enumerate{
-\item Target file specified should follow a pre-determined layout used by
-\href{https://github.com/vmalnathnambiar/exfilms/blob/main/docs/how-to-create-a-target-file.md}{ExfilMS}.
-\item If both target file path and ANPC method library is specified, the target file path will be used as the first point of extraction.
-If no data is found, the ANPC method library specified is then used.
+\item Target file should follow a pre-determined layout used by
+\href{https://github.com/vmalnathnambiar/exfilms/blob/main/docs/how-to-create-a-target-file.md}{ExfilMS} for its targeted spectra filtering process.
+\item If both target file path and ANPC method library is specified, the target file path will be used as the first point of extraction,
+followed by the ANPC method library if no data is found.
 }
 }
 \examples{
-# Example 1: Specifying a target file
+# Example 1: Specifying a target file path
 extractTargetFile(targetFilePath = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSeo31hlruA3QuwoESz5IDJ9Nu6ndSAgLTRn3uc45rOPO4BlksfHzh9xtNB22Oes9JOxhEbI4NK-zxl/pub?gid=0&single=true&output=tsv")
 
 # Example 2: Specifying an ANPC method library

@@ -1,24 +1,30 @@
-#' Display Principal Component Analysis (PCA)
+#' Display PCA
 #'
-#' Perform Principle Component Analysis (PCA) and display analysis outcomes (scree plot, scores plot, loadings plot, and/or biplot).
+#' Perform principle component analysis (PCA) and display analysis outcomes:
+#' - Scree plot
+#' - Scores plot
+#' - Loadings plot
+#' - Biplot
 #'
 #' @import ggplot2
 #' @import HotellingEllipse
 #' @import ggforce
 #'
 #' @export
-#' @param data A data frame containing data to perform PCA.
-#' @param firstColumnIndex A numeric value representing the index of the first data column to perform PCA on.
-#' @param lastColumnIndex A numeric value representing the index of the last data column to perform PCA on. (Default: `NULL`)
-#' @param scale A logical value representing the scaling used for the PCA. (Default: `TRUE`, Options: `TRUE` or `FALSE`)
-#' @param confidence A numeric value representing the data confidence (%) to be used for identifying the PC threshold.
-#' The value is also used to draw the data distribution and Hotelling Ellipse on scores plot. (Default: `95`, Options: `95` or `99`)
-#' @param distribution A character string representing the data distribution type to be drawn on the scores plot and biplot. (Default: `NULL`, Options: `"normal"` or `"t"`)
+#' @param data A data frame containing data to be used to perform PCA.
+#' @param firstColumnIndex A numeric value representing the index of the first data column to perform PCA.
+#' @param lastColumnIndex A numeric value representing the index of the last data column to perform PCA. (Default: `NULL`)
+#' @param scale A logical value representing the scaling to be used for the PCA. (Default: `TRUE`, Options: `TRUE` or `FALSE`)
+#' @param confidence A numeric value representing the data confidence (%) to be used for identifying the principle component (PC) threshold.
+#' The value is also used to draw the data distribution and confidence (Hotelling T² Ellipse) on the scores plot and biplot.
+#' (Default: `95`, Options: `95` or `99`)
+#' @param distribution A character string representing the data distribution type to be drawn on the scores plot and biplot.
+#' (Default: `NULL`, Options: `"normal"` or `"t"`)
 #' @param colour A character string representing the name of the data column to be used for colour grouping. (Default: `NULL`)
 #' @param shape A character string representing the name of the data column to be used for shape grouping. (Default: `NULL`)
 #' @param subtitle A character string representing the plot subtitle. (Default: `NULL`)
-#' @param colourLabel A character string representing the colour grouping label. (Default: Value used for `colour`)
-#' @param shapeLabel A character string representing the shape grouping label. (Default: Value used for `shape`)
+#' @param colourLabel A character string representing the colour grouping label. (Default: `colour`)
+#' @param shapeLabel A character string representing the shape grouping label. (Default: `shape`)
 #' @param screePlotToggle A logical value representing the toggle to display the generated scree plot. (Default: `TRUE`, Options: `TRUE` or `FALSE`)
 #' @param scoresPlotToggle A logical value representing the toggle to display the generated scores plot. (Default: `TRUE`, Options: `TRUE` or `FALSE`)
 #' @param loadingsPlotToggle A logical value representing the toggle to display the generated loadings plot. (Default: `TRUE`, Options: `TRUE` or `FALSE`)
@@ -40,8 +46,8 @@ displayPCA <- function(data,
                        loadingsPlotToggle = TRUE,
                        biPlotToggle = TRUE) {
   # Validate parameters
-  if (nrow(data) == 0 || ncol(data) == 0) {
-    stop("Invalid 'data': Empty data frame")
+  if (!is.data.frame(data)) {
+    stop("Invalid 'data': Must be a data frame")
   }
   
   parameter <- list(
@@ -62,41 +68,38 @@ displayPCA <- function(data,
   )
   for (i in names(parameter)) {
     if (i == "firstColumnIndex") {
-      validateNumericValue(parameterName = i, parameterValue = parameter[[i]])
-    } else if (i == "lastColumnIndex" && !is.null(parameter[[i]]) && (length(parameter[[i]]) != 1 || !is.numeric(parameter[[i]]))) {
-      stop(paste0("Invalid '", i, "': Must either be NULL or a numeric value of length 1"))
+      validateNumericValue(name = i, value = parameter[[i]])
+    } else if (i == "lastColumnIndex") {
+      validateNullableNumericValue(name = i, value = parameter[[i]])
     } else if (i == "scale" || i == "screePlotToggle" || i == "scoresPlotToggle" || i == "loadingsPlotToggle" || i == "biPlotToggle") {
-      validateLogicalValue(parameterName = i, parameterValue = parameter[[i]])
-    } else if (i == "confidence" && validateNumericValue(parameterName = i, parameterValue = parameter[[i]]) && !parameter[[i]] %in% c(95, 99)) {
-      stop(paste0("Invalid '", i, "': Must either be 95 or 99"))
-    } else if (i == "distribution" && !is.null(parameter[[i]]) && (length(parameter[[i]]) != 1 || !is.character(parameter[[i]]) || !parameter[[i]] %in% c("normal", "t"))) {
-      stop(paste0("Invalid '", i, "': Must either be NULL, 'normal', or 't'"))
-    } else if ((i == "colour" || i == "shape") && !is.null(parameter[[i]]) &&
-               (length(parameter[[i]]) != 1 || !is.character(parameter[[i]]) || is.na(parameter[[i]]) || parameter[[i]] == "")) {
-      stop(paste0("Invalid '", i, "': Must either be NULL or a non-NA, non-empty character string of length 1"))
-    } else if ((i == "subtitle" || i == "colourLabel" || i == "shapeLabel") &&
-               !is.null(parameter[[i]]) && (length(parameter[[i]]) != 1 || !is.character(parameter[[i]]))) {
-      stop(paste0("Invalid '", i, "': Must either be NULL or a character string of length 1"))
+      validateLogicalValue(name = i, value = parameter[[i]])
+    } else if (i == "confidence" && (length(parameter[[i]]) != 1 || !is.numeric(parameter[[i]]) || !parameter[[i]] %in% c(95, 99))) {
+      stop(paste0("Invalid '", i, "': Must be a numeric value of length 1 (95 or 99)"))
+    } else if (i == "distribution" && !is.null(parameter[[i]]) &&
+               (length(parameter[[i]]) != 1 || !is.character(parameter[[i]]) || !parameter[[i]] %in% c("normal", "t"))) {
+      stop(paste0("Invalid '", i, "': Must either be NULL or a character string of length 1 ('normal' or 't'"))
+    } else if (i == "colour" || i == "shape") {
+      validateNullableCharacterStringValue(name = i, value = parameter[[i]])
+    } else if (i == "subtitle" || i == "colourLabel" || i == "shapeLabel") {
+      validateNullableCharacterString(name = i, value = parameter[[i]])
     }
     
-    if (i == "firstColumnIndex" || (i == "lastColumnIndex" && !is.null(parameter[[i]]))) {
-      if (parameter[[i]] <= 0 || parameter[[i]] > ncol(data)) {
-        stop(paste0("Invalid '", i, "': Must be a valid index of a data column"))
-      }
+    if ((i == "firstColumnIndex" || (i == "lastColumnIndex" && !is.null(parameter[[i]]))) && (parameter[[i]] < 1 || parameter[[i]] > ncol(data))) {
+      stop(paste0("Invalid '", i, "': Column index out of bound"))
     }
   }
   
   parameter <- c(colour, shape)
   if (!all(parameter %in% colnames(data))) {
-    stop(paste0("Unable to perform Principal Component Analysis: Missing one or more data column (", paste(parameter[!parameter %in% colnames(data)], collapse = ", "), ")"))
+    stop(paste0(
+      "Unable to perform Principal Component Analysis: Missing one or more data column (", 
+      paste(parameter[!parameter %in% colnames(data)], collapse = ", "), ")"
+    ))
   }
   
   # Perform PCA
   tryCatch({
-    # PCA summary
     pca <- summary(prcomp(if (is.null(lastColumnIndex)) data[, firstColumnIndex:ncol(data)] else data[, firstColumnIndex:lastColumnIndex], scale = scale))
-    
-    # Identify variances
     variance <- data.frame(
       principalComponent = paste0("PC", 1:length(pca$importance[1, ])),
       standardDev = pca$importance[1, ],
@@ -104,10 +107,10 @@ displayPCA <- function(data,
       cumulativeProportion = pca$importance[3, ] * 100
     )
     
-    # Check PC threshold status
+    # PCA outcomes
     threshold <- which(variance$cumulativeProportion >= confidence)[1]
     if (threshold > 1) {
-      # Plot scree plot
+      # Display scree plot
       screePlot <- ggplot2::ggplot(data = variance, aes(x = principalComponent, y = varianceProportion, group = 1)) + 
         ggplot2::geom_col(fill = "orange") +
         ggplot2::geom_point() +
@@ -127,20 +130,18 @@ displayPCA <- function(data,
         ) +
         ggplot2::labs(title = "Principal Component Analysis: Scree Plot", subtitle = subtitle, x = "Principal Components", y = "Proportion of Variance (%)")
       
-        # Display scree plot
         if (screePlotToggle == TRUE) {
           print(screePlot)
         }
       
+      # PCA scores and loadings
       tryCatch({
-        # PCA scores and loadings data
         scores <- data.frame(pca$x)
         loading <- data.frame(pca$rotation)
         
-        # Loop through PCs that passed the threshold limit
         for (i in 1:(threshold - 1)) {
           for (j in (i+1):threshold) {
-            # Plot scores
+            # Display scores plot
             scoresPlot <- ggplot2::ggplot(data = scores, aes(x = .data[[paste0("PC", i)]], y = .data[[paste0("PC", j)]])) +
               ggplot2::geom_point(
                 aes(
@@ -167,34 +168,26 @@ displayPCA <- function(data,
                 shape = shapeLabel
               )
             
-              # Hotelling Ellipse
-              hotelling <- HotellingEllipse::ellipseParam(data = scores, k = 2, pcx = i, pcy = j)
-              if (confidence == 95) {
-                scoresPlot <- scoresPlot +
-                  ggforce::geom_ellipse(
-                    aes(x0 = 0, y0 = 0, a = hotelling$Ellipse$a.95pct, b = hotelling$Ellipse$b.95pct, angle = 0), linetype = "dashed", colour = "red"
-                  ) +
-                  ggplot2::labs(caption = "Hotelling T² Ellipse (95% Confidence)")
-              } else if (confidence == 99) {
-                scoresPlot <- scoresPlot +
-                  ggforce::geom_ellipse(
-                    aes(x0 = 0, y0 = 0, a = hotelling$Ellipse$a.99pct, b = hotelling$Ellipse$b.99pct, angle = 0), linetype = "dashed", colour = "red"
-                  ) +
-                  ggplot2::labs(caption = "Hotelling T² Ellipse (99% Confidence)")
-              }
+            hotelling <- HotellingEllipse::ellipseParam(data = scores, k = 2, pcx = i, pcy = j)
+            scoresPlot <- scoresPlot +
+              ggforce::geom_ellipse(
+                aes(
+                  x0 = 0, y0 = 0, a = hotelling$Ellipse[[paste0("a.", confidence, "pct")]], b = hotelling$Ellipse[[paste0("b.", confidence, "pct")]], angle = 0
+                ),
+                linetype = "dashed", colour = "red"
+              ) +
+              ggplot2::labs(caption = paste0("Hotelling T² Ellipse (", confidence, "% Confidence)"))
+            
+            if (!is.null(distribution)) {
+              scoresPlot <- scoresPlot +
+                ggplot2::stat_ellipse(type = distribution, level = confidence / 100, linewidth = 0.25)
+            }
               
-              # Data distribution
-              if (!is.null(distribution)) {
-                scoresPlot <- scoresPlot +
-                  ggplot2::stat_ellipse(type = distribution, level = confidence / 100, linewidth = 0.25)
-              }
+            if (scoresPlotToggle == TRUE) {
+              print(scoresPlot)
+            }
             
-              # Display scores plot
-              if (scoresPlotToggle == TRUE) {
-                print(scoresPlot)
-              }
-            
-            # Plot loadings
+            # Display loadings plot
             loadingsPlot <- ggplot2::ggplot(data = loading, aes(x = .data[[paste0("PC", i)]], y = .data[[paste0("PC", j)]])) +
               ggplot2::geom_point(aes(colour = row.names(loading))) +
               ggplot2::theme(
@@ -210,13 +203,12 @@ displayPCA <- function(data,
                 y = paste0("PC", j, " [", round(pca$importance[2, j] * 100, 2), "%]"),
                 colour = "Variables"
               )
+              
+            if (loadingsPlotToggle == TRUE) {
+              print(loadingsPlot)
+            }
             
-              # Display loadings plot
-              if (loadingsPlotToggle == TRUE) {
-                print(loadingsPlot)
-              }
-            
-            # Plot biplot
+            # Display biplot
             biplot <- scoresPlot +
               ggplot2::geom_segment(
                 data = loading,
@@ -227,10 +219,9 @@ displayPCA <- function(data,
               ggplot2::geom_text(data = loading, aes(x = .data[[paste0("PC", i)]], y = .data[[paste0("PC", j)]], label = row.names(loading))) + 
               ggplot2::labs(title = "Principal Component Analysis: Biplot")
               
-              # Display biplot
-              if (biPlotToggle == TRUE) {
-                print(biplot)
-              }
+            if (biPlotToggle == TRUE) {
+              print(biplot)
+            }
           }
         }
       },

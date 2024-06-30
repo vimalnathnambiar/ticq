@@ -48,7 +48,7 @@ metadataAnonymiser <- params$metadataAnonymiser
 # Validate input path
 jsonFileCount <- length(retrieveFileName(inputPath = inputPath, fileExtension = "JSON"))
 if (jsonFileCount == 0) {
-  stop("Invalid 'inputPath': No available JSON file(s) was found at the specified path")
+  stop("Invalid 'inputPath': No available JSON file was found at the specified path")
 } 
 
 # Update new sample status
@@ -66,19 +66,17 @@ if (length(outputDirectoryPath) == 0) {
   message(paste0("Setting default path"))
   outputDirectoryPath <- paste0(getwd(), "/output/")
 }
-createDirectoryPath(parameterName = 'outputDirectoryPath', parameterValue = outputDirectoryPath)
+createDirectoryPath(name = 'outputDirectoryPath', value = outputDirectoryPath)
 print(paste("Output directory path:", outputDirectoryPath))
 ```
 
 ## Historical Data
 ```{r, echo = FALSE, warning = FALSE}
 # Validate historical data path
-if (!is.null(historicalDataPath)) {
-  if (length(parameterValue) != 1 || !is.character(parameterValue) || is.na(parameterValue) || parameterValue == "") {
-    stop("Invalid 'historicalDataPath: Must either be NULL or a non-NA, non-empty character string of length 1")
-  } else if (!validateFileExtension(parameterName = 'historicalDataPath', parameterValue = historicalDataPath, fileExtension = "RDS")) {
-    stop("Invalid 'historicalDataPath': No available RDS file found at the specified path")
-  }
+if (!is.null(historicalDataPath) && 
+    validateNullableCharacterStringValue(name = "historicalDataPath", value = historicalDataPath) &&
+    !validateFileExtensionStatus(name = 'historicalDataPath', value = historicalDataPath, fileExtension = "RDS")) {
+  stop("Invalid 'historicalDataPath': No available RDS file found at the specified path")
 }
 
 # Update historical data status
@@ -93,7 +91,7 @@ if (historicalDataStatus) {
 
 ## Target File
 ```{r, echo = FALSE, warning = FALSE}
-# Validate target file path and ANPC method library
+# Extract target file
 targetFile <- extractTargetFile(
   targetFilePath = targetFilePath,
   anpcMethodLibrary = anpcMethodLibrary,
@@ -114,7 +112,7 @@ rm(targetFilePath)
 
 ## Chromatogram Region
 ```{r, echo = FALSE, warning = FALSE}
-# ANPC method library associated chromatogram region data
+# Associated ANPC method library chromatogram region data
 anpcChromatogramRegionData <- list(
   "MS-AA-POS" = list(massCalibrationEnd = 0.3, washStart = 5),
   "MS-HIL-POS" = list(massCalibrationEnd = 0.7, washStart = 11),
@@ -124,7 +122,7 @@ anpcChromatogramRegionData <- list(
 )
 
 # Validate chromatogram region data
-if (!is.null(chromatogramRegion) && !validateChromatogramRegion(parameterName = "chromatogramRegion", parameterValue = chromatogramRegion)) {
+if (!is.null(chromatogramRegion) && !validateChromatogramRegion(name = "chromatogramRegion", value = chromatogramRegion)) {
   message("Setting default value")
   chromatogramRegion <- NULL
 }
@@ -154,7 +152,7 @@ Spectral data is extracted from ExfilMS generated JSON files located at input pa
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample status
 if (newSampleStatus) {
-  # Extract spectral data and sample metadata
+  # Extract spectral and metadata
   result <- extractExfilMS(inputPath = inputPath)
   
   # Update new sample status
@@ -181,7 +179,7 @@ if (newSampleStatus) {
 ```{r, echo = FALSE, warning = FALSE, include = FALSE}
 # Check new sample status
 if (newSampleStatus) {
-  # Column names of extracted spectral data
+  # Column names of extracted spectral and metadata
   sampleID <- "sampleID"
   project <- "project"
   cohort <- "cohort"
@@ -203,8 +201,8 @@ if (newSampleStatus) {
 ```
 
 ```{r, echo = FALSE, warning = FALSE, include = FALSE}
-# Validate metadata anonymiser
-validateLogicalValue(parameterName = "metadataAnonymiser", parameterValue = metadataAnonymiser)
+# Validate metadata anonymiser status
+validateLogicalValue(name = "metadataAnonymiser", value = metadataAnonymiser)
 
 # Check new sample status and anonymise metadata
 if (newSampleStatus && metadataAnonymiser) {
@@ -229,7 +227,7 @@ Extracted samples are checked for the presence of undefined sample type (based o
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample status
 if (newSampleStatus) {
-  # Check undefined sample types
+  # Check undefined sample type
   result <- checkUndefinedSampleType(
     data = passedData,
     commonColumn = colnames(passedData)[which(colnames(passedData) == sampleID):which(colnames(passedData) == spectrumCount)],
@@ -287,10 +285,10 @@ if (newSampleStatus) {
   # Check historical data status
   if (historicalDataStatus) {
     historicalData <- readRDS(historicalDataPath)
-    if (ncol(historicalData) == ncol(passedData) && all(colnames(historicalData) == colnames(passedData))) {
+    if (identical(colnames(historicalData), colnames(passedData))) {
       passedData <- rbind(historicalData, passedData)
     } else {
-      message("Unable to append historical data: Inconsistencies between historical and sample data")
+      message("Unable to append historical data: Non-identical data columns")
     }
     rm(historicalData)
     invisible(gc())
@@ -395,7 +393,7 @@ if (newSampleStatus) {
     # Check historical data status
     if (historicalDataStatus) {
       historicalData <- readRDS(historicalDataPath)
-      if (ncol(historicalData) == ncol(passedData) && all(colnames(historicalData) == colnames(passedData))) {
+      if (identical(colnames(historicalData), colnames(passedData))) {
         plotData <- historicalData %>%
           dplyr::filter(.data[[msLevel]] == 1) %>%
           dplyr::select(
@@ -404,7 +402,7 @@ if (newSampleStatus) {
           ) %>%
           rbind(., plotData)
       } else {
-        message("Unable to append historical data: Inconsistencies between historical and sample data")
+        message("Unable to append historical data: Non-identical data columns")
       }
       rm(historicalData)
       invisible(gc())
@@ -1586,7 +1584,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   boundary <- "sd"
   xTickToggle <- FALSE
   
-  # Data frame to store analysis result
+  # Analysis result
   analysisResult_TS <- data.frame()
 } else if (!newSampleStatus) {
   message("Unable to perform Time Series Analysis: No available sample data")
@@ -1601,16 +1599,12 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample, spectral data and chromatogram region status
 if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
-  # Check sample type patterns
+  # Perform time series analysis
   pattern <- c("sLTR Plasma", "LTR Plasma", "sLTR Serum", "LTR Serum", "sLTR Urine", "LTR Urine")
-
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in unique(sub("sLTR |LTR ", "", pattern))) {
-      # Check pattern
       tmpPattern <- c(paste("sLTR", i), paste("LTR", i))
       if (any(tmpPattern %in% sampleTypeList)) {
-        # Perform time series analysis
         analysisResult_TS <- displayTimeSeries(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% tmpPattern),
@@ -1629,8 +1623,6 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
         ) %>%
           rbind(analysisResult_TS, .)
       }
-
-      # Clean environment
       rm(tmpPattern)
     }
   } else {
@@ -1643,15 +1635,11 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample, spectral data and chromatogram region status
 if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
-  # Check sample type patterns
+  # Perform time series analysis
   pattern <- c("dLTR Plasma", "dLTR Serum", "dLTR Urine")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in pattern) {
-      # Check pattern
       if (i %in% sampleTypeList) {
-        # Perform time series analysis
         analysisResult_TS <- displayTimeSeries(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
@@ -1681,15 +1669,11 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample, spectral data and chromatogram region status
 if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
-  # Check sample type patterns
+  # Perform time series analysis
   pattern <- c("PQC Plasma", "PQC Serum", "PQC Urine")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in pattern) {
-      # Check pattern
       if (i %in% sampleTypeList) {
-        # Perform time series analysis
         analysisResult_TS <- displayTimeSeries(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
@@ -1719,15 +1703,11 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample, spectral data and chromatogram region status
 if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
-  # Check sample type patterns
+  # Perform time series analysis
   pattern <- c("dPQC Plasma", "dPQC Serum", "dPQC Urine")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in pattern) {
-      # Check pattern
       if (i %in% sampleTypeList) {
-        # Perform time series analysis
         analysisResult_TS <- displayTimeSeries(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
@@ -1757,15 +1737,11 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample, spectral data and chromatogram region status
 if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
-  # Check sample type patterns
+  # Perform time series analysis
   pattern <- c("QC01", "QC02", "QC03", "QC04")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in pattern) {
-      # Check pattern
       if (i %in% sampleTypeList) {
-        # Perform time series analysis
         analysisResult_TS <- displayTimeSeries(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
@@ -1795,15 +1771,11 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample, spectral data and chromatogram region status
 if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
-  # Check sample type patterns
+  # Perform time series analysis
   pattern <- c("CAL01", "CAL02", "CAL03", "CAL04", "CAL05", "CAL06", "CAL07", "CAL08")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in pattern) {
-      # Check pattern
       if (i %in% sampleTypeList) {
-        # Perform time series analysis
         analysisResult_TS <- displayTimeSeries(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
@@ -1833,15 +1805,11 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample, spectral data and chromatogram region status
 if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
-  # Check sample type patterns
+  # Perform time series analysis
   pattern <- c("Single Blank", "Double Blank")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in pattern) {
-      # Check pattern
       if (i %in% sampleTypeList) {
-        # Perform time series analysis
         analysisResult_TS <- displayTimeSeries(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
@@ -1871,19 +1839,13 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample, spectral data and chromatogram region status
 if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
-  # Check sample type patterns
+  # Perform time series analysis
   pattern <- c("Sample Plasma", "Sample Serum", "Sample Urine")
-
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in pattern) {
-      # Check pattern
       if (i %in% sampleTypeList) {
-        # Compare against long term references
         tmpPattern <- sub("Sample ", "", i)
         tmpPattern <- c(paste("sLTR", tmpPattern), paste("LTR", tmpPattern))
-                
-        # Perform time series analysis
         analysisResult_TS <- displayTimeSeries(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, i)),
@@ -1904,8 +1866,6 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
         ) %>%
           dplyr::filter(.data[[sampleType]] %in% i) %>%
           rbind(analysisResult_TS, .)
-        
-        # Clean environment
         rm(tmpPattern)
       }
     }
@@ -1919,19 +1879,13 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample, spectral data and chromatogram region status
 if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
-  # Check sample type patterns
+  # Perform time series analysis
   pattern <- c("dSample Plasma", "dSample Serum", "dSample Urine")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in pattern) {
-      # Check pattern
       if (i %in% sampleTypeList) {
-        # Compare against long term references
         tmpPattern <- sub("dSample ", "", i)
         tmpPattern <- c(paste("dLTR", tmpPattern))
-                
-        # Perform time series analysis
         analysisResult_TS <- displayTimeSeries(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, i)),
@@ -1952,8 +1906,6 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
         ) %>%
           dplyr::filter(.data[[sampleType]] %in% i) %>%
           rbind(analysisResult_TS, .)
-        
-        # Clean environment
         rm(tmpPattern)
       }
     }
@@ -1961,7 +1913,6 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
     print("No available data")
   }
   
-  # Clean environment
   rm(x, y, title, xLabel, yLabel, boundary, xTickToggle, pattern, i)
 }
 ```
@@ -1995,7 +1946,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   y <- massCalibrationRegion
   yLabel <- "Mass Calibration Region (TIC)"
   
-  # Data frame to store analysis result
+  # Analysis result
   analysisResult_VP_massCalibrationRegion <- data.frame()
 }
 ```
@@ -2004,16 +1955,12 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample, spectral data and chromatogram region status
 if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
-  # Check sample type patterns
+  # Perform violin plot analysis
   pattern <- c("sLTR Plasma", "LTR Plasma", "sLTR Serum", "LTR Serum", "sLTR Urine", "LTR Urine")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in unique(sub("sLTR |LTR ", "", pattern))) {
-      # Check pattern
       tmpPattern <- c(paste("sLTR", i), paste("LTR", i))
       if (any(tmpPattern %in% sampleTypeList)) {
-        # Perform violin plot analysis
         analysisResult_VP_massCalibrationRegion <- displayViolinBox(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% tmpPattern),
@@ -2032,8 +1979,6 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
         ) %>%
           rbind(analysisResult_VP_massCalibrationRegion, .)
       }
-      
-      # Clean environment
       rm(tmpPattern)
     }
   } else {
@@ -2046,15 +1991,11 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample, spectral data and chromatogram region status
 if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
-  # Check sample type patterns
+  # Perform violin plot analysis
   pattern <- c("dLTR Plasma", "dLTR Serum", "dLTR Urine")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in pattern) {
-      # Check pattern
       if (i %in% sampleTypeList) {
-        # Perform violin plot analysis
         analysisResult_VP_massCalibrationRegion <- displayViolinBox(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
@@ -2084,15 +2025,11 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample, spectral data and chromatogram region status
 if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
-  # Check sample type patterns
+  # Perform violin plot analysis
   pattern <- c("PQC Plasma", "PQC Serum", "PQC Urine")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in pattern) {
-      # Check pattern
       if (i %in% sampleTypeList) {
-        # Perform violin plot analysis
         analysisResult_VP_massCalibrationRegion <- displayViolinBox(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
@@ -2122,15 +2059,11 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample, spectral data and chromatogram region status
 if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
-  # Check sample type patterns
+  # Perform violin plot analysis
   pattern <- c("dPQC Plasma", "dPQC Serum", "dPQC Urine")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in pattern) {
-      # Check pattern
       if (i %in% sampleTypeList) {
-        # Perform violin plot analysis
         analysisResult_VP_massCalibrationRegion <- displayViolinBox(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
@@ -2160,15 +2093,11 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample, spectral data and chromatogram region status
 if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
-  # Check sample type patterns
+  # Perform violin plot analysis
   pattern <- c("QC01", "QC02", "QC03", "QC04")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in pattern) {
-      # Check pattern
       if (i %in% sampleTypeList) {
-        # Perform violin plot analysis
         analysisResult_VP_massCalibrationRegion <- displayViolinBox(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
@@ -2198,15 +2127,11 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample, spectral data and chromatogram region status
 if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
-  # Check sample type patterns
+  # Perform violin plot analysis
   pattern <- c("CAL01", "CAL02", "CAL03", "CAL04", "CAL05", "CAL06", "CAL07", "CAL08")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in pattern) {
-      # Check pattern
       if (i %in% sampleTypeList) {
-        # Perform violin plot analysis
         analysisResult_VP_massCalibrationRegion <- displayViolinBox(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
@@ -2236,15 +2161,11 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample, spectral data and chromatogram region status
 if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
-  # Check sample type patterns
+  # Perform violin plot analysis
   pattern <- c("Single Blank", "Double Blank")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in pattern) {
-      # Check pattern
       if (i %in% sampleTypeList) {
-        # Perform violin plot analysis
         analysisResult_VP_massCalibrationRegion <- displayViolinBox(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
@@ -2274,19 +2195,13 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample, spectral data and chromatogram region status
 if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
-  # Check sample type patterns
+  # Perform violin plot analysis
   pattern <- c("Sample Plasma", "Sample Serum", "Sample Urine")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in pattern) {
-      # Check pattern
       if (i %in% sampleTypeList) {
-        # Compare against long term references
         tmpPattern <- sub("Sample ", "", i)
         tmpPattern <- c(paste("sLTR", tmpPattern), paste("LTR", tmpPattern))
-        
-        # Perform violin plot analysis
         analysisResult_VP_massCalibrationRegion <- displayViolinBox(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, i)),
@@ -2307,8 +2222,6 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
         ) %>%
           dplyr::filter(.data[[sampleType]] %in% i) %>%
           rbind(analysisResult_VP_massCalibrationRegion, .)
-        
-        # Clean environment
         rm(tmpPattern)
       }
     }
@@ -2322,19 +2235,13 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample, spectral data and chromatogram region status
 if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
-  # Check sample type patterns
+  # Perform violin plot analysis
   pattern <- c("dSample Plasma", "dSample Serum", "dSample Urine")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in pattern) {
-      # Check pattern
       if (i %in% sampleTypeList) {
-        # Compare against long term references
         tmpPattern <- sub("dSample ", "", i)
         tmpPattern <- c(paste("dLTR", tmpPattern))
-        
-        # Perform violin plot analysis
         analysisResult_VP_massCalibrationRegion <- displayViolinBox(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, i)),
@@ -2355,8 +2262,6 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
         ) %>%
           dplyr::filter(.data[[sampleType]] %in% i) %>%
           rbind(analysisResult_VP_massCalibrationRegion, .)
-        
-        # Clean environment
         rm(tmpPattern)
       }
     }
@@ -2375,7 +2280,7 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
   y <- analyteRegion
   yLabel <- "Analyte Region (TIC)"
   
-  # Data frame to store analysis result
+  # Analysis result
   analysisResult_VP_analyteRegion <- data.frame()
 }
 ```
@@ -2384,16 +2289,12 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample, spectral data and chromatogram region status
 if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
-  # Check sample type patterns
+  # Perform violin plot analysis
   pattern <- c("sLTR Plasma", "LTR Plasma", "sLTR Serum", "LTR Serum", "sLTR Urine", "LTR Urine")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in unique(sub("sLTR |LTR ", "", pattern))) {
-      # Check pattern
       tmpPattern <- c(paste("sLTR", i), paste("LTR", i))
       if (any(tmpPattern %in% sampleTypeList)) {
-        # Perform violin plot analysis
         analysisResult_VP_analyteRegion <- displayViolinBox(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% tmpPattern),
@@ -2412,8 +2313,6 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
         ) %>%
           rbind(analysisResult_VP_analyteRegion, .)
       }
-      
-      # Clean environment
       rm(tmpPattern)
     }
   } else {
@@ -2426,15 +2325,11 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample, spectral data and chromatogram region status
 if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
-  # Check sample type patterns
+  # Perform violin plot analysis
   pattern <- c("dLTR Plasma", "dLTR Serum", "dLTR Urine")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in pattern) {
-      # Check pattern
       if (i %in% sampleTypeList) {
-        # Perform violin plot analysis
         analysisResult_VP_analyteRegion <- displayViolinBox(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
@@ -2464,15 +2359,11 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample, spectral data and chromatogram region status
 if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
-  # Check sample type patterns
+  # Perform violin plot analysis
   pattern <- c("PQC Plasma", "PQC Serum", "PQC Urine")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in pattern) {
-      # Check pattern
       if (i %in% sampleTypeList) {
-        # Perform violin plot analysis
         analysisResult_VP_analyteRegion <- displayViolinBox(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
@@ -2502,15 +2393,11 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample, spectral data and chromatogram region status
 if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
-  # Check sample type patterns
+  # Perform violin plot analysis
   pattern <- c("dPQC Plasma", "dPQC Serum", "dPQC Urine")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in pattern) {
-      # Check pattern
       if (i %in% sampleTypeList) {
-        # Perform violin plot analysis
         analysisResult_VP_analyteRegion <- displayViolinBox(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
@@ -2540,15 +2427,11 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample, spectral data and chromatogram region status
 if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
-  # Check sample type patterns
+  # Perform violin plot analysis
   pattern <- c("QC01", "QC02", "QC03", "QC04")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in pattern) {
-      # Check pattern
       if (i %in% sampleTypeList) {
-        # Perform violin plot analysis
         analysisResult_VP_analyteRegion <- displayViolinBox(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
@@ -2578,15 +2461,11 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample, spectral data and chromatogram region status
 if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
-  # Check sample type patterns
+  # Perform violin plot analysis
   pattern <- c("CAL01", "CAL02", "CAL03", "CAL04", "CAL05", "CAL06", "CAL07", "CAL08")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in pattern) {
-      # Check pattern
       if (i %in% sampleTypeList) {
-        # Perform violin plot analysis
         analysisResult_VP_analyteRegion <- displayViolinBox(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
@@ -2616,15 +2495,11 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample, spectral data and chromatogram region status
 if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
-  # Check sample type patterns
+  # Perform violin plot analysis
   pattern <- c("Single Blank", "Double Blank")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in pattern) {
-      # Check pattern
       if (i %in% sampleTypeList) {
-        # Perform violin plot analysis
         analysisResult_VP_analyteRegion <- displayViolinBox(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
@@ -2654,19 +2529,13 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample, spectral data and chromatogram region status
 if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
-  # Check sample type patterns
+  # Perform violin plot analysis
   pattern <- c("Sample Plasma", "Sample Serum", "Sample Urine")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in pattern) {
-      # Check pattern
       if (i %in% sampleTypeList) {
-        # Compare against long term references
         tmpPattern <- sub("Sample ", "", i)
         tmpPattern <- c(paste("sLTR", tmpPattern), paste("LTR", tmpPattern))
-        
-        # Perform violin plot analysis
         analysisResult_VP_analyteRegion <- displayViolinBox(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, i)),
@@ -2687,8 +2556,6 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
         ) %>%
           dplyr::filter(.data[[sampleType]] %in% i) %>%
           rbind(analysisResult_VP_analyteRegion, .)
-        
-        # Clean environment
         rm(tmpPattern)
       }
     }
@@ -2702,19 +2569,13 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample, spectral data and chromatogram region status
 if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
-  # Check sample type patterns
+  # Perform violin plot analysis
   pattern <- c("dSample Plasma", "dSample Serum", "dSample Urine")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in pattern) {
-      # Check pattern
       if (i %in% sampleTypeList) {
-        # Compare against long term references
         tmpPattern <- sub("dSample ", "", i)
         tmpPattern <- c(paste("dLTR", tmpPattern))
-        
-        # Perform violin plot analysis
         analysisResult_VP_analyteRegion <- displayViolinBox(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% c(tmpPattern, i)),
@@ -2735,8 +2596,6 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
         ) %>%
           dplyr::filter(.data[[sampleType]] %in% i) %>%
           rbind(analysisResult_VP_analyteRegion, .)
-        
-        # Clean environment
         rm(tmpPattern)
       }
     }
@@ -2744,7 +2603,6 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
     print("No available data")
   }
   
-  # Clean environment
   rm(plotData, prewashRegion, massCalibrationRegion, analyteRegion, washRegion, shape, shapeLabel, colour, colourLabel, x, title, xLabel,
      boundary, boxWidth, y, yLabel, pattern, i)
   invisible(gc())
@@ -2787,7 +2645,6 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
     print("No available data")
   }
   
-  # Clean environment
   rm(analysisResult_TS)
   invisible(gc())
 } else if (!newSampleStatus) {
@@ -2848,7 +2705,6 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
     print("No available data")
   }
   
-  # Clean environment
   rm(analysisResult_VP_massCalibrationRegion)
   invisible(gc())
 }
@@ -2890,14 +2746,12 @@ if (newSampleStatus && spectralDataStatus && chromatogramRegionStatus) {
     print("No available data")
   }
   
-  # Clean environment
   rm(analysisResult_VP_analyteRegion)
   invisible(gc())
 }
 
 # Check new sample status
 if (newSampleStatus) {
-  # Clean environment
   rm(spectralDataStatus)
 }
 ```
@@ -2921,7 +2775,7 @@ if (newSampleStatus) {
     # Check historical data status
     if (historicalDataStatus) {
       historicalData <- readRDS(historicalDataPath)
-      if (ncol(historicalData) == ncol(passedData) && all(colnames(historicalData) == colnames(passedData))) {
+      if (identical(colnames(historicalData), colnames(passedData))) {
         plotData <- historicalData %>%
           dplyr::filter(.data[[msLevel]] == 1) %>%
           dplyr::select(
@@ -2930,10 +2784,8 @@ if (newSampleStatus) {
           ) %>%
           rbind(., plotData)
       } else {
-        message("Unable to append historical data: Inconsistencies between historical and sample data")
+        message("Unable to append historical data: Non-identical data columns")
       }
-      
-      # Clean environment
       rm(historicalData)
       invisible(gc())
     }
@@ -2958,16 +2810,12 @@ if (newSampleStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample and spectral data status
 if (newSampleStatus && spectralDataStatus) {
-  # Check sample type patterns
+  # Display base peak chromatogram
   pattern <- c("sLTR Plasma", "LTR Plasma", "sLTR Serum", "LTR Serum", "sLTR Urine", "LTR Urine")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in unique(sub("sLTR |LTR ", "", pattern))) {
-      # Check pattern
       tmpPattern <- c(paste("sLTR", i), paste("LTR", i))
       if (any(tmpPattern %in% sampleTypeList)) {
-        # Display base peak chromatogram
         displayChromatogram(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% tmpPattern),
@@ -2982,8 +2830,6 @@ if (newSampleStatus && spectralDataStatus) {
           chromatogramRegion = chromatogramRegion
         )
       }
-      
-      # Clean environment
       rm(tmpPattern)
     }
   } else {
@@ -2996,15 +2842,11 @@ if (newSampleStatus && spectralDataStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample and spectral data status
 if (newSampleStatus && spectralDataStatus) {
-  # Check sample type patterns
+  # Display base peak chromatogram
   pattern <- c("dLTR Plasma", "dLTR Serum", "dLTR Urine")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in pattern) {
-      # Check pattern
       if (i %in% sampleTypeList) {
-        # Display base peak chromatogram
         displayChromatogram(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
@@ -3030,15 +2872,11 @@ if (newSampleStatus && spectralDataStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample and spectral data status
 if (newSampleStatus && spectralDataStatus) {
-  # Check sample type patterns
+  # Display base peak chromatogram
   pattern <- c("PQC Plasma", "PQC Serum", "PQC Urine")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in pattern) {
-      # Check pattern
       if (i %in% sampleTypeList) {
-        # Display base peak chromatogram
         displayChromatogram(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
@@ -3064,15 +2902,11 @@ if (newSampleStatus && spectralDataStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample and spectral data status
 if (newSampleStatus && spectralDataStatus) {
-  # Check sample type patterns
+  # Display base peak chromatogram
   pattern <- c("dPQC Plasma", "dPQC Serum", "dPQC Urine")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in pattern) {
-      # Check pattern
       if (i %in% sampleTypeList) {
-        # Display base peak chromatogram
         displayChromatogram(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
@@ -3098,15 +2932,11 @@ if (newSampleStatus && spectralDataStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample and spectral data status
 if (newSampleStatus && spectralDataStatus) {
-  # Check sample type patterns
+  # Display base peak chromatogram
   pattern <- c("QC01", "QC02", "QC03", "QC04")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in pattern) {
-      # Check pattern
       if (i %in% sampleTypeList) {
-        # Display base peak chromatogram
         displayChromatogram(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
@@ -3132,15 +2962,11 @@ if (newSampleStatus && spectralDataStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample and spectral data status
 if (newSampleStatus && spectralDataStatus) {
-  # Check sample type patterns
+  # Display base peak chromatogram
   pattern <- c("CAL01", "CAL02", "CAL03", "CAL04", "CAL05", "CAL06", "CAL07", "CAL08")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in pattern) {
-      # Check pattern
       if (i %in% sampleTypeList) {
-        # Display base peak chromatogram
         displayChromatogram(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
@@ -3166,15 +2992,11 @@ if (newSampleStatus && spectralDataStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample and spectral data status
 if (newSampleStatus && spectralDataStatus) {
-  # Check sample type patterns
+  # Display base peak chromatogram
   pattern <- c("Single Blank", "Double Blank")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in pattern) {
-      # Check pattern
       if (i %in% sampleTypeList) {
-        # Display base peak chromatogram
         displayChromatogram(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
@@ -3200,15 +3022,11 @@ if (newSampleStatus && spectralDataStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample and spectral data status
 if (newSampleStatus && spectralDataStatus) {
-  # Check sample type patterns
+  # Display base peak chromatogram
   pattern <- c("Sample Plasma", "Sample Serum", "Sample Urine")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in pattern) {
-      # Check pattern
       if (i %in% sampleTypeList) {
-        # Display base peak chromatogram
         displayChromatogram(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
@@ -3234,15 +3052,11 @@ if (newSampleStatus && spectralDataStatus) {
 ```{r, echo = FALSE, warning = FALSE}
 # Check new sample and spectral data status
 if (newSampleStatus && spectralDataStatus) {
-  # Check sample type patterns
+  # Display base peak chromatogram
   pattern <- c("dSample Plasma", "dSample Serum", "dSample Urine")
-  
   if (any(pattern %in% sampleTypeList)) {
-    # Loop through patterns
     for (i in pattern) {
-      # Check pattern
       if (i %in% sampleTypeList) {
-        # Display base peak chromatogram
         displayChromatogram(
           data = plotData %>%
             dplyr::filter(.data[[sampleType]] %in% i),
@@ -3262,14 +3076,12 @@ if (newSampleStatus && spectralDataStatus) {
     print("No available data")
   }
   
-  # Clean environment
   rm(plotData, x, y, title, xLabel, yLabel, colour, colourLabel, pattern, i)
   invisible(gc())
 }
 
 # Check new sample status
 if (newSampleStatus) {
-  # Clean environment
   rm(spectralDataStatus)
 }
 ```
