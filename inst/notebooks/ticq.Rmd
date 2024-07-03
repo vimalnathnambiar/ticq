@@ -216,6 +216,7 @@ if (newSampleStatus && metadataAnonymiser) {
     instrument = instrument,
     plate = plate
   )
+  saveRDS(passedData, file = paste0(outputDirectoryPath, params$title, "_anonymised.rds"))
 }
 
 rm(metadataAnonymiser)

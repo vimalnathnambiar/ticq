@@ -154,17 +154,16 @@ displayMultipleChromatogram <- function(data,
           ncol = plotColumn,
           nrow = plotRow,
           common.legend = TRUE,
-          legend = ifelse(isFirstPlot, "top", "none")
+          legend = if (isFirstPlot) "top" else "none"
         )
         
         if (isFirstPlot) {
           plotGrid <- ggpubr::annotate_figure(plotGrid, top = ggpubr::text_grob(paste0(title, ": ", subtitle)))
+          isFirstPlot <- FALSE
         }
         
         print(plotGrid)
-
         plotList <- list()
-        isFirstPlot <- FALSE
       }
     }
   },

@@ -179,8 +179,8 @@ displayMultipleTimeSeries <- function(data,
         ggplot2::theme(
           panel.background = element_blank(),
           axis.line = element_line(colour = "black"),
-          legend.title = element_text(size = 8),
-          legend.text = element_text(size = 8)
+          legend.title = element_text(size = 6),
+          legend.text = element_text(size = 6)
         ) + 
         ggplot2::labs(caption = if (is.null(caption)) y else paste(y, caption), x = xLabel, y = yLabel, colour = colourLabel, shape = shapeLabel)
       
@@ -285,17 +285,16 @@ displayMultipleTimeSeries <- function(data,
             ncol = plotColumn,
             nrow = plotRow,
             common.legend = TRUE,
-            legend = ifelse(isFirstPlot, "top", "none")
+            legend = if (isFirstPlot) "top" else "none"
           )
           
           if (isFirstPlot) {
             plotGrid <- ggpubr::annotate_figure(plotGrid, top = ggpubr::text_grob(paste0(title, ": ", subtitle)))
+            isFirstPlot <- FALSE
           }
           
           print(plotGrid)
-          
           plotList <- list()
-          isFirstPlot <- FALSE
         }
       )
     }

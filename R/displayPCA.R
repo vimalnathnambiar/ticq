@@ -116,7 +116,7 @@ displayPCA <- function(data,
         ggplot2::geom_point() +
         ggplot2::geom_line(aes(y = varianceProportion, colour = "Proportion of Variance")) +
         ggplot2::geom_line(aes(y = cumulativeProportion, colour = "Cumulative Proportion"), linetype = "dashed") +
-        ggplot2::geom_vline(aes(xintercept = threshold, colour = "Threshold"), linetype = "dotted") +
+        ggplot2::geom_vline(aes(xintercept = threshold, colour = "Threshold"), linetype = "dashed") +
         ggplot2::geom_text(aes(label = paste0(round(varianceProportion, 2), "%")), vjust = -0.5, size = 3) +
         ggplot2::theme(
           panel.background = element_blank(),
@@ -125,7 +125,7 @@ displayPCA <- function(data,
           legend.text = element_text(size = 8)
         ) +
         ggplot2::scale_colour_manual(
-          values = c("red", "darkgreen", "blue"),
+          values = c("blue", "darkgreen", "red"),
           labels = c("Cumulative Proportion", "Proportion of Variance", paste("Threshold", paste0("(>=", confidence, "%)")))
         ) +
         ggplot2::labs(title = "Principal Component Analysis: Scree Plot", subtitle = subtitle, x = "Principal Components", y = "Proportion of Variance (%)")
