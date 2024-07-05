@@ -15,7 +15,7 @@ extractMethod <- function(input) {
       grepl("MS-AI-HILPOS|MS-HIL-POS|MS-HILpos", input) ~ "MS-HIL-POS",
       grepl("MS-AI-HILNEG|MS-HIL-NEG|MS-HILneg", input) ~ "MS-HIL-NEG",
       grepl("MS-AI-RPPOS|MS-RP-POS|MS-RPpos", input) ~ "MS-RP-POS",
-      grepl("MS-AI-RPNEG|MS-RP-NEGMS-RPneg", input) ~ "MS-RP-NEG",
+      grepl("MS-AI-RPNEG|MS-RP-NEG|MS-RPneg", input) ~ "MS-RP-NEG",
       TRUE ~ NA_character_
     )
   )
